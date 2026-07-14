@@ -11,8 +11,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Cloudflare Pages 배포
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy . --project-name=okya --commit-dirty=true
+          projectName: okya
+          directory: .
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
