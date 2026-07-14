@@ -1,0 +1,42 @@
+name: Android APK 빌드
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 패키지 설치
+        run: npm install
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Android 프로젝트 생성
+        run: npx cap add android
+
+      - name: 웹 파일 동기화
+        run: npx cap sync android
+
+      - name: APK 빌드 (디버그)
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+
+      - name: APK 업로드
+        uses: actions/upload-artifact@v4
+        with:
+          name: okya-android-${{ github.run_number }}
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
