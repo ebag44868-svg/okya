@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>옥야 · 창녕옥야고</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="옥야">
+<meta name="theme-color" content="#5B67CA">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+/* ── 디자인 토큰 ── */
+:root{
+  --bg:#F7F8FA;
+  --card:#fff;
+  --ink:#191F28;
+  --ink2:#4E5968;
+  --muted:#8B95A1;
+  --line:#EEF1F5;
+  --primary:#1A5CE6;
+  --primary-d:#1349C0;
+  --primary-tint:#EEF3FF;
+  --danger:#E53E3E;
+  --danger-tint:#FFF0F0;
+  --r:24px;
+  --sh:0 4px 20px rgba(0,0,0,.06),-2px 2px 10px rgba(0,0,0,.04);
+  --sh-blue:0 10px 28px rgba(26,92,230,.22),-3px 3px 12px rgba(26,92,230,.1);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);}
+body{font-family:'Pretendard',-apple-system,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;transition:opacity .15s ease;}
+button:active{opacity:.7;}
+input,select,textarea{font-family:inherit;font-size:16px;width:100%;padding:13px 15px;border:none;border-radius:14px;background:#F1F3F5;color:var(--ink);outline:none;transition:background .15s,box-shadow .15s;}
+input:focus,select:focus,textarea:focus{background:#fff;box-shadow:0 0 0 2px var(--primary);}
+label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bottom:6px;}
+.field{margin-bottom:14px;}
+
+/* ── Layout ── */
+#app{max-width:430px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;position:relative;}
+.screen{flex:1;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(92px + env(safe-area-inset-bottom));background:var(--card);}
+.screen.no-nav{padding-bottom:0;background:var(--card);}
+
+/* ── Bottom nav (floating) ── */
+.bnav{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:398px;background:rgba(255,255,255,.93);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:24px;box-shadow:0 8px 32px rgba(0,0,0,.10),0 2px 8px rgba(0,0,0,.06);border:1px solid rgba(255,255,255,.65);display:flex;padding:8px 6px;z-index:100;}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;font-size:10px;font-weight:600;color:var(--muted);transition:color .2s;}
+.bnav-item.active{color:var(--primary);}
+.bnav-item svg{width:22px;height:22px;}
+
+/* ── 헤더 ── */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;padding-top:calc(14px + env(safe-area-inset-top));background:var(--card);border-bottom:1px solid var(--line);}
+.hdr h2{font-size:18px;font-weight:800;}
+.sub-hdr{display:flex;align-items:center;gap:10px;padding:12px 20px;padding-top:calc(12px + env(safe-area-inset-top));background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;}
+.sub-hdr h2{font-size:18px;font-weight:800;}
+.back-btn{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--bg);flex:none;}
+.back-btn svg{width:20px;height:20px;}
+
+/* ── 카드 (통일된 단일 스타일) ── */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:20px;margin-bottom:12px;}
+.card-list{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:12px;}
+
+/* ── 잔액 카드 ── */
+.bal-card{background:var(--primary-tint);color:var(--primary);border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh);margin:16px 20px;}
+.bal-card .lbl{font-size:12px;opacity:.75;font-weight:600;letter-spacing:.03em;}
+.bal-card .amt{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:8px 0 4px;line-height:1;color:var(--primary);}
+.bal-card .amt small{font-size:16px;font-weight:700;opacity:.9;margin-left:2px;}
+.bal-acts{display:flex;gap:8px;margin-top:16px;}
+.bal-act{display:flex;align-items:center;gap:6px;background:var(--primary);border-radius:12px;padding:9px 16px;font-size:13.5px;font-weight:700;color:#fff;}
+.bal-act:active{opacity:.7;}
+.bal-act svg{width:15px;height:15px;}
+
+/* ── 정보 위젯 ── */
+.ic-lbl{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em;display:flex;align-items:center;gap:4px;margin-bottom:10px;}
+.ic-lbl svg{width:13px;height:13px;}
+.ic-item{font-size:13px;color:var(--ink2);line-height:1.9;}
+.ic-more{font-size:11.5px;color:var(--muted);margin-top:4px;}
+
+/* ── 섹션 타이틀 ── */
+.sec-title{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;letter-spacing:.02em;}
+
+/* ── 리스트 아이템 ── */
+.row-item{display:flex;align-items:center;gap:13px;padding:14px 20px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s;}
+.row-item:last-child{border-bottom:none;}
+.row-item:active{background:var(--bg);}
+.row-ic{width:40px;height:40px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--primary-tint);color:var(--primary);}
+.row-ic svg{width:20px;height:20px;}
+.row-body{flex:1;min-width:0;}
+.row-title{font-size:15px;font-weight:600;}
+.row-desc{font-size:12.5px;color:var(--muted);margin-top:2px;}
+.row-right{color:var(--muted);display:flex;align-items:center;}
+.row-right svg{width:18px;height:18px;}
+
+/* ── 거래 내역 아이템 ── */
+.ldg-item{display:flex;align-items:center;gap:13px;padding:14px 20px;border-bottom:1px solid var(--line);}
+.ldg-item:last-child{border-bottom:none;}
+.ldg-ic{width:36px;height:36px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;}
+.ldg-ic.up{background:var(--primary-tint);color:var(--primary);}
+.ldg-ic.dn{background:#F1F3F5;color:var(--ink2);}
+.ldg-body{flex:1;min-width:0;}
+.ldg-body b{font-size:14px;font-weight:600;display:block;}
+.ldg-body span{font-size:12px;color:var(--muted);margin-top:2px;display:block;}
+.ldg-val{font-size:14px;font-weight:800;white-space:nowrap;}
+.ldg-val.p{color:var(--primary);}
+.ldg-val.m{color:var(--ink2);}
+
+/* ── 버튼 ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:15px 16px;border-radius:16px;font-size:16px;font-weight:700;background:var(--primary);color:#fff;letter-spacing:-.01em;transition:opacity .15s;}
+.btn:active{opacity:.8;}
+.btn.out{background:var(--primary-tint);color:var(--primary);}
+.btn.gray{background:#F1F3F5;color:var(--ink2);}
+.btn.danger{background:var(--danger-tint);color:var(--danger);}
+.btn.green{background:#EDFAF5;color:#059669;}
+.btn.sm{width:auto;padding:8px 14px;font-size:13.5px;border-radius:12px;}
+
+/* ── 필 ── */
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:8px;}
+.pill.blue{background:var(--primary-tint);color:var(--primary);}
+.pill.gray{background:#F1F3F5;color:var(--ink2);}
+.pill.green{background:#EDFAF5;color:#059669;}
+.pill.gold{background:#FFFAEB;color:#D97706;}
+
+/* ── 탭 ── */
+.tabs{display:flex;gap:4px;padding:10px 20px;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:7px 15px;border-radius:20px;font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap;flex:none;transition:background .2s,color .2s;}
+.tab.active{background:var(--primary);color:#fff;}
+
+/* ── 토스트 ── */
+.toast{position:fixed;left:50%;bottom:calc(98px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(8px);background:rgba(25,31,40,.92);color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:200;white-space:nowrap;backdrop-filter:blur(12px);}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── 로더 ── */
+.loader{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted);font-size:14px;}
+.spin{width:26px;height:26px;border:2.5px solid var(--line);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:36px 20px;color:var(--muted);font-size:14px;line-height:1.8;}
+
+/* ── 반응 버튼 ── */
+.react-btn{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;padding:6px 12px;border-radius:20px;border:1.5px solid var(--line);background:var(--card);color:var(--ink2);}
+.react-btn.on-r{background:var(--danger-tint);border-color:var(--danger);color:var(--danger);}
+.react-btn.on-b{background:var(--primary-tint);border-color:var(--primary);color:var(--primary);}
+.react-btn.on-g{background:#F1F3F5;border-color:#555;color:#222;}
+.reacts{display:flex;gap:7px;flex-wrap:wrap;}
+
+/* ── 기타 ── */
+.check-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);font-size:15px;font-weight:500;}
+.check-item input{width:auto;}
+.note{font-size:13px;color:var(--muted);line-height:1.7;}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--primary);flex:none;}
+.thumb{width:100%;max-height:200px;object-fit:cover;border-radius:16px;margin-top:8px;}
+
+/* ── 커뮤니티 그리드 ── */
+.comm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.comm-card{background:var(--card);border-radius:var(--r);padding:22px 16px 18px;box-shadow:var(--sh);cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column;align-items:center;text-align:center;}
+.comm-card:active{transform:scale(.97);}
+.comm-ic{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;flex:none;margin-bottom:12px;}
+.comm-ic svg{width:28px;height:28px;}
+.comm-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.comm-desc{font-size:12px;color:var(--muted);line-height:1.4;}
+
+/* ── 학교 그리드 ── */
+.school-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:4px;}
+.school-item{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:4px 0;}
+.school-item:active{opacity:.7;}
+.school-ic{width:62px;height:62px;border-radius:18px;display:flex;align-items:center;justify-content:center;flex:none;}
+.school-ic svg{width:26px;height:26px;}
+.school-title{font-size:12px;font-weight:700;color:var(--ink);text-align:center;}
+.school-desc{font-size:10px;color:var(--muted);text-align:center;line-height:1.3;}
+
+/* ── 애니메이션 ── */
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:slideUp .25s cubic-bezier(.22,1,.36,1) both;}
+
+/* ── 스플래시 화면 ── */
+.splash-screen{
+  min-height:100dvh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:var(--bg);position:relative;
+  padding:env(safe-area-inset-top) 32px env(safe-area-inset-bottom);
+}
+.splash-inner{
+  display:flex;flex-direction:column;align-items:center;
+  animation:splashIn .55s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes splashIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.splash-logo-wrap{
+  width:92px;height:92px;border-radius:28px;overflow:hidden;
+  box-shadow:0 18px 44px rgba(26,92,230,.22),0 4px 14px rgba(26,92,230,.12);
+  margin-bottom:22px;
+}
+.splash-logo-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.splash-app-name{font-size:27px;font-weight:800;letter-spacing:-.03em;color:var(--ink);margin-bottom:6px;}
+.splash-school{font-size:13px;color:var(--muted);font-weight:500;letter-spacing:.01em;}
+.splash-footer{
+  position:absolute;bottom:calc(48px + env(safe-area-inset-bottom));
+  left:0;right:0;display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.splash-footer span{
+  width:6px;height:6px;border-radius:50%;background:var(--line);
+  animation:dotPulse 1.4s ease-in-out infinite;
+}
+.splash-footer span:nth-child(2){animation-delay:.2s;}
+.splash-footer span:nth-child(3){animation-delay:.4s;}
+@keyframes dotPulse{
+  0%,70%,100%{background:var(--line);}
+  35%{background:var(--primary);}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="splash-screen">
+    <div class="splash-inner">
+      <div class="splash-logo-wrap"><img id="splash-logo" src="" alt="옥야"></div>
+      <div class="splash-app-name">옥야</div>
+      <div class="splash-school">창녕옥야고등학교 학생회</div>
+    </div>
+    <div class="splash-footer"><span></span><span></span><span></span></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script type="module">
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/+esm'
+
+const sb=createClient(
+  'https://rzajmazztaarzrqqkezr.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6YWptYXp6dGFhcnpycXFrZXpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxODk0NzQsImV4cCI6MjA5ODc2NTQ3NH0.IDk1fSv_B76wbzYouKS8TP4TObso2nA50rpo9qj96MU'
+)
+
+const uid=p=>(p||'x')+'_'+Math.random().toString(36).slice(2,9)
+const fmt=n=>Number(n).toLocaleString('ko-KR')
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
+const nowISO=()=>new Date().toISOString()
+const timeago=iso=>{if(!iso)return'';const s=Math.floor((Date.now()-new Date(iso))/1000);if(s<60)return'방금';if(s<3600)return Math.floor(s/60)+'분 전';if(s<86400)return Math.floor(s/3600)+'시간 전';const d=new Date(iso);return(d.getMonth()+1)+'월 '+d.getDate()+'일'}
+const fmtDate=iso=>{if(!iso)return'상시';const d=new Date(iso);return(d.getMonth()+1)+'월 '+d.getDate()+'일'}
+const isExpired=e=>e.deadline&&new Date(e.deadline)<new Date()
+function readImg(file,maxW=900,q=0.6){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height;if(w>maxW){h=Math.round(h*maxW/w);w=maxW}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',q))};img.src=r.result};r.readAsDataURL(file)})}
+
+// 모든 DB 쿼리에 타임아웃 적용
+function wt(p,ms=7000){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms))])}
+
+let SESSION=null,USERS=[],TAB='home',STACK=[],commTab='challenge'
+const openBooks=new Set()
+const app=()=>document.getElementById('app')
+function toast(m){const t=document.getElementById('toast');if(!t)return;t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500)}
+const nameOf=id=>(USERS.find(u=>u.id===id)||{name:'학생회'}).name
+
+async function getAllTx(){try{const{data}=await wt(sb.from('okya_tx').select('*').order('at',{ascending:false}));return data||[]}catch{return[]}}
+function balOf(id,txs){return txs.filter(t=>t.to===id).reduce((s,t)=>s+t.amount,0)-txs.filter(t=>t.from===id).reduce((s,t)=>s+t.amount,0)}
+async function addTx(tx){try{const{error}=await wt(sb.from('okya_tx').insert({id:uid('tx'),at:nowISO(),...tx}));if(error)toast('오류: '+error.message);return!error}catch{toast('네트워크 오류');return false}}
+
+const LOGO='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAAROklEQVR4nO2deZQdVZ3HP/fW8vZ+vWQhAUyaQCALAhMNZGE4gKCIGFQgQyDIgIBDROXIQWUcdVyAAYIgJKigyXGcgSMkomwBJqBgIsQcksTsCVvSJIF099u3qrp3/qjXne10A+nOwlhTn3N6fVV1b93v/f5+d6l+LZRSGkAIQUjwkB92BUIOLGbo3GATOjjghAIHnFDggBMKHHBCgQNOKHDACQUOOKHAAScUOOCEAgecU2v9/+6thKuOR3ve7f7ZlJqWtI0hgtffzYNTjAZE/Sv17z88lm8ocMVPFTXDBg9ah+RY9O1GhqRiH2q9DgQH7O2Es2WH5etLLN/gsbnNoz1vYAjNsCbN8UcYnDbR4rjRMcA4IOW/H5Wa4LV3YmgzCp7GkBWUCmYU2+8OLtUcfr00yz1PwuqtFtpJgDTqBhagNb9+ukqyweOs4zu5dkaEKWOTHExXC6ExDY0j/YhiSOOgln8w2a85eF1bia/9osTTqxIgImCAjNa11aC1QAjQOkGhCg8ud3j61Tz/et4urp3RclBzYLdhNbszRwDZbw5euaXIRXPLbNyaRtoW2tAIpUGDFsJ3r9D1tlRIIdCmJFNOcf3CIrlCJ9+/qBEpDlLI/qA+rffimL8D9ovA67YVmXVrgU1vp5ARiUaDAt3VQrr+qdspAn8TSyCERBspblxc4pChOa7+ZCN727JKe2zcXmPV6w47Ol20p2hO23y01WD8oRaWae/dDfRXnFBkig6FKggBAoGrNElb0pyyeh2aKdV49Y0qG7a5FEsKw4QRTTYfPcJk7IgI4gNmo7myw6o3aqzfViNX8JCGZHizwbFjbCaMsBH7ME7Z50FWpuhw1bw8m7Y1IqIGekBTa4EvssLTCX74QI7Tj61w9MgPGs16PLO6wJ2P1PjTGoNcJY5WUf8lQ5OMlDlxTJlrPm0x46RUdzm96NHpVD9bpi+/UeKKn+bZ2hHBNAWeYzA02cnP5zQwdXwTADXX5b6nstyzxGNDWwRHReuRCjAEjfEyp04sct2MIFOPTvYpw/UUC57JcvfjsL7NpuZGd5tAQipe4YwJWa7/XJwTj27Y69btyT46WHPzohzPr05DxGDw6yYCYcCOjgQ/fTzDvMujvm36wVMeNy/q5KaHIhQrTWBphCERhvAjhoZCzWbpasVz64pcc9a7/Hh2C1HL3LPIuua6j/x/e6vIrFuKrN82BCwBriCRyHP3xU1MHZ9CAxXHZc78dhYsjYBsAEN2NUkdSbZs8btlHn98Nc+dV7Yz+5SW7jJqrse1C9qZ/2gEZMovRwJK1TsI5Ks2i19w+eOaAj+5rJNLTm1koHljn0Y1f1lfZN4TEmz7PQdqQghkj4/+qedoU/L7Fw22dtbe4zjNLYs7+c5/RSl6KWTE8HO5o9GuC44Hbn1kbIFLnNsfjvPNhR14Su15qW4xRA8Db95ZZvbtRdZva0BGDECTiue972raedOSgEKg+dlTORY8m0JEEkhLgHA46tAC0yZ2MmF0BosSuCAtk848iivvqvHsqvbucv7zjxnm/0EirATSBpTDkYfkOXlCluNGZ4lRBqUhakiZTShFvP/LmxoWtaZR5DkMaAAAAAElFTkSuQmCC'
+;(()=>{const sl=document.getElementById('splash-logo');if(sl)sl.src=LOGO})()
+const FACTS=['창녕옥야고등학교는 경남 창녕에 있는 기숙형 사립고등학교입니다.','옥야의 영문 표기는 OKYA High School입니다.','옥야 학생들은 대부분 기숙사에서 함께 생활합니다.','이 앱은 옥야 학생회를 위해 만들어진 서비스입니다.','옥야머니는 실제 돈이 아니라 학생회 활동 포인트입니다.','오늘도 옥야에서 좋은 하루 보내세요!']
+function cheer(){const m=new Date().getMonth()+1;return{3:'새 학기, 모두 화이팅!',4:'수행평가 시즌, 힘내요!',5:'중간고사 화이팅!',6:'기말고사 화이팅!',7:'방학이 코앞이에요!',9:'2학기도 화이팅!',10:'수행평가 시즌, 힘내요!',11:'기말·수능 화이팅!',12:'기말고사 화이팅!'}[m]||'오늘도 옥야, 화이팅!'}
+
+// 더미 데이터 (나중에 실제 API로 교체)
+const MEAL=['돈까스','된장국','깍두기','잡곡밥','우유']
+const SCHEDULE=[
+  {date:'2026-07-18',label:'영어 수행평가'},
+  {date:'2026-07-21',label:'체육대회'},
+  {date:'2026-07-25',label:'기말고사 시작'},
+]
+const NOTICES=[
+  {id:'n1',cat:'학생회',title:'2학기 학생회 임원 선거 공고',at:'2026-07-10T00:00:00Z'},
+  {id:'n2',cat:'학사',title:'기말고사 시험 범위 안내',at:'2026-07-08T00:00:00Z'},
+]
+
+const I={
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>',
+  money:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 8.5h4a2 2 0 010 4H9m0-4v8m4-4h2.5"/></svg>',
+  school:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2 8l10 5 10-5-10-5z"/><path d="M2 8v8m20-8v8"/><path d="M6 21v-7a6 6 0 0012 0v7"/></svg>',
+  comm:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+  my:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>',
+  send:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
+  hist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 16 14"/></svg>',
+  print:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M8 15h8v5H8z"/></svg>',
+  video:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="12" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3"/></svg>',
+  petition:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h9a2 2 0 012 2V20H7a2 2 0 01-2-2V4.5z"/><path d="M16 7H7.5"/><path d="M16 11H7.5"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  logout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+  food:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3z"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  timetable:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>',
+  study:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>',
+  notice:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>',
+  library:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 016.5 2H20v20H6.5a2.5 2.5 0 010-5H20"/></svg>',
+  door:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M9 21V5a2 2 0 012-2h2a2 2 0 012 2v16"/><line x1="13" y1="12" x2="13" y2="12.5"/></svg>',
+  bus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h3l3 3v5h-6V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+  binding:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><line x1="9" y1="2" x2="9" y2="22"/></svg>',
+  lost:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0022 16z"/><polyline points="2.27 6.96 12 12.01 21.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+  mapPin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+  msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H6l-4 4V6a2 2 0 012-2z"/></svg>',
+  image:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+}
+
+function bnav(){
+  const tabs=[{k:'home',l:'홈',ic:I.home},{k:'money',l:'머니',ic:I.money},{k:'school',l:'학교',ic:I.school},{k:'comm',l:'커뮤',ic:I.comm},{k:'search',l:'검색',ic:I.search},{k:'my',l:'MY',ic:I.my}]
+  return`<nav class="bnav">${tabs.map(t=>`<button class="bnav-item${TAB===t.k?' active':''}" data-tab="${t.k}">${t.ic}<span>${t.l}</span></button>`).join('')}</nav>`
+}
+function bindNav(){document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;STACK=[];routeTab()})}
+function routeTab(){({home:rHome,money:rMoney,school:rSchool,comm:rComm,search:rSearch,my:rMy})[TAB]?.()}
+function push(fn){STACK.push(fn);fn()}
+function pop(){STACK.pop();if(STACK.length)STACK[STACK.length-1]();else routeTab()}
+
+async function rHome(){
+  TAB='home'
+  app().innerHTML=`<div class="screen fade-in">
+    <div style="padding:calc(20px + env(safe-area-inset-top)) 20px 18px;background:var(--card);border-bottom:1px solid var(--line)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div>
+          <div style="font-size:13px;color:var(--muted);font-weight:500;margin-bottom:3px">안녕하세요,</div>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink)">${esc(SESSION.name)}님</div>
+        </div>
+        <img src="${LOGO}" style="width:36px;height:36px;border-radius:10px;object-fit:cover;margin-top:4px">
+      </div>
+    </div>
+    <div class="loader" style="min-height:200px"><div class="spin"></div></div>
+  </div>${bnav()}`
+  bindNav()
+
+  const admin=SESSION.role==='admin'
+  const txs=await getAllTx()
+  const bal=balOf(SESSION.id,txs)
+  const issued=txs.filter(t=>t.type==='발행').reduce((s,t)=>s+t.amount,0)
+  const todayStr=new Date().toISOString().slice(0,10)
+  const upcoming=SCHEDULE.filter(s=>s.date>=todayStr)
+
+  // D-day 카드
+  const nextExam=upcoming.find(s=>s.label.includes('고사')||s.label.includes('평가')||s.label.includes('시작'))
+  const ddCard=nextExam?`<div style="background:var(--primary-tint);border-radius:var(--r);padding:18px 20px;margin-bottom:14px;cursor:pointer"><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:5px">${fmtDate(nextExam.date)}</div><div style="font-size:19px;font-weight:800;color:var(--ink);letter-spacing:-.02em">${esc(nextExam.label)}&nbsp;<span style="font-size:15px;font-weight:800;color:var(--primary)">D-${Math.max(0,Math.ceil((new Date(nextExam.date)-new Date(todayStr))/86400000))}</span></div></div>`:''
+
+  app().innerHTML=`<div class="screen fade-in">
+
+    <!-- 인사 헤더 -->
+    <div style="padding:calc(20px + env(safe-area-inset-top)) 20px 18px;background:var(--card);border-bottom:1px solid var(--line)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div>
+          <div style="font-size:13px;color:var(--muted);font-weight:500;margin-bottom:3px">안녕하세요,</div>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink)">${esc(SESSION.name)}님</div>
+        </div>
+        <img src="${LOGO}" style="width:36px;height:36px;border-radius:10px;object-fit:cover;margin-top:4px">
+      </div>
+    </div>
+
+    <div style="padding:16px 20px 0">
+
+      <!-- 공지 배너 -->
+      <div style="background:var(--primary-tint);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="width:38px;height:38px;border-radius:11px;background:var(--primary);display:flex;align-items:center;justify-content:center;flex:none;color:#fff">${I.bell}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700;color:var(--primary)">오늘 공지 ${NOTICES.length}개</div>
+          <div style="font-size:12px;color:var(--ink2);margin-top:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${esc(NOTICES[0]?.title||'새 공지를 확인해보세요')}</div>
+        </div>
+        <div style="color:var(--primary);display:flex;flex:none">${I.chev}</div>
+      </div>
+
+      <!-- 잔액 카드 -->
+      <div class="bal-card" style="margin:0 0 14px">
+        <div class="lbl">${admin?'학생회 총 발행량':'옥야머니 잔액'}</div>
+        <div class="amt">${fmt(admin?issued:bal)}<small>옥</small></div>
+        <div class="bal-acts">
+          <button class="bal-act" id="ha-send">${I.send} ${admin?'발행':'송금'}</button>
+          <button class="bal-act" id="ha-hist">${I.hist} 내역</button>
+        </div>
+      </div>
+
+      <!-- D-day 카드 -->
+      ${ddCard}
+
+      <!-- 오늘 급식 -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+          <div style="font-size:15px;font-weight:700;color:var(--ink)">오늘 급식</div>
+          <div style="font-size:12px;color:var(--muted)">${new Date().toLocaleDateString('ko-KR',{month:'numeric',day:'numeric',weekday:'short'})}</div>
+        </div>
+        <div style="background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--sh)">
+          ${MEAL.map((m,i)=>`<div style="padding:11px 16px;font-size:14px;color:var(--ink2);font-weight:500${i<MEAL.length-1?';border-bottom:1px solid var(--line)':''}">${esc(m)}</div>`).join('')}
+        </div>
+      </div>
+
+      <!-- 다가오는 일정 -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:9px">다가오는 일정</div>
+        <div style="background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--sh)">
+          ${upcoming.length
+            ?upcoming.slice(0,3).map((s,i,a)=>`<div style="display:flex;align-items:center;gap:12px;padding:13px 16px${i<a.length-1?';border-bottom:1px solid var(--line)':''}"><div style="width:7px;height:7px;border-radius:50%;background:var(--primary);flex:none"></div><div style="flex:1;font-size:14px;font-weight:600;color:var(--ink)">${esc(s.label)}</div><div style="font-size:12px;color:var(--muted);white-space:nowrap">${fmtDate(s.date)}</div></div>`).join('')
+            :`<div style="padding:16px;font-size:14px;color:var(--muted);text-align:center">다가오는 일정이 없어요</div>`}
+        </div>
+      </div>
+
+      <!-- 학교 공지 -->
+      <div style="margin-bottom:4px">
+        <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:9px">학교 공지</div>
+        <div style="background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--sh)">
+          ${NOTICES.map((n,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:13px 16px${i<NOTICES.length-1?';border-bottom:1px solid var(--line)':''}"><div style="width:36px;height:36px;border-radius:10px;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;flex:none;color:var(--primary)">${I.notice}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${esc(n.title)}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${esc(n.cat)} · ${fmtDate(n.at)}</div></div></div>`).join('')}
+        </div>
+      </div>
+
+    </div>
+    <div style="height:16px"></div>
+  </div>${bnav()}`
+
+  bindNav()
+  document.getElementById('ha-send').onclick=()=>{TAB='money';push(()=>fTransfer(admin?'발행':'송금'))}
+  document.getElementById('ha-hist').onclick=()=>{TAB='money';rMoney()}
+}
+
+async function rMoney(){
+  TAB='money'
+  app().innerHTML=`<div class="screen fade-in"><div class="hdr"><h2>옥야머니</h2></div><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>${bnav()}`
+  bindNav()
+  const admin=SESSION.role==='admin'
+  const txs=await getAllTx()
+  const bal=balOf(SESSION.id,txs)
+  const issued=txs.filter(t=>t.type==='발행').reduce((s,t)=>s+t.amount,0)
+  const list=(admin?txs.filter(t=>t.type==='발행'):txs.filter(t=>t.to===SESSION.id||t.from===SESSION.id))
+  const rows=list.length?list.map(t=>{
+    const inc=t.to===SESSION.id
+    const lbl=admin?nameOf(t.to):(inc?nameOf(t.from)+' → 나':'나 → '+nameOf(t.to))
+    return`<div class="ldg-item"><div class="ldg-ic ${inc?'up':'dn'}">${inc?'+':'−'}</div><div class="ldg-body"><b>${esc(admin?nameOf(t.to):t.reason||t.type)}</b><span>${admin?(esc(t.reason||'발행')+' · '):(lbl+' · ')}${timeago(t.at)}</span></div><div class="ldg-val ${inc?'p':'m'}">${inc?'+':'−'}${fmt(t.amount)}옥</div></div>`
+  }).join(''):'<div class="empty">내역이 없어요.</div>'
+
+  app().innerHTML=`<div class="screen fade-in">
+    <div class="hdr"><h2>옥야머니</h2></div>
+    <div class="bal-card">
+      <div class="lbl">${admin?'학생회 총 발행량':'보유 잔액'}</div>
+      <div class="amt">${fmt(admin?issued:bal)}<small>옥</small></div>
+      <div class="bal-acts">
+        <button class="bal-act" id="m-act">${I.send} ${admin?'발행':'송금'}</button>
+      </div>
+    </div>
+    <div style="padding:0 20px">
+      <div class="sec-title">${admin?'전체 발행 내역':'거래 내역'}</div>
+      <div class="card-list">${rows}</div>
+    </div>
+    <div style="height:20px"></div>
+  </div>${bnav()}`
+  bindNav()
+  document.getElementById('m-act').onclick=()=>push(()=>fTransfer(admin?'발행':'송금'))
+}
+
+function fTransfer(mode){
+  // 단계 1: 받는 사람 검색
+  const others=USERS.filter(u=>u.id!==SESSION.id&&!(mode==='송금'&&u.role==='admin'))
+  const buildList=(q='')=>{
+    const fl=q?others.filter(u=>u.name.includes(q)):others
+    if(!fl.length)return`<div style="padding:60px 20px;text-align:center;color:var(--muted);font-size:14px">검색 결과가 없어요</div>`
+    return fl.map(u=>`<div class="row-item tf-user" data-uid="${u.id}" style="padding:14px 20px">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--primary);flex:none">${esc(u.name.charAt(0))}</div>
+      <div class="row-body"><div class="row-title">${esc(u.name)}</div><div class="row-desc">${u.role==='admin'?'학생회 임원':'학생'}</div></div>
+      <div class="row-right">${I.chev}</div>
+    </div>`).join('')
+  }
+  app().innerHTML=`<div class="screen no-nav fade-in">
+    <div style="padding:calc(16px + env(safe-area-inset-top)) 20px 12px;border-bottom:1px solid var(--line)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <button class="back-btn" id="bk" style="flex:none">${I.back}</button>
+        <div style="flex:1;text-align:center;font-size:17px;font-weight:700">${mode==='발행'?'옥야머니 발행':'송금'}</div>
+        <button id="tf-cancel" style="flex:none;font-size:14px;color:var(--muted);background:none;border:none;cursor:pointer;padding:0 4px">취소</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:14px;padding:11px 14px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="tf-q" placeholder="이름 검색" style="flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--ink)" autocomplete="off" autocorrect="off">
+      </div>
+    </div>
+    <div id="tf-list">${buildList()}</div>
+  </div>`
+  const bind=()=>document.querySelectorAll('.tf-user').forEach(el=>{
+    el.onclick=()=>push(()=>fTransferAmt(mode,USERS.find(u=>u.id===el.dataset.uid)))
+  })
+  bind()
+  document.getElementById('bk').onclick=pop
+  document.getElementById('tf-cancel').onclick=()=>{STACK.length=0;routeTab()}
+  document.getElementById('tf-q').oninput=e=>{
+    document.getElementById('tf-list').innerHTML=buildList(e.target.value)
+    bind()
+  }
+}
+
+async function fTransferAmt(mode,toUser){
+  // 단계 2: 금액 입력 + 숫자 키패드 + 메시지
+  app().innerHTML=`<div class="screen no-nav"><div class="loader" style="min-height:300px"><div class="spin"></div></div></div>`
+  const txs=await getAllTx()
+  const myBal=balOf(SESSION.id,txs)
+  let amtStr='0'
+  const upd=()=>{
+    const n=parseInt(amtStr)||0
+    const el=document.getElementById('tf-disp')
+    if(el)el.innerHTML=n>0?`<span style="color:var(--ink)">${fmt(n)}<span style="font-size:22px;font-weight:600;margin-left:3px">옥</span></span>`:`<span style="color:var(--line)">보낼금액</span>`
+    const nb=document.getElementById('tf-next')
+    if(nb){const ok=n>0&&(mode==='발행'||n<=myBal);nb.disabled=!ok;nb.style.opacity=ok?'1':'.4'}
+    const bw=document.getElementById('tf-bwarn')
+    if(bw)bw.style.display=(mode==='송금'&&n>0&&n>myBal)?'block':'none'
+  }
+  app().innerHTML=`<div class="screen no-nav fade-in" style="display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;padding:calc(16px + env(safe-area-inset-top)) 20px 14px;border-bottom:1px solid var(--line)">
+      <button class="back-btn" id="bk" style="flex:none">${I.back}</button>
+      <div style="flex:1;text-align:center">
+        <div style="font-size:16px;font-weight:700">${esc(toUser.name)}</div>
+        <div style="font-size:12px;color:var(--muted)">창녕옥야고등학교</div>
+      </div>
+      <button id="tf-cancel" style="flex:none;font-size:14px;color:var(--muted);background:none;border:none;cursor:pointer;width:36px;text-align:right">취소</button>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:28px 20px 8px">
+      <div id="tf-disp" style="font-size:42px;font-weight:800;letter-spacing:-.03em"><span style="color:var(--line)">보낼금액</span></div>
+    </div>
+    <div style="padding:0 20px calc(16px + env(safe-area-inset-bottom))">
+      <div style="background:var(--bg);border-radius:14px;padding:13px 16px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:13px;color:var(--ink2)">${mode==='발행'?'발행 주체':'내 잔액'}</span>
+        <span style="font-size:14px;font-weight:700;color:var(--ink)">${mode==='발행'?'학생회':fmt(myBal)+'옥'}</span>
+      </div>
+      <div id="tf-bwarn" style="display:none;color:var(--danger);font-size:12px;font-weight:600;text-align:center;margin-bottom:4px">잔액이 부족해요</div>
+      <div style="background:var(--bg);border-radius:14px;padding:13px 16px;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <input id="tf-reason" placeholder="사유 또는 메시지 (선택)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--ink)">
+      </div>
+      <div id="tf-numpad" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">
+        ${['1','2','3','4','5','6','7','8','9','00','0','⌫'].map(k=>`<button data-k="${k}" style="height:52px;border-radius:14px;background:var(--bg);border:none;font-size:${k==='⌫'?'0':'20'}px;font-weight:600;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent">${k==='⌫'?`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>`:k}</button>`).join('')}
+      </div>
+      <button id="tf-next" disabled style="width:100%;padding:16px;border-radius:16px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;opacity:.4;transition:opacity .15s">다음</button>
+    </div>
+  </div>`
+  document.getElementById('bk').onclick=pop
+  document.getElementById('tf-cancel').onclick=()=>{STACK.length=0;routeTab()}
+  document.getElementById('tf-numpad').onclick=e=>{
+    const k=e.target.closest('[data-k]')?.dataset.k
+    if(!k)return
+    if(k==='⌫')amtStr=amtStr.length>1?amtStr.slice(0,-1):'0'
+    else if(k==='00'){if(amtStr!=='0'&&amtStr.length<7)amtStr+='00'}
+    else{if(amtStr==='0')amtStr=k;else if(amtStr.length<7)amtStr+=k}
+    upd()
+  }
+  document.getElementById('tf-next').onclick=()=>{
+    const amount=parseInt(amtStr)||0
+    if(amount<=0)return
+    fTransferConfirm(mode,toUser,amount,document.getElementById('tf-reason').value.trim())
+  }
+}
+
+function fTransferConfirm(mode,toUser,amount,reason){
+  // 단계 3: 확인 바텀시트 → 완료 화면
+  const ov=document.createElement('div')
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end'
+  ov.innerHTML=`<div style="width:100%;background:#fff;border-radius:28px 28px 0 0;padding:32px 24px calc(28px + env(safe-area-inset-bottom))">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;font-weight:800;color:var(--primary)">${esc(toUser.name.charAt(0))}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px">${mode==='발행'?'발행 확인':'송금 확인'}</div>
+      <div style="font-size:20px;font-weight:800;color:var(--ink);line-height:1.5">${esc(toUser.name)}님에게<br><span style="color:var(--primary)">${fmt(amount)}옥</span> ${mode==='발행'?'발행':'송금'}할까요?</div>
+      ${reason?`<div style="margin-top:10px;font-size:13px;color:var(--muted)">"${esc(reason)}"</div>`:''}
+    </div>
+    <div style="display:flex;gap:10px">
+      <button id="tf-cc" style="flex:1;padding:15px;border-radius:14px;background:var(--bg);border:none;font-size:15px;font-weight:700;color:var(--ink2);cursor:pointer">취소</button>
+      <button id="tf-ok" style="flex:2;padding:15px;border-radius:14px;background:var(--primary);border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer">${mode==='발행'?'발행하기':'보내기'}</button>
+    </div>
+  </div>`
+  document.body.appendChild(ov)
+  ov.querySelector('#tf-cc').onclick=()=>ov.remove()
+  ov.querySelector('#tf-ok').onclick=async()=>{
+    const btn=ov.querySelector('#tf-ok')
+    btn.disabled=true;btn.textContent='처리 중...'
+    const ok=await addTx({from:mode==='발행'?'u_council':SESSION.id,to:toUser.id,amount,type:mode==='발행'?'발행':'송금',reason})
+    ov.remove()
+    if(ok){
+      STACK.length=0
+      app().innerHTML=`<div class="screen no-nav fade-in" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh">
+        <div style="text-align:center;padding:40px 24px">
+          <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#34D399,#059669);display:flex;align-items:center;justify-content:center;margin:0 auto 28px;box-shadow:0 10px 28px rgba(5,150,105,.28)">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div style="font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1.45">${esc(toUser.name)}님에게<br><span style="color:var(--primary)">${fmt(amount)}옥</span> 보냈어요</div>
+          ${reason?`<div style="margin-top:10px;font-size:14px;color:var(--muted)">"${esc(reason)}"</div>`:''}
+        </div>
+        <div style="position:fixed;bottom:0;left:0;right:0;padding:0 20px calc(24px + env(safe-area-inset-bottom))">
+          <button id="tf-done" style="width:100%;padding:16px;border-radius:16px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer">확인</button>
+        </div>
+      </div>`
+      document.getElementById('tf-done').onclick=()=>{TAB='money';rMoney()}
+    }else{
+      toast('처리 중 오류가 발생했어요')
+    }
+  }
+}
+
+function rSchool(){
+  TAB='school'
+  const MENU=[
+    {id:'food',   ic:'food',    color:'#FF6B35', bg:'#FFF3EE', title:'급식',       desc:'오늘의 학교 급식'},
+    {id:'cal',    ic:'cal',     color:'#1A5CE6', bg:'#EEF3FF', title:'학사일정',    desc:'시험·행사 일정'},
+    {id:'tt',     ic:'timetable',color:'#7C3AED',bg:'#F3EEFF', title:'시간표',      desc:'학년별 수업 시간표'},
+    {id:'study',  ic:'study',   color:'#059669', bg:'#EDFAF5', title:'시험대비자료', desc:'과목별 학습 자료'},
+    {id:'notice', ic:'notice',  color:'#D97706', bg:'#FFFAEB', title:'공지방',      desc:'학교 공지 및 안내'},
+    {id:'lib',    ic:'library', color:'#0891B2', bg:'#E0F8FF', title:'도서관',      desc:'도서 검색 · 대출'},
+    {id:'room',   ic:'door',    color:'#6D28D9', bg:'#F5F0FF', title:'교실예약',    desc:'자습실·회의실 예약'},
+    {id:'mt',     ic:'video',   color:'#2563EB', bg:'#EEF4FF', title:'회의록',      desc:'대의원회 영상 목록'},
+  ]
+  app().innerHTML=`<div class="screen fade-in">
+    <div class="hdr" style="border-bottom:1px solid var(--line)"><h2>학교</h2></div>
+    <div style="padding:16px 20px 0">
+      <div class="card" style="padding:16px 16px 10px">
+        <div class="school-grid">
+          ${MENU.map(m=>`<div class="school-item" data-sid="${m.id}">
+            <div class="school-ic" style="background:${m.bg};color:${m.color}">${I[m.ic]}</div>
+            <div class="school-title">${m.title}</div>
+            <div class="school-desc">${m.desc}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div style="height:8px"></div>
+  </div>${bnav()}`
+  bindNav()
+  // 메뉴 클릭 핸들러
+  document.querySelectorAll('[data-sid]').forEach(el=>{
+    el.onclick=()=>{
+      const sid=el.dataset.sid
+      if(sid==='food')push(rSchoolFood)
+      else if(sid==='cal')push(rSchoolCal)
+      else if(sid==='tt')push(rSchoolTT)
+      else if(sid==='mt')push(rMeeting)
+      else push(()=>rSchoolComingSoon(MENU.find(m=>m.id===sid)?.title||''))
+    }
+  })
+}
+
+function rSchoolFood(){
+  app().innerHTML=`<div class="screen no-nav fade-in">
+    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>오늘 급식</h2></div>
+    <div style="padding:20px">
+      <div class="card">
+        <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px">${new Date().toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'})}</div>
+        ${MEAL.map(m=>`<div style="padding:10px 0;border-bottom:1px solid var(--line);font-size:15px;font-weight:500">${esc(m)}</div>`).join('')}
+      </div>
+      <div class="note" style="margin-top:12px;text-align:center">실제 급식 정보는 추후 나이스 API 연동 예정</div>
+    </div>
+  </div>`
+  document.getElementById('bk').onclick=pop
+}
+
+function rSchoolCal(){
+  const ALL=[...SCHEDULE,
+    {date:'2026-08-01',label:'여름방학 시작'},
+    {date:'2026-09-01',label:'2학기 개학'},
+    {date:'2026-10-12',label:'중간고사 시작'},
+  ]
+  const now=new Date()
+  let vy=now.getFullYear(),vm=now.getMonth()
+  const todayStr=now.toISOString().slice(0,10)
+  const render=()=>{
+    const first=new Date(vy,vm,1),last=new Date(vy,vm+1,0)
+    const startDow=first.getDay(),days=last.getDate()
+    const mStr=`${vy}-${String(vm+1).padStart(2,'0')}`
+    const evMap={}
+    ALL.filter(s=>s.date.startsWith(mStr)).forEach(s=>{
+      const d=parseInt(s.date.split('-')[2])
+      if(!evMap[d])evMap[d]=[]
+      evMap[d].push(s.label)
+    })
+    const cells=[]
+    for(let i=0;i<startDow;i++)cells.push(null)
+    for(let d=1;d<=days;d++)cells.push(d)
+    while(cells.length%7)cells.push(null)
+    const monthEvs=ALL.filter(s=>s.date.startsWith(mStr)).sort((a,b)=>a.date>b.date?1:-1)
+    app().innerHTML=`<div class="screen no-nav fade-in">
+      <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>학사일정</h2></div>
+      <div style="padding:0 20px 24px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0 14px">
+          <button id="prev-m" style="background:none;border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink2)">${I.back}</button>
+          <div style="font-size:17px;font-weight:700">${vy}년 ${vm+1}월</div>
+          <button id="next-m" style="background:none;border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink2)">${I.chev}</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px">
+          ${['일','월','화','수','목','금','토'].map((d,i)=>`<div style="text-align:center;font-size:11px;font-weight:600;padding:4px 0;color:${i===0?'var(--danger)':i===6?'var(--primary)':'var(--muted)'}">${d}</div>`).join('')}
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px">
+          ${cells.map((d,i)=>{
+            if(!d)return'<div></div>'
+            const dow=i%7
+            const ds=`${vy}-${String(vm+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
+            const isToday=ds===todayStr
+            const hasEv=(evMap[d]||[]).length>0
+            return`<div style="display:flex;flex-direction:column;align-items:center;padding:2px 0">
+              <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${isToday?'var(--primary)':'transparent'};font-size:13px;font-weight:${isToday||hasEv?700:400};color:${isToday?'#fff':dow===0?'var(--danger)':dow===6?'var(--primary)':'var(--ink)'}">${d}</div>
+              ${hasEv?`<div style="width:5px;height:5px;border-radius:50%;background:${isToday?'rgba(255,255,255,.7)':'var(--primary)'};margin-top:1px"></div>`:'<div style="height:6px"></div>'}
+            </div>`
+          }).join('')}
+        </div>
+        ${monthEvs.length?`<div style="margin-top:20px">
+          <div class="sec-title" style="margin-bottom:8px">이번 달 일정</div>
+          <div class="card-list">
+            ${monthEvs.map((s,i,a)=>`<div style="display:flex;align-items:center;gap:12px;padding:13px 16px${i<a.length-1?';border-bottom:1px solid var(--line)':''}">
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--primary);flex:none"></div>
+              <div style="flex:1;font-size:14px;font-weight:600;color:var(--ink)">${esc(s.label)}</div>
+              <div style="font-size:12px;color:var(--muted)">${s.date.slice(5).replace('-','/')}</div>
+            </div>`).join('')}
+          </div>
+        </div>`:`<div style="margin-top:20px;text-align:center;color:var(--muted);font-size:13px;padding:16px 0">이번 달 등록된 일정이 없어요</div>`}
+      </div>
+    </div>`
+    document.getElementById('bk').onclick=pop
+    document.getElementById('prev-m').onclick=()=>{vm--;if(vm<0){vm=11;vy--}render()}
+    document.getElementById('next-m').onclick=()=>{vm++;if(vm>11){vm=0;vy++}render()}
+  }
+  render()
+}
+
+function rSchoolTT(){
+  const days=['월','화','수','목','금']
+  const subjects=[['국어','수학','영어','과학','체육','자습'],['수학','영어','사회','국어','음악','자습'],['영어','과학','수학','체육','국어','자습'],['사회','국어','수학','영어','미술','자습'],['체육','수학','영어','국어','과학','자습']]
+  app().innerHTML=`<div class="screen no-nav fade-in">
+    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>시간표</h2></div>
+    <div style="padding:16px 20px">
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <tr>${days.map(d=>`<th style="padding:8px;background:var(--primary-tint);color:var(--primary);font-weight:700;text-align:center;border-radius:8px">${d}</th>`).join('')}</tr>
+          ${[0,1,2,3,4,5].map(r=>`<tr>${days.map((_,c)=>`<td style="padding:8px 4px;text-align:center;font-size:13px;color:var(--ink2)">${subjects[c][r]}</td>`).join('')}</tr>`).join('')}
+        </table>
+      </div>
+      <div class="note" style="margin-top:12px;text-align:center">더미 시간표 — 실제 시간표는 추후 연동 예정</div>
+    </div>
+  </div>`
+  document.getElementById('bk').onclick=pop
+}
+
+function rSchoolComingSoon(title){
+  app().innerHTML=`<div class="screen no-nav fade-in">
+    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>${esc(title)}</h2></div>
+    <div style="padding:60px 20px;text-align:center">
+      <div style="width:64px;height:64px;border-radius:20px;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">${I.school}</div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:8px">준비 중이에요</div>
+      <div class="note">곧 업데이트될 예정입니다.</div>
+    </div>
+  </div>`
+  document.getElementById('bk').onclick=pop
+}
+
+async function rPrint(){
+  const COST=100,admin=SESSION.role==='admin'
+  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>옥야제본소</h2></div><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
+  document.getElementById('bk').onclick=pop
+  let data=[]
+  try{const r=await wt(sb.from('okya_prints').select('*').order('at',{ascending:false}));data=r.data||[]}catch{}
+  const prs=admin?data:data.filter(p=>p.owner===SESSION.id)
+  const list=prs.length?prs.map(p=>`<div class="ldg-item"><div class="ldg-ic" style="background:var(--primary-tint);color:var(--primary);font-size:16px">📄</div><div class="ldg-body"><b>${esc(p.title)}</b><span>${admin?esc(p.owner_name):('내 신청')} · ${p.pages}장 · ${timeago(p.at)}</span></div>${admin?`<button class="btn out sm" data-done="${p.id}">완료</button>`:''}</div>`).join(''):'<div class="empty">신청 내역이 없어요.</div>'
+  app().innerHTML=`<div class="screen no-nav fade-in">
+    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>옥야제본소</h2></div>
+    ${!admin?`<div style="padding:20px 20px 0"><div class="card"><div style="font-size:15px;font-weight:700;margin-bottom:12px">제본 신청</div><div class="field"><label>제목</label><input id="pt" placeholder="예: 미적분 오답노트"></div><div class="field"><label>장수</label><input id="pp" type="number" inputmode="numeric" placeholder="예: 24"></div><button class="btn" id="preq">신청하기 · ${COST}옥</button><p class="note" style="margin-top:10px">신청 시 ${COST}옥이 사용됩니다.</p></div></div>`:''}
+    <div style="padding:16px 20px 0"><div class="sec-title">신청 목록</div><div class="card-list">${list}</div></div>
+  </div>`
+  document.getElementById('bk').onclick=pop
+  const pr=document.getElementById('preq')
+  if(pr)pr.onclick=async()=>{
+    const title=document.getElementById('pt').value.trim(),pages=parseInt(document.getElementById('pp').value,10)||0
+    if(!title||!pages){toast('제목과 장수를 입력해줘');return}
+    const txs=await getAllTx();if(balOf(SESSION.id,txs)<COST){toast('옥야머니가 부족해요');return}
+    await addTx({from:SESSION.id,to:'u_council',amount:COST,type:'사용',reason:'인쇄소: '+title})
+    try{await wt(sb.from('okya_prints').insert({id:uid('pr'),title,pages,owner:SESSION.id,owner_name:SESSION.name,at:nowISO()}))}catch{}
+    toast('신청 완료 · '+COST+'옥 사용');rPrint()
+  }
+  document.querySelectorAll('[data-done]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_prints').delete().eq('id',b.dataset.done))}catch{};toast('완료');rPrint()})
+}
+
+async function rMeeting(){
+  const admin=SESSION.role==='admin'
+  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>회의록</h2></div><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
+  document.getElementById('bk').onclick=pop
+  let ms=[]
+  try{const r=await wt(sb.from('okya_meetings').select('*').order('at',{ascending:false}));ms=r.data||[]}catch{}
+  const list=ms.length?ms.map(m=>`<div class="ldg-item"><div class="ldg-ic" style="background:#EEF4FF;color:#2563EB;font-size:16px">🎬</div><div class="ldg-body"><b>${esc(m.title)}</b><span><a href="${esc(m.url)}" target="_blank" style="color:var(--primary)">영상 보기 ↗</a> · ${timeago(m.at)}</span></div>${admin?`<button class="btn danger sm" data-del="${m.id}">삭제</button>`:''}</div>`).join(''):'<div class="empty">등록된 영상이 없어요.</div>'
+  app().innerHTML=`<div class="screen no-nav fade-in">
+    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>회의록</h2></div>
+    ${admin?`<div style="padding:20px 20px 0"><div class="card"><div style="font-size:15px;font-weight:700;margin-bottom:12px">영상 등록</div><div class="field"><label>제목</label><input id="mt" placeholder="예: 2학기 2차 대의원회"></div><div class="field"><label>유튜브 링크</label><input id="mu" placeholder="https://youtube.com/..."></div><button class="btn" id="madd">등록</button></div></div>`:''}
+    <div style="padding:16px 20px 0"><div class="sec-title">회의 영상</div><div class="card-list">${list}</div></div>
+  </div>`
+  document.getElementById('bk').onclick=pop
+  const a=document.getElementById('madd')
+  if(a)a.onclick=async()=>{
+    const title=document.getElementById('mt').value.trim();if(!title){toast('제목을 입력해줘');return}
+    try{await wt(sb.from('okya_meetings').insert({id:uid('m'),title,url:document.getElementById('mu').value.trim()||'https://youtube.com/',at:nowISO()}))}catch{}
+    rMeeting()
+  }
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_meetings').delete().eq('id',b.dataset.del))}catch{};toast('삭제');rMeeting()})
+}
+
+function rComm(){
+  TAB='comm'
+  const CARDS=[
+    {id:'challenge', ic:'star',    color:'#D97706', bg:'#FFFAEB', title:'챌린지',    desc:'옥야머니 이벤트'},
+    {id:'book',      ic:'book',    color:'#059669', bg:'#EDFAF5', title:'책 교환',   desc:'읽은 책 나누기'},
+    {id:'petition',  ic:'petition',color:'#1A5CE6', bg:'#EEF3FF', title:'청원',      desc:'학교에 건의하기'},
+    {id:'binding',   ic:'binding', color:'#7C3AED', bg:'#F3EEFF', title:'옥야제본소', desc:'제본 신청 · 100옥'},
+  ]
+  app().innerHTML=`<div class="screen fade-in">
+    <div class="hdr" style="border-bottom:1px solid var(--line)"><h2>커뮤니티</h2></div>
+    <div style="padding:16px 20px 20px">
+      <div class="comm-grid" style="margin-bottom:14px">
+        ${CARDS.map(c=>`<div class="comm-card" data-cid="${c.id}">
+          <div class="comm-ic" style="background:${c.bg};color:${c.color}">${I[c.ic]}</div>
+          <div class="comm-title">${c.title}</div>
+          <div class="comm-desc">${c.desc}</div>
+        </div>`).join('')}
+      </div>
+      <!-- 분실물 - 전체 너비 카드 -->
+      <div class="comm-card" data-cid="lost" style="flex-direction:row;align-items:center;text-align:left;padding:18px 20px;gap:16px">
+        <div class="comm-ic" style="background:#FFF0F0;color:var(--danger);margin-bottom:0;flex:none">${I.lost}</div>
+        <div style="flex:1">
+          <div class="comm-title" style="margin-bottom:2px">분실물</div>
+          <div class="comm-desc">분실물 신고 · 찾아주기</div>
+        </div>
+        <div style="color:var(--muted);display:flex;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M9 6l6 6-6 6"/></svg></div>
+      </div>
+    </div>
+  </div>${bnav()}`
+  bindNav()
+  document.querySelectorAll('[data-cid]').forEach(el=>{
+    el.onclick=()=>{
+      const id=el.dataset.cid
+      if(id==='challenge')push(rChallengePage)
+      else if(id==='book')push(rBookPage)
+      else if(id==='petition')push(rPetitionPage)
+      else if(id==='binding')push(rPrint)
+      else if(id==='lost')push(rLost)
+    }
+  })
+}
+
+async function rLost(){
+  app().innerHTML=`<div class="screen no-nav" style="display:flex;flex-direction:column;height:100dvh">
+    <div class="sub-hdr" style="flex:none">
+      <button class="back-btn" id="bk">${I.back}</button>
+      <h2>분실물</h2>
+      <button id="lost-map" style="background:none;border:none;font-size:12px;font-weight:700;color:var(--primary);cursor:pointer;display:flex;align-items:center;gap:3px;padding:0 4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>지도</button>
+    </div>
+    <div id="lost-feed" style="flex:1;overflow-y:auto;padding:10px 0 4px;background:var(--bg)">
+      <div class="loader" style="min-height:200px"><div class="spin"></div></div>
+    </div>
+    <div id="lp-attach" style="display:none;flex:none;background:#fff;border-top:1px solid var(--line);padding:16px 20px 12px">
+      <div style="display:flex;gap:20px">
+        <label for="lp-gallery" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          <div style="width:52px;height:52px;border-radius:14px;background:#EDFAF5;display:flex;align-items:center;justify-content:center;color:#059669"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+          <span style="font-size:11px;font-weight:600;color:var(--muted)">사진 선택</span>
+        </label>
+        <input id="lp-gallery" type="file" accept="image/*" style="display:none">
+        <label for="lp-capture" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          <div style="width:52px;height:52px;border-radius:14px;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;color:var(--primary)">${I.camera}</div>
+          <span style="font-size:11px;font-weight:600;color:var(--muted)">사진 찍기</span>
+        </label>
+        <input id="lp-capture" type="file" accept="image/*" capture="environment" style="display:none">
+      </div>
+    </div>
+    <div style="flex:none;background:var(--bg);padding:6px 12px calc(12px + env(safe-area-inset-bottom))">
+      <div style="background:#fff;border-radius:20px;box-shadow:0 2px 16px rgba(0,0,0,.07);padding:8px 8px 8px 10px;display:flex;align-items:flex-end;gap:8px">
+        <button id="lp-plus" style="width:34px;height:34px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;color:var(--muted);border:none">${I.plus}</button>
+        <div style="flex:1;display:flex;align-items:flex-end;gap:6px">
+          <textarea id="lp-txt" rows="1" placeholder="메시지를 입력하세요..." style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--ink);resize:none;max-height:80px;line-height:1.45;font-family:inherit;padding:0;min-height:20px"></textarea>
+          <img id="lp-thumb" style="display:none;width:24px;height:24px;border-radius:4px;object-fit:cover;flex:none">
+        </div>
+        <button id="lp-send" style="width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;flex:none;color:#fff;border:none;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+    </div>
+  </div>`
+
+  document.getElementById('bk').onclick=pop
+  document.getElementById('lost-map').onclick=showLostMap
+
+  let pendingPhoto=null
+  let attachOpen=false
+
+  document.getElementById('lp-plus').onclick=()=>{
+    attachOpen=!attachOpen
+    document.getElementById('lp-attach').style.display=attachOpen?'block':'none'
+  }
+
+  const handlePhotoFile=async f=>{
+    if(!f)return
+    attachOpen=false
+    document.getElementById('lp-attach').style.display='none'
+    pendingPhoto=await readImg(f,900,0.8)
+    const th=document.getElementById('lp-thumb')
+    if(th){th.src=pendingPhoto;th.style.display='block'}
+  }
+  document.getElementById('lp-gallery').onchange=async e=>handlePhotoFile(e.target.files[0])
+  document.getElementById('lp-capture').onchange=async e=>handlePhotoFile(e.target.files[0])
+
+  const lptxt=document.getElementById('lp-txt')
+  lptxt.oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'}
+
+  document.getElementById('lp-send').onclick=async()=>{
+    const text=lptxt.value.trim()
+    if(!text&&!pendingPhoto)return
+    const btn=document.getElementById('lp-send')
+    btn.disabled=true
+    try{
+      await wt(sb.from('okya_lost').insert({id:uid('lost'),user_id:SESSION.id,photo:pendingPhoto||null,description:text||null,at:nowISO()}))
+      lptxt.value='';lptxt.style.height='auto'
+      pendingPhoto=null
+      const th=document.getElementById('lp-thumb')
+      if(th){th.style.display='none';th.src=''}
+      await loadMsgs()
+    }catch{toast('전송 실패')}
+    finally{btn.disabled=false}
+  }
+
+  const nameOf2=uid2=>USERS.find(u=>u.id===uid2)?.name||'알 수 없음'
+
+  async function loadMsgs(){
+    let msgs=[]
+    try{const{data}=await wt(sb.from('okya_lost').select('*').order('at',{ascending:true}));msgs=data||[]}catch{}
+    const feed=document.getElementById('lost-feed')
+    if(!feed)return
+    if(!msgs.length){feed.innerHTML=`<div style="padding:60px 20px;text-align:center;color:var(--muted);font-size:14px">첫 번째 메시지를 남겨보세요</div>`;return}
+    feed.innerHTML=msgs.map((m,i,a)=>{
+      const isMe=m.user_id===SESSION.id
+      const name=nameOf2(m.user_id)
+      const showHdr=!isMe&&(i===0||a[i-1].user_id!==m.user_id)
+      const isLast=i===a.length-1||a[i+1].user_id!==m.user_id
+      if(isMe){return`<div style="display:flex;justify-content:flex-end;padding:2px 14px;margin-bottom:${isLast?8:2}px"><div style="max-width:72%">${m.photo?`<img src="${m.photo}" style="width:100%;border-radius:14px 14px 2px 14px;display:block;${m.description?'margin-bottom:4px':''}">`:''} ${m.description?`<div style="background:var(--primary-tint);color:var(--primary);border-radius:18px 18px 4px 18px;padding:10px 14px;font-size:14px;line-height:1.55;word-break:break-word">${esc(m.description)}</div>`:''}<div style="font-size:10px;color:var(--muted);text-align:right;margin-top:3px">${timeago(m.at)}</div></div></div>`}
+      return`<div style="display:flex;align-items:flex-start;gap:8px;padding:${showHdr?8:2}px 14px;margin-bottom:${isLast?8:2}px"><div style="width:34px;flex:none">${showHdr?`<div class="lost-av" data-uid="${m.user_id}" style="width:34px;height:34px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--primary);cursor:pointer">${esc(name.charAt(0))}</div>`:''}</div><div style="max-width:72%">${showHdr?`<div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px">${esc(name)}</div>`:''} ${m.photo?`<img src="${m.photo}" style="width:100%;border-radius:4px 14px 14px 14px;display:block;${m.description?'margin-bottom:4px':''}">`:''} ${m.description?`<div style="background:#fff;color:var(--ink);border-radius:4px 18px 18px 18px;padding:10px 14px;font-size:14px;line-height:1.55;word-break:break-word">${esc(m.description)}</div>`:''}<div style="font-size:10px;color:var(--muted);margin-top:3px">${timeago(m.at)}</div></div></div>`
+    }).join('')
+    feed.scrollTop=feed.scrollHeight
+    feed.querySelectorAll('.lost-av').forEach(el=>{el.onclick=()=>push(()=>rUserProfile(el.dataset.uid))})
+  }
+
+  await loadMsgs()
+}
+
+function showLostMap(){
+  const ov=document.createElement('div')
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px'
+  ov.innerHTML=`<div style="background:#fff;border-radius:24px;width:100%;max-height:82dvh;overflow:hidden;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line);flex:none">
+      <div style="font-size:16px;font-weight:700">분실물 박스 위치</div>
+      <button id="close-map" style="background:none;border:none;cursor:pointer;color:var(--muted);display:flex">${I.close}</button>
+    </div>
+    <div style="overflow-y:auto;padding:16px">
+      <div style="background:var(--bg);border-radius:16px;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-bottom:16px">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div style="font-size:15px;font-weight:700;color:var(--ink)">지도 준비 중이에요</div>
+        <div style="font-size:13px;color:var(--muted)">곧 실제 학교 평면도로 업데이트돼요</div>
+      </div>
+      <div class="sec-title" style="margin-bottom:8px">분실물 박스 위치 (B)</div>
+      <div class="card-list">
+        ${[
+          {n:'1·2학년 복도 입구',d:'1-2교실과 2-1교실 사이 복도'},
+          {n:'2·3학년 복도 입구',d:'2-2교실과 3-1교실 사이 복도'},
+          {n:'행정실 앞 복도',d:'행정실 입구 복도 옆'},
+        ].map((b,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 16px${i<2?';border-bottom:1px solid var(--line)':''}">
+          <div style="width:30px;height:30px;border-radius:50%;background:var(--danger-tint);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--danger);flex:none">B</div>
+          <div><div style="font-size:13px;font-weight:600">${b.n}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${b.d}</div></div>
+        </div>`).join('')}
+      </div>
+      <div style="height:8px"></div>
+    </div>
+  </div>`
+  document.body.appendChild(ov)
+  ov.querySelector('#close-map').onclick=()=>ov.remove()
+  ov.onclick=e=>{if(e.target===ov)ov.remove()}
+}
+
+// ── 검색 탭 ──
+async function rSearch(){
+  TAB='search'
+  app().innerHTML=`<div class="screen fade-in">
+    <div class="hdr" style="border-bottom:1px solid var(--line)"><h2>검색</h2></div>
+    <div style="padding:14px 20px 8px">
+      <div style="background:var(--bg);border-radius:14px;padding:10px 16px;display:flex;align-items:center;gap:10px">
+        <div style="color:var(--muted);display:flex">${I.search}</div>
+        <input id="srch-inp" placeholder="이름으로 검색..." style="flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--ink);font-family:inherit">
+        <button id="srch-clear" style="display:none;background:none;border:none;color:var(--muted);cursor:pointer;display:flex">${I.close}</button>
+      </div>
+    </div>
+    <div id="srch-res" style="padding:4px 0"></div>
+    <div id="dm-hist" style="padding:0 0 8px">
+      <div style="padding:8px 20px 6px;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase">최근 대화</div>
+      <div id="dm-hist-list"><div class="loader" style="min-height:80px"><div class="spin"></div></div></div>
+    </div>
+  </div>${bnav()}`
+  bindNav()
+
+  const inp=document.getElementById('srch-inp')
+  const res=document.getElementById('srch-res')
+  const hist=document.getElementById('dm-hist')
+
+  const showResults=q=>{
+    const trimmed=q.trim()
+    hist.style.display=trimmed?'none':'block'
+    if(!trimmed){res.innerHTML='';return}
+    const found=USERS.filter(u=>u.id!==SESSION.id&&u.name.includes(trimmed))
+    res.innerHTML=found.length
+      ?found.map(u=>`<div class="row-item" data-uid="${u.id}" style="padding:12px 20px;cursor:pointer">
+          <div style="width:42px;height:42px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--primary);flex:none">${u.photo?`<img src="${u.photo}" style="width:42px;height:42px;border-radius:50%;object-fit:cover">`:esc(u.name.charAt(0))}</div>
+          <div class="row-body"><div class="row-title">${esc(u.name)}</div><div class="row-desc">${u.role==='admin'?'학생회':'학생'}</div></div>
+          <div class="row-right">${I.chev}</div>
+        </div>`).join('')
+      :`<div style="padding:32px 20px;text-align:center;color:var(--muted);font-size:14px">검색 결과가 없어요</div>`
+    res.querySelectorAll('[data-uid]').forEach(el=>{el.onclick=()=>push(()=>rUserProfile(el.dataset.uid))})
+  }
+
+  inp.oninput=()=>showResults(inp.value)
+
+  // 최근 DM 로드
+  let dms=[]
+  try{
+    const{data}=await wt(sb.from('okya_dm').select('*').or(`from_id.eq.${SESSION.id},to_id.eq.${SESSION.id}`).order('at',{ascending:false}),5000)
+    const seen=new Set()
+    dms=(data||[]).filter(dm=>{
+      const other=dm.from_id===SESSION.id?dm.to_id:dm.from_id
+      if(seen.has(other))return false
+      seen.add(other)
+      return true
+    })
+  }catch{}
+  const histList=document.getElementById('dm-hist-list')
+  if(!histList)return
+  if(!dms.length){histList.innerHTML=`<div style="padding:20px;text-align:center;color:var(--muted);font-size:14px">아직 대화가 없어요</div>`;return}
+  histList.innerHTML=dms.map(dm=>{
+    const otherId=dm.from_id===SESSION.id?dm.to_id:dm.from_id
+    const other=USERS.find(u=>u.id===otherId)
+    const name=other?.name||'알 수 없음'
+    const preview=dm.text?dm.text.slice(0,22)+(dm.text.length>22?'…':''):'사진'
+    return`<div class="row-item" data-uid="${otherId}" style="padding:12px 20px;cursor:pointer">
+      <div style="width:42px;height:42px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--primary);flex:none">${other?.photo?`<img src="${other.photo}" style="width:42px;height:42px;border-radius:50%;object-fit:cover">`:esc(name.charAt(0))}</div>
+      <div class="row-body"><div class="row-title">${esc(name)}</div><div class="row-desc">${esc(preview)} · ${timeago(dm.at)}</div></div>
+      <div class="row-right">${I.chev}</div>
+    </div>`
+  }).join('')
+  histList.querySelectorAll('[data-uid]').forEach(el=>{el.onclick=()=>push(()=>rUserProfile(el.dataset.uid))})
+}
+
+function rUserProfile(userId){
+  const user=USERS.find(u=>u.id===userId)
+  if(!user){toast('사용자를 찾을 수 없어요');return}
+  const isMe=userId===SESSION.id
+  const name=user.name
+  app().innerHTML=`<div class="screen no-nav fade-in">
+    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>프로필</h2><div></div></div>
+    <div style="padding:40px 20px 28px;text-align:center;border-bottom:1px solid var(--line)">
+      <div style="width:80px;height:80px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:var(--primary);margin:0 auto 16px;overflow:hidden">${user.photo?`<img src="${user.photo}" style="width:80px;height:80px;border-radius:50%;object-fit:cover">`:esc(name.charAt(0))}</div>
+      <div style="font-size:22px;font-weight:800;color:var(--ink);margin-bottom:6px">${esc(name)}</div>
+      <div style="font-size:13px;color:var(--muted)">창녕옥야고등학교 · ${user.role==='admin'?'학생회':'학생'}</div>
+    </div>
+    ${!isMe?`<div style="padding:20px">
+      <button id="dm-btn" style="width:100%;padding:14px;border-radius:14px;background:var(--primary);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">${I.msg}<span>메시지 보내기</span></button>
+    </div>`:'<div style="padding:20px;text-align:center;color:var(--muted);font-size:14px">내 프로필이에요</div>'}
+  </div>`
+  document.getElementById('bk').onclick=pop
+  if(!isMe)document.getElementById('dm-btn').onclick=()=>push(()=>rDmChat(userId))
+}
+
+async function rDmChat(userId){
+  const user=USERS.find(u=>u.id===userId)
+  const name=user?.name||'알 수 없음'
+  const myId=SESSION.id
+  app().innerHTML=`<div class="screen no-nav" style="display:flex;flex-direction:column;height:100dvh">
+    <div class="sub-hdr" style="flex:none">
+      <button class="back-btn" id="bk">${I.back}</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--primary);overflow:hidden">${user?.photo?`<img src="${user.photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`:esc(name.charAt(0))}</div>
+        <h2>${esc(name)}</h2>
+      </div>
+      <div></div>
+    </div>
+    <div id="dm-feed" style="flex:1;overflow-y:auto;padding:10px 0 4px;background:var(--bg)">
+      <div class="loader" style="min-height:200px"><div class="spin"></div></div>
+    </div>
+    <div style="flex:none;background:var(--bg);padding:6px 12px calc(12px + env(safe-area-inset-bottom))">
+      <div style="background:#fff;border-radius:20px;box-shadow:0 2px 16px rgba(0,0,0,.07);padding:8px 8px 8px 14px;display:flex;align-items:flex-end;gap:8px">
+        <textarea id="dm-txt" rows="1" placeholder="메시지를 입력하세요..." style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--ink);resize:none;max-height:80px;line-height:1.45;font-family:inherit;padding:0;min-height:20px"></textarea>
+        <button id="dm-snd" style="width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;flex:none;color:#fff;border:none;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+    </div>
+  </div>`
+  document.getElementById('bk').onclick=pop
+  const dmtxt=document.getElementById('dm-txt')
+  dmtxt.oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'}
+  document.getElementById('dm-snd').onclick=async()=>{
+    const text=dmtxt.value.trim();if(!text)return
+    const btn=document.getElementById('dm-snd');btn.disabled=true
+    try{
+      await wt(sb.from('okya_dm').insert({id:uid('dm'),from_id:myId,to_id:userId,text,at:nowISO()}))
+      dmtxt.value='';dmtxt.style.height='auto'
+      await loadDms()
+    }catch{toast('전송 실패')}
+    finally{btn.disabled=false}
+  }
+  async function loadDms(){
+    let msgs=[]
+    try{const{data}=await wt(sb.from('okya_dm').select('*').or(`and(from_id.eq.${myId},to_id.eq.${userId}),and(from_id.eq.${userId},to_id.eq.${myId})`).order('at',{ascending:true}));msgs=data||[]}catch{}
+    const feed=document.getElementById('dm-feed');if(!feed)return
+    if(!msgs.length){feed.innerHTML=`<div style="padding:60px 20px;text-align:center;color:var(--muted);font-size:14px">${esc(name)}님에게 첫 메시지를 보내보세요</div>`;return}
+    feed.innerHTML=msgs.map((m,i,a)=>{
+      const isMe=m.from_id===myId
+      const showHdr=!isMe&&(i===0||a[i-1].from_id!==m.from_id)
+      const isLast=i===a.length-1||a[i+1].from_id!==m.from_id
+      if(isMe){return`<div style="display:flex;justify-content:flex-end;padding:2px 14px;margin-bottom:${isLast?8:2}px"><div style="max-width:72%"><div style="background:var(--primary-tint);color:var(--primary);border-radius:18px 18px 4px 18px;padding:10px 14px;font-size:14px;line-height:1.55;word-break:break-word">${esc(m.text)}</div><div style="font-size:10px;color:var(--muted);text-align:right;margin-top:3px">${timeago(m.at)}</div></div></div>`}
+      return`<div style="display:flex;align-items:flex-start;gap:8px;padding:${showHdr?8:2}px 14px;margin-bottom:${isLast?8:2}px"><div style="width:34px;flex:none">${showHdr?`<div style="width:34px;height:34px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--primary)">${esc(name.charAt(0))}</div>`:''}</div><div style="max-width:72%">${showHdr?`<div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px">${esc(name)}</div>`:''}<div style="background:#fff;color:var(--ink);border-radius:4px 18px 18px 18px;padding:10px 14px;font-size:14px;line-height:1.55;word-break:break-word">${esc(m.text)}</div><div style="font-size:10px;color:var(--muted);margin-top:3px">${timeago(m.at)}</div></div></div>`
+    }).join('')
+    feed.scrollTop=feed.scrollHeight
+  }
+  await loadDms()
+}
+
+
+async function rChallengePage(){
+  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>챌린지</h2></div><div id="cb"><div class="loader" style="min-height:160px"><div class="spin"></div></div></div></div>`
+  document.getElementById('bk').onclick=pop
+  await iChallenge()
+}
+
+async function rBookPage(){
+  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>책 교환</h2></div><div id="cb"><div class="loader" style="min-height:160px"><div class="spin"></div></div></div></div>`
+  document.getElementById('bk').onclick=pop
+  await iBook()
+}
+
+async function rPetitionPage(){
+  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>청원</h2></div><div id="cb"><div class="loader" style="min-height:160px"><div class="spin"></div></div></div></div>`
+  document.getElementById('bk').onclick=pop
+  await iPetition()
+}
+
+async function iChallenge(){
+  const admin=SESSION.role==='admin'
+  let evs=[],subs=[]
+  try{const r=await wt(sb.from('okya_events').select('*').order('at',{ascending:false}));evs=r.data||[]}catch{}
+  const expired=evs.filter(isExpired)
+  if(expired.length){
+    await Promise.allSettled(expired.flatMap(e=>[wt(sb.from('okya_events').delete().eq('id',e.id)).catch(()=>{}),wt(sb.from('okya_event_subs').delete().eq('event_id',e.id)).catch(()=>{})]))
+    evs=evs.filter(e=>!isExpired(e))
+  }
+  try{const r=await wt(sb.from('okya_event_subs').select('id,event_id'));subs=r.data||[]}catch{}
+  function ddTag(dl){if(!dl)return'';const d=Math.ceil((new Date(dl)-new Date())/86400000);const red=d<=1;return`<span style="font-size:11px;font-weight:700;color:${red?'var(--danger)':'var(--muted)'};background:${red?'#FEF0F1':'var(--line)'};padding:2px 7px;border-radius:6px">${red?'D-day':'D-'+d}</span>`}
+  const cards=evs.length?evs.map(e=>{const cnt=subs.filter(s=>s.event_id===e.id).length;return`<div style="padding:16px 20px;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:7px;margin-bottom:5px"><span class="pill blue">챌린지</span>${e.deadline?`<span style="font-size:11.5px;color:var(--muted)">~${fmtDate(e.deadline)}</span>`:''}${ddTag(e.deadline)}</div><div style="font-size:15px;font-weight:700;margin-bottom:3px">${esc(e.title)}</div>${e.descr?`<div style="font-size:13px;color:var(--ink2);line-height:1.5">${esc(e.descr)}</div>`:''}</div><div style="background:var(--primary);color:#fff;border-radius:11px;padding:7px 11px;font-size:14px;font-weight:800;text-align:center;flex:none">${fmt(e.reward)}<div style="font-size:10px;opacity:.8">옥</div></div></div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)"><button style="font-size:13px;font-weight:600;color:var(--primary);background:var(--primary-tint);padding:7px 12px;border-radius:10px" data-gallery="${e.id}">📷 인증 사진 (${cnt})</button>${admin?`<button class="btn danger sm" data-cancel="${e.id}">취소</button>`:`<button class="btn out sm" data-verify="${e.id}">인증하기</button>`}</div></div>`}).join(''):'<div class="empty">진행 중인 챌린지가 없어요.</div>'
+  const aform=admin?`<div style="padding:0 20px 16px"><div class="card"><div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:12px">새 챌린지 만들기</div><div class="field"><label>제목</label><input id="et" placeholder="예: 등교 스트레칭 챌린지"></div><div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>보상(옥)</label><input id="er" type="number" placeholder="100"></div><div class="field" style="flex:1"><label>마감일</label><input id="edd" type="date"></div></div><div class="field"><label>설명</label><input id="edesc" placeholder="간단 설명"></div><button class="btn sm" id="eadd">등록</button></div></div>`:''
+  document.getElementById('cb').innerHTML=`<div class="card-list" style="margin:0 20px 12px">${cards}</div>${aform}`
+  const add=document.getElementById('eadd')
+  if(add)add.onclick=async()=>{
+    const title=document.getElementById('et').value.trim();if(!title){toast('제목을 입력해줘');return}
+    try{await wt(sb.from('okya_events').insert({id:uid('e'),title,reward:parseInt(document.getElementById('er').value,10)||0,descr:document.getElementById('edesc').value.trim(),deadline:document.getElementById('edd').value?new Date(document.getElementById('edd').value+'T23:59:59').toISOString():null,at:nowISO()}))}catch{toast('등록 실패');return}
+    iChallenge()
+  }
+  document.querySelectorAll('[data-verify]').forEach(b=>b.onclick=()=>push(()=>rVerify(b.dataset.verify)))
+  document.querySelectorAll('[data-gallery]').forEach(b=>b.onclick=()=>push(()=>rGallery(b.dataset.gallery)))
+  document.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=async()=>{
+    await Promise.allSettled([wt(sb.from('okya_event_subs').delete().eq('event_id',b.dataset.cancel)).catch(()=>{}),wt(sb.from('okya_events').delete().eq('id',b.dataset.cancel)).catch(()=>{})])
+    toast('챌린지 취소');iChallenge()
+  })
+}
+
+async function rVerify(eid){
+  let e=null
+  try{const r=await wt(sb.from('okya_events').select('*').eq('id',eid).single());e=r.data}catch{}
+  if(!e){toast('챌린지를 찾을 수 없어요');return}
+  app().innerHTML=`<div class="screen no-nav fade-in">
+    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>챌린지 인증</h2></div>
+    <div style="padding:20px">
+      <div class="card" style="background:var(--primary-tint);margin-bottom:16px"><div style="font-weight:700;font-size:15px;margin-bottom:3px">${esc(e.title)}</div><div style="font-size:13px;color:var(--primary)">보상 ${fmt(e.reward)}옥 · ${fmtDate(e.deadline)}</div></div>
+      <div class="field"><label>참여 학생 이름</label><input id="vn" placeholder="예: 박은찬, 김옥야"></div>
+      <div class="field"><label>인증 사진</label><input id="vf" type="file" accept="image/*"></div>
+      <button class="btn" id="vsub">인증 제출</button>
+      <p class="note" style="margin-top:12px">학생회가 확인하고 옥야머니를 지급해요.</p>
+    </div>
+  </div>`
+  document.getElementById('bk').onclick=pop
+  document.getElementById('vsub').onclick=async()=>{
+    const names=document.getElementById('vn').value.trim()
+    const f=document.getElementById('vf').files[0];let photo=null
+    if(f){toast('사진 처리 중...');photo=await readImg(f)}
+    try{await wt(sb.from('okya_event_subs').insert({id:uid('s'),event_id:eid,by_id:SESSION.id,by_name:SESSION.name,names,photo,at:nowISO()}),12000)}catch{toast('제출 실패');return}
+    toast('인증 제출 완료');pop()
+  }
+}
+
+async function rGallery(eid){
+  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>인증 사진</h2></div><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
+  document.getElementById('bk').onclick=pop
+  const admin=SESSION.role==='admin'
+  let subs=[],ev=null
+  try{const[r1,r2]=await Promise.allSettled([wt(sb.from('okya_event_subs').select('*').eq('event_id',eid).order('at',{ascending:false})),wt(sb.from('okya_events').select('title,reward').eq('id',eid).single())]);subs=r1.status==='fulfilled'?(r1.value.data||[]):[];ev=r2.status==='fulfilled'?r2.value.data:null}catch{}
+  const title=ev?ev.title:'인증 사진'
+  const cards=subs.length?subs.map(s=>{const reacts=s.reactions||{};const hearts=Object.values(reacts).filter(v=>v==='heart').length;const tears=Object.values(reacts).filter(v=>v==='tear').length;const my=reacts[SESSION.id];return`<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-size:14px;font-weight:700">${esc(s.names||s.by_name)}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${timeago(s.at)}</div></div>${admin?`<button class="btn out sm" data-award="${s.id}">지급</button>`:''}</div>${s.photo?`<img class="thumb" src="${s.photo}">`:''}<div class="reacts" style="margin-top:10px"><button class="react-btn${my==='heart'?' on-r':''}" data-pr="${s.id}::heart">❤️ ${hearts}</button><button class="react-btn${my==='tear'?' on-b':''}" data-pr="${s.id}::tear">😢 ${tears}</button></div></div>`}).join(''):'<div class="empty">아직 인증 사진이 없어요.</div>'
+  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>📷 ${esc(title)}</h2></div><div style="padding:20px 20px 40px">${cards}</div></div>`
+  document.getElementById('bk').onclick=pop
+  document.querySelectorAll('[data-pr]').forEach(b=>b.onclick=async()=>{
+    const[id,t]=b.dataset.pr.split('::');let reacts={}
+    try{const r=await wt(sb.from('okya_event_subs').select('reactions').eq('id',id).single());reacts={...(r.data?.reactions||{})}}catch{}
+    if(reacts[SESSION.id]===t)delete reacts[SESSION.id];else reacts[SESSION.id]=t
+    try{await wt(sb.from('okya_event_subs').update({reactions:reacts}).eq('id',id))}catch{}
+    rGallery(eid)
+  })
+  if(admin)document.querySelectorAll('[data-award]').forEach(b=>b.onclick=()=>push(()=>rAward(b.dataset.award)))
+}
+
+async function rAward(subId){
+  let s=null,ev=null
+  try{const[r1,r2]=await Promise.allSettled([wt(sb.from('okya_event_subs').select('*').eq('id',subId).single()),wt(sb.from('okya_events').select('*'))]);s=r1.status==='fulfilled'?r1.value.data:null;if(s&&r2.status==='fulfilled')ev=(r2.value.data||[]).find(e=>e.id===s.event_id)}catch{}
+  if(!s){pop();return}
+  ev=ev||{reward:0,title:''}
+  const students=USERS.filter(u=>u.role!=='admin')
+  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>옥야머니 지급</h2></div><div style="padding:20px"><div class="card" style="background:var(--primary-tint);margin-bottom:14px"><div style="font-weight:700;margin-bottom:3px">${esc(ev.title)}</div><div style="font-size:13px;color:var(--primary)">보상 ${fmt(ev.reward)}옥</div><div style="font-size:13px;margin-top:5px">제출자: <b>${esc(s.names||'-')}</b></div></div>${s.photo?`<img class="thumb" src="${s.photo}" style="margin-bottom:14px">`:''}  <label style="margin-bottom:8px">지급할 학생 선택</label><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">${students.map(u=>`<label class="check-item"><input type="checkbox" value="${u.id}" ${u.id===s.by_id?'checked':''}>${esc(u.name)}</label>`).join('')}</div><button class="btn" id="pay">선택한 학생에게 ${fmt(ev.reward)}옥 지급</button></div></div>`
+  document.getElementById('bk').onclick=pop
+  document.getElementById('pay').onclick=async()=>{
+    const ids=[...document.querySelectorAll('.check-item input:checked')].map(i=>i.value)
+    if(!ids.length){toast('지급할 학생을 선택해줘');return}
+    for(const id of ids)await addTx({from:'u_council',to:id,amount:ev.reward,type:'발행',reason:'['+ev.title+'] 인증'})
+    try{await wt(sb.from('okya_event_subs').delete().eq('id',subId))}catch{}
+    toast(ids.length+'명 지급 완료');pop();pop()
+  }
+}
+
+async function iBook(){
+  let books=[]
+  try{const r=await wt(sb.from('okya_books').select('*').order('at',{ascending:false}));books=r.data||[]}catch{}
+  function bRow(b){
+    const mine=b.owner===SESSION.id,applied=(b.applicants||[]).some(a=>a.id===SESSION.id)
+    let act=''
+    if(b.status==='open'){if(mine)act=(b.applicants&&b.applicants.length)?`<button class="btn out sm" data-confirm="${b.id}">확정</button>`:`<span style="font-size:12px;color:var(--muted)">대기중</span>`;else act=applied?`<button class="btn gray sm" data-unapply="${b.id}">취소</button>`:`<button class="btn out sm" data-apply="${b.id}">${b.kind}</button>`}
+    else if(b.status==='matched'){if(b.recipient===SESSION.id)act=`<button class="btn green sm" data-complete="${b.id}">완료</button>`;else act=`<span class="pill green">${esc(b.recipient_name)}와 확정</span>`}
+    const apps=(b.status==='open'&&b.applicants?.length)?`<div style="font-size:12px;color:var(--muted);margin-top:3px">신청: ${b.applicants.map(a=>esc(a.name)).join(', ')}</div>`:''
+    const open=openBooks.has(b.id),cs=b.comments||[]
+    return`<div style="padding:14px 20px;border-bottom:1px solid var(--line)"><div style="display:flex;align-items:flex-start;gap:10px"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="pill ${b.kind==='나눔'?'green':'gold'}">${b.kind}</span><span style="font-size:12px;color:var(--muted)">${esc(b.grade)}</span></div><div style="font-size:15px;font-weight:600">${esc(b.title)}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${esc(b.owner_name)} · ${timeago(b.at)}</div>${apps}</div><div style="flex:none">${act}</div></div><div style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px"><button style="font-size:13px;font-weight:600;color:var(--primary)" data-ctoggle="${b.id}">💬 댓글 ${cs.length} · ${open?'접기':'열기'}</button>${open?`<div style="margin-top:8px">${cs.length?cs.map(c=>`<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div style="display:flex;gap:7px;align-items:center;margin-bottom:3px"><span style="font-size:13px;font-weight:700">${esc(c.byName)}</span><span style="font-size:11px;color:var(--muted)">${timeago(c.at)}</span></div><div style="font-size:13.5px;line-height:1.5;color:var(--ink2)">${esc(c.text)}</div></div>`).join(''):'<div style="font-size:13px;color:var(--muted);padding:8px 0">첫 댓글을 남겨보세요.</div>'}<div style="display:flex;gap:8px;margin-top:8px"><input data-cbook="${b.id}" placeholder="댓글 입력" style="flex:1;padding:9px 12px;font-size:14px"><button class="btn sm" data-csend="${b.id}">등록</button></div></div>`:''}</div></div>`
+  }
+  const rows=books.length?books.map(bRow).join(''):'<div class="empty">등록된 책이 없어요.</div>'
+  document.getElementById('cb').innerHTML=`<div style="padding:0 20px 12px"><div class="card"><div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:10px">책 올리기</div><div class="field"><label>교재명</label><input id="bt" placeholder="예: 통합사회1 (비상)"></div><div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>학년</label><select id="bg"><option>1학년</option><option>2학년</option><option>3학년</option></select></div><div class="field" style="flex:1"><label>구분</label><select id="bk2"><option>나눔</option><option>교환</option></select></div></div><button class="btn" id="badd">등록하기</button></div></div><div class="card-list" style="margin:0 20px">${rows}</div>`
+  document.getElementById('badd').onclick=async()=>{
+    const title=document.getElementById('bt').value.trim();if(!title){toast('교재명을 입력해줘');return}
+    try{await wt(sb.from('okya_books').insert({id:uid('b'),title,grade:document.getElementById('bg').value,kind:document.getElementById('bk2').value,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}))}catch{toast('등록 실패');return}
+    toast('등록 완료');iBook()
+  }
+  document.querySelectorAll('[data-apply]').forEach(b=>b.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',b.dataset.apply).single());const apps=[...(r.data?.applicants||[])];if(!apps.some(a=>a.id===SESSION.id))apps.push({id:SESSION.id,name:SESSION.name,at:nowISO()});await wt(sb.from('okya_books').update({applicants:apps}).eq('id',b.dataset.apply))}catch{toast('오류');return};toast('신청했어요');iBook()})
+  document.querySelectorAll('[data-unapply]').forEach(b=>b.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',b.dataset.unapply).single());await wt(sb.from('okya_books').update({applicants:(r.data?.applicants||[]).filter(a=>a.id!==SESSION.id)}).eq('id',b.dataset.unapply))}catch{};iBook()})
+  document.querySelectorAll('[data-complete]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_books').delete().eq('id',b.dataset.complete))}catch{};toast('완료');iBook()})
+  document.querySelectorAll('[data-confirm]').forEach(b=>b.onclick=()=>push(()=>rConfirmBook(b.dataset.confirm)))
+  document.querySelectorAll('[data-ctoggle]').forEach(b=>b.onclick=()=>{const id=b.dataset.ctoggle;if(openBooks.has(id))openBooks.delete(id);else openBooks.add(id);iBook()})
+  document.querySelectorAll('[data-csend]').forEach(b=>b.onclick=async()=>{const id=b.dataset.csend,inp=document.querySelector('[data-cbook="'+id+'"]'),text=inp?.value.trim();if(!text)return;try{const r=await wt(sb.from('okya_books').select('comments').eq('id',id).single());const comments=[...(r.data?.comments||[]),{by:SESSION.id,byName:SESSION.name,text,at:nowISO()}];await wt(sb.from('okya_books').update({comments}).eq('id',id))}catch{};openBooks.add(id);iBook()})
+}
+
+async function rConfirmBook(id){
+  let b=null;try{const r=await wt(sb.from('okya_books').select('*').eq('id',id).single());b=r.data}catch{}
+  if(!b){pop();return}
+  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>${b.kind} 확정</h2></div><div style="padding:20px"><div class="card" style="background:var(--primary-tint);margin-bottom:14px"><b>${esc(b.title)}</b></div><label style="margin-bottom:8px">누구와 ${b.kind}할까요?</label><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">${(b.applicants||[]).map(a=>`<label class="check-item"><input type="radio" name="rc" value="${a.id}" data-name="${esc(a.name)}">${esc(a.name)}</label>`).join('')||'<div class="empty">신청자가 없어요</div>'}</div><button class="btn" id="cf">확정하기</button></div></div>`
+  document.getElementById('bk').onclick=pop
+  document.getElementById('cf').onclick=async()=>{const sel=document.querySelector('input[name="rc"]:checked');if(!sel){toast('상대를 선택해줘');return};try{await wt(sb.from('okya_books').update({status:'matched',recipient:sel.value,recipient_name:sel.dataset.name}).eq('id',id))}catch{};toast('확정했어요');pop()}
+}
+
+async function iPetition(){
+  const admin=SESSION.role==='admin'
+  let ps=[]
+  try{const r=await wt(sb.from('okya_petitions').select('*').order('at',{ascending:false}));ps=r.data||[]}catch{}
+  const pub=ps.filter(p=>p.status==='approved'),pend=ps.filter(p=>p.status==='pending')
+  const rv=(p,t)=>Object.values(p.reacts||{}).filter(v=>v===t).length
+  const pubList=pub.length?pub.map(p=>{const mine=(p.reacts||{})[SESSION.id];return`<div style="padding:14px 20px;border-bottom:1px solid var(--line)"><div style="font-size:15px;font-weight:600;margin-bottom:3px">${esc(p.txt)}</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px">공개됨 · ${timeago(p.approved_at||p.at)}</div><div class="reacts"><button class="react-btn${mine==='up'?' on-r':''}" data-react="${p.id}::up">👍 ${rv(p,'up')}</button><button class="react-btn${mine==='down'?' on-b':''}" data-react="${p.id}::down">👎 ${rv(p,'down')}</button><button class="react-btn${mine==='meh'?' on-g':''}" data-react="${p.id}::meh">⋯ ${rv(p,'meh')}</button></div></div>`}).join(''):'<div class="empty">아직 공개된 청원이 없어요.</div>'
+  const pendList=admin&&pend.length?pend.map(p=>`<div style="padding:14px 20px;border-bottom:1px solid var(--line)"><div style="font-size:15px;font-weight:600;margin-bottom:3px">${esc(p.txt)}</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px">검토 대기 · ${timeago(p.at)}</div><div style="display:flex;gap:8px"><button class="btn out sm" data-ap="${p.id}">공개</button><button class="btn danger sm" data-rj="${p.id}">반려</button></div></div>`).join(''):''
+  document.getElementById('cb').innerHTML=`<div style="padding:0 20px 12px">${!admin?`<div class="card"><div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:10px">청원 올리기 (익명)</div><div class="field"><textarea id="pt" rows="3" placeholder="건의하고 싶은 내용을 적어줘" style="resize:none"></textarea></div><button class="btn" id="psub">제출하기</button><p class="note" style="margin-top:10px">제출한 청원은 학생회 검토 후 공개됩니다.</p></div>`:''}${admin&&pend.length?`<div class="sec-title" style="margin-top:4px">검토 대기 (${pend.length})</div><div class="card-list" style="margin-bottom:12px">${pendList}</div>`:''}<div class="sec-title" style="margin-top:4px">공개된 청원</div><div class="card-list">${pubList}</div></div>`
+  const psub=document.getElementById('psub')
+  if(psub)psub.onclick=async()=>{const txt=document.getElementById('pt').value.trim();if(!txt){toast('내용을 입력해줘');return};try{await wt(sb.from('okya_petitions').insert({id:uid('p'),txt,status:'pending',by_id:SESSION.id,at:nowISO(),reacts:{}}))}catch{toast('제출 실패');return};toast('제출 완료 · 검토 후 공개돼요');iPetition()}
+  document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_petitions').update({status:'approved',approved_at:nowISO()}).eq('id',b.dataset.ap))}catch{};iPetition()})
+  document.querySelectorAll('[data-rj]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_petitions').delete().eq('id',b.dataset.rj))}catch{};iPetition()})
+  document.querySelectorAll('[data-react]').forEach(b=>b.onclick=async()=>{const[id,t]=b.dataset.react.split('::');try{const r=await wt(sb.from('okya_petitions').select('reacts').eq('id',id).single());const reacts={...(r.data?.reacts||{})};if(reacts[SESSION.id]===t)delete reacts[SESSION.id];else reacts[SESSION.id]=t;await wt(sb.from('okya_petitions').update({reacts}).eq('id',id))}catch{};iPetition()})
+}
+
+function rMy(){
+  TAB='my'
+  const photoSrc=SESSION.photo||null
+  const initials=SESSION.name.charAt(0)
+  const isAdmin=SESSION.role==='admin'
+
+  app().innerHTML=`<div class="screen fade-in">
+
+    <!-- 상단 알림 버튼 -->
+    <div style="display:flex;justify-content:flex-end;padding:calc(14px + env(safe-area-inset-top)) 20px 0">
+      <button style="width:38px;height:38px;border-radius:50%;background:var(--bg);border:none;display:flex;align-items:center;justify-content:center;color:var(--ink2);cursor:pointer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+    </div>
+
+    <!-- 프로필 영역 (흰 배경) -->
+    <div style="padding:24px 20px 28px;display:flex;flex-direction:column;align-items:center;border-bottom:1px solid var(--line)">
+      <div style="position:relative;margin-bottom:16px">
+        ${photoSrc
+          ? `<img src="${photoSrc}" style="width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid var(--line)">`
+          : `<div style="width:84px;height:84px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:var(--primary)">${initials}</div>`}
+        <label for="my-photo-input" style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(26,92,230,.35)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </label>
+        <input id="my-photo-input" type="file" accept="image/*" style="display:none">
+      </div>
+      <div style="font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:6px">${esc(SESSION.name)}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:var(--muted);font-weight:500">창녕옥야고등학교</span>
+        <span style="width:3px;height:3px;border-radius:50%;background:var(--line)"></span>
+        <span style="font-size:13px;color:var(--primary);font-weight:700">${isAdmin?'학생회':'학생'}</span>
+      </div>
+    </div>
+
+    <!-- 메뉴 섹션 -->
+    <div style="padding:20px 20px 0">
+
+      <div class="sec-title" style="margin-bottom:10px">테마 색상</div>
+      <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap">
+        ${(()=>{let cur=null;try{cur=JSON.parse(localStorage.getItem('okya-theme')||'null')}catch{}
+          return THEMES.map(t=>`<button data-theme='${JSON.stringify(t)}' title="${t.name}" style="width:44px;height:44px;border-radius:10px;background:${t.primary};border:${cur&&cur.primary===t.primary?'3px solid var(--ink)':'3px solid transparent'};outline:2px solid ${cur&&cur.primary===t.primary?t.primary:'transparent'};outline-offset:2px;cursor:pointer;transition:transform .15s;flex:none"></button>`).join('')
+        })()}
+      </div>
+
+      <div class="sec-title" style="margin-bottom:8px">설정</div>
+      <div class="card-list" style="margin-bottom:20px">
+        <div class="row-item" id="my-noti">
+          <div class="row-ic" style="background:#FFFAEB;color:#D97706">${I.bell}</div>
+          <div class="row-body">
+            <div class="row-title">알림 설정</div>
+            <div class="row-desc">공지·챌린지 알림 관리</div>
+          </div>
+          <div class="row-right">${I.chev}</div>
+        </div>
+        <div class="row-item" id="my-info">
+          <div class="row-ic" style="background:var(--primary-tint);color:var(--primary)">${I.school}</div>
+          <div class="row-body">
+            <div class="row-title">앱 정보</div>
+            <div class="row-desc">옥야 v1.0 · 창녕옥야고 학생회</div>
+          </div>
+          <div class="row-right">${I.chev}</div>
+        </div>
+      </div>
+
+      <div class="sec-title" style="margin-bottom:8px">계정</div>
+      <div class="card-list">
+        <div class="row-item" id="my-out">
+          <div class="row-ic" style="background:var(--danger-tint);color:var(--danger)">${I.logout}</div>
+          <div class="row-body">
+            <div class="row-title" style="color:var(--danger)">로그아웃</div>
+            <div class="row-desc" style="color:var(--danger);opacity:.7">현재 계정에서 나가기</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="height:36px"></div>
+  </div>${bnav()}`
+
+  bindNav()
+
+  document.getElementById('my-photo-input').onchange=async(e)=>{
+    const f=e.target.files[0];if(!f)return
+    toast('사진 업로드 중...')
+    const data=await readImg(f,400,0.7)
+    SESSION.photo=data
+    try{await wt(sb.from('okya_users').update({photo:data}).eq('id',SESSION.id))}catch{}
+    rMy()
+  }
+
+  document.querySelectorAll('[data-theme]').forEach(btn=>{
+    btn.onclick=()=>{
+      try{applyTheme(JSON.parse(btn.dataset.theme))}catch{}
+      rMy()
+    }
+  })
+
+  document.getElementById('my-noti').onclick=()=>toast('알림 설정은 준비 중이에요')
+  document.getElementById('my-info').onclick=()=>toast('옥야 v1.0 · 창녕옥야고 학생회')
+
+  document.getElementById('my-out').onclick=async()=>{
+    try{await sb.auth.signOut()}catch{}
+    SESSION=null;USERS=[];rLogin()
+  }
+}
+
+function rLogin(){
+  app().innerHTML=`
+  <div style="min-height:100dvh;display:flex;flex-direction:column;background:var(--bg)">
+    <!-- 상단 브랜드 영역 -->
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px 28px 20px;text-align:center">
+      <img src="${LOGO}" style="width:72px;height:72px;border-radius:24px;object-fit:cover;box-shadow:0 8px 24px rgba(26,92,230,.18);margin-bottom:20px">
+      <div style="font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--ink)">옥야</div>
+      <div style="font-size:14px;color:var(--muted);margin-top:4px">창녕옥야고등학교 학생회</div>
+    </div>
+
+    <!-- 로그인 카드 -->
+    <div style="padding:0 20px 40px;padding-bottom:calc(40px + env(safe-area-inset-bottom))">
+      <div style="background:var(--card);border-radius:28px;padding:28px 24px;box-shadow:var(--sh)">
+        <div style="font-size:19px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px">로그인</div>
+        <div style="font-size:14px;color:var(--ink2);line-height:1.6;margin-bottom:24px">학교 구글 계정으로 로그인하면<br>옥야 서비스를 이용할 수 있어요.</div>
+
+        <button id="gg" style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:15px 20px;border-radius:16px;background:var(--bg);border:1.5px solid var(--line);font-size:15px;font-weight:700;color:var(--ink);transition:background .15s">
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          Google 계정으로 계속하기
+        </button>
+
+        <p style="font-size:12px;color:var(--muted);margin-top:16px;text-align:center;line-height:1.6">처음 로그인하면 자동으로 계정이 만들어져요.</p>
+      </div>
+    </div>
+  </div>`
+  const gg=document.getElementById('gg')
+  gg.onmouseenter=()=>gg.style.background='var(--line)'
+  gg.onmouseleave=()=>gg.style.background='var(--bg)'
+  gg.onclick=async()=>{
+    gg.disabled=true;gg.style.opacity='.6'
+    const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin,queryParams:{prompt:'select_account'}}})
+    if(error){toast('로그인 실패: '+error.message);gg.disabled=false;gg.style.opacity='1'}
+  }
+}
+
+async function handleUserUpsert(authUser){
+  const name=authUser.user_metadata?.full_name||authUser.user_metadata?.name||(authUser.email||'').split('@')[0]||'학생'
+  let role='student'
+  try{const r=await wt(sb.from('okya_users').select('role').eq('id',authUser.id).maybeSingle());if(r.data)role=r.data.role}catch{}
+  try{const r=await wt(sb.from('okya_users').upsert({id:authUser.id,name,role}).select().single());SESSION=r.data||{id:authUser.id,name,role}}catch{SESSION={id:authUser.id,name,role}}
+  try{const r=await wt(sb.from('okya_users').select('id,name,role'));USERS=r.data||[]}catch{}
+  STACK=[];routeTab()
+}
+
+// ── 테마 ──
+const THEMES=[
+  {name:'파랑',primary:'#1A5CE6',d:'#1349C0',tint:'#EEF3FF'},
+  {name:'보라',primary:'#7C3AED',d:'#6D28D9',tint:'#F3EEFF'},
+  {name:'초록',primary:'#059669',d:'#047857',tint:'#EDFAF5'},
+  {name:'주황',primary:'#D97706',d:'#B45309',tint:'#FFFAEB'},
+  {name:'분홍',primary:'#DB2777',d:'#BE185D',tint:'#FCE7F3'},
+  {name:'민트',primary:'#0D9488',d:'#0F766E',tint:'#CCFBF1'},
+  {name:'레드',primary:'#DC2626',d:'#B91C1C',tint:'#FEE2E2'},
+  {name:'하늘',primary:'#0891B2',d:'#0E7490',tint:'#E0F8FF'},
+  {name:'라임',primary:'#65A30D',d:'#4D7C0F',tint:'#ECFCCB'},
+  {name:'핫핑크',primary:'#EC4899',d:'#BE185D',tint:'#FDF2F8'},
+]
+function applyTheme(t){
+  const r=document.documentElement.style
+  r.setProperty('--primary',t.primary)
+  r.setProperty('--primary-d',t.d)
+  r.setProperty('--primary-tint',t.tint)
+  r.setProperty('--sh-blue',`0 10px 28px ${t.primary}38,-3px 3px 12px ${t.primary}1a`)
+  localStorage.setItem('okya-theme',JSON.stringify(t))
+}
+
+// ── 초기화 ──
+;(async()=>{
+  // 저장된 테마 먼저 적용
+  try{const st=localStorage.getItem('okya-theme');if(st)applyTheme(JSON.parse(st))}catch{}
+  const _t0=Date.now()
+  // 스플래시 최소 1.5초 표시 보장
+  const holdSplash=()=>new Promise(r=>setTimeout(r,Math.max(0,1500-(Date.now()-_t0))))
+  const fallback=setTimeout(()=>{if(app().querySelector('.splash-screen'))rLogin()},10000)
+  try{
+    try{const r=await wt(sb.from('okya_users').select('id,name,role'),6000);USERS=r.data||[]}catch{}
+    const{data}=await wt(sb.auth.getSession(),6000)
+    clearTimeout(fallback)
+    await holdSplash()
+    if(data?.session?.user)await handleUserUpsert(data.session.user)
+    else rLogin()
+    sb.auth.onAuthStateChange(async(event,s)=>{
+      if((event==='SIGNED_IN'||event==='INITIAL_SESSION')&&s)await handleUserUpsert(s.user)
+      else if(event==='SIGNED_OUT'){SESSION=null;USERS=[];rLogin()}
+    })
+  }catch{
+    clearTimeout(fallback)
+    await holdSplash()
+    rLogin()
+  }
+})()
+</script>
+</body>
+</html>
