@@ -241,6 +241,18 @@ const timeago=iso=>{if(!iso)return'';const s=Math.floor((Date.now()-new Date(iso
 const fmtDate=iso=>{if(!iso)return'상시';const d=new Date(iso);return(d.getMonth()+1)+'월 '+d.getDate()+'일'}
 const isExpired=e=>e.deadline&&new Date(e.deadline)<new Date()
 function readImg(file,maxW=900,q=0.6){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height;if(w>maxW){h=Math.round(h*maxW/w);w=maxW}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',q))};img.src=r.result};r.readAsDataURL(file)})}
+// 압축한 이미지를 Blob으로 반환 (Storage 업로드용)
+function compressImg(file,maxW=900,q=0.6){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height;if(w>maxW){h=Math.round(h*maxW/w);w=maxW}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);c.toBlob(b=>res(b),'image/jpeg',q)};img.src=r.result};r.readAsDataURL(file)})}
+// 사진을 Supabase Storage('photos' 버킷)에 올리고 공개 URL 반환. 실패 시 null.
+async function uploadImg(file,folder='misc',maxW=900,q=0.6){
+  try{
+    const blob=await compressImg(file,maxW,q)
+    const path=`${folder}/${uid('img')}.jpg`
+    const{error}=await wt(sb.storage.from('photos').upload(path,blob,{contentType:'image/jpeg',upsert:false}),15000)
+    if(error){console.warn('사진 업로드 실패:',error.message);toast('사진 업로드 실패');return null}
+    return sb.storage.from('photos').getPublicUrl(path).data.publicUrl
+  }catch(e){console.warn(e);toast('사진 처리 실패');return null}
+}
 
 // 모든 DB 쿼리에 타임아웃 적용
 function wt(p,ms=7000){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms))])}
@@ -932,7 +944,8 @@ async function rLost(){
   document.getElementById('bk').onclick=pop
   document.getElementById('lost-map').onclick=showLostMap
 
-  let pendingPhoto=null
+  let pendingPhoto=null   // 썸네일 미리보기용(dataURL)
+  let pendingFile=null    // 실제 업로드할 원본 파일
   let attachOpen=false
 
   document.getElementById('lp-plus').onclick=()=>{
@@ -944,6 +957,7 @@ async function rLost(){
     if(!f)return
     attachOpen=false
     document.getElementById('lp-attach').style.display='none'
+    pendingFile=f
     pendingPhoto=await readImg(f,900,0.8)
     const th=document.getElementById('lp-thumb')
     if(th){th.src=pendingPhoto;th.style.display='block'}
@@ -956,13 +970,15 @@ async function rLost(){
 
   document.getElementById('lp-send').onclick=async()=>{
     const text=lptxt.value.trim()
-    if(!text&&!pendingPhoto)return
+    if(!text&&!pendingFile)return
     const btn=document.getElementById('lp-send')
     btn.disabled=true
     try{
-      await wt(sb.from('okya_lost').insert({id:uid('lost'),user_id:SESSION.id,photo:pendingPhoto||null,description:text||null,at:nowISO()}))
+      let photoUrl=null
+      if(pendingFile){toast('사진 업로드 중...');photoUrl=await uploadImg(pendingFile,'lost',900,0.8);if(!photoUrl){btn.disabled=false;return}}
+      await wt(sb.from('okya_lost').insert({id:uid('lost'),user_id:SESSION.id,photo:photoUrl,description:text||null,at:nowISO()}))
       lptxt.value='';lptxt.style.height='auto'
-      pendingPhoto=null
+      pendingPhoto=null;pendingFile=null
       const th=document.getElementById('lp-thumb')
       if(th){th.style.display='none';th.src=''}
       await loadMsgs()
@@ -1234,7 +1250,7 @@ async function rVerify(eid){
   document.getElementById('vsub').onclick=async()=>{
     const names=document.getElementById('vn').value.trim()
     const f=document.getElementById('vf').files[0];let photo=null
-    if(f){toast('사진 처리 중...');photo=await readImg(f)}
+    if(f){toast('사진 업로드 중...');photo=await uploadImg(f,'challenge');if(!photo)return}
     try{await wt(sb.from('okya_event_subs').insert({id:uid('s'),event_id:eid,by_id:SESSION.id,by_name:SESSION.name,names,photo,at:nowISO()}),12000)}catch{toast('제출 실패');return}
     toast('인증 제출 완료');pop()
   }
@@ -1411,9 +1427,10 @@ function rMy(){
   document.getElementById('my-photo-input').onchange=async(e)=>{
     const f=e.target.files[0];if(!f)return
     toast('사진 업로드 중...')
-    const data=await readImg(f,400,0.7)
-    SESSION.photo=data
-    try{await wt(sb.from('okya_users').update({photo:data}).eq('id',SESSION.id))}catch{}
+    const url=await uploadImg(f,'profile',400,0.7)
+    if(!url)return
+    SESSION.photo=url
+    try{await wt(sb.from('okya_users').update({photo:url}).eq('id',SESSION.id))}catch{}
     rMy()
   }
 
