@@ -13,20 +13,20 @@
 <style>
 /* ── 디자인 토큰 ── */
 :root{
-  --bg:#F7F8FA;
-  --card:#fff;
-  --ink:#191F28;
-  --ink2:#4E5968;
-  --muted:#8B95A1;
-  --line:#EEF1F5;
-  --primary:#1A5CE6;
-  --primary-d:#1349C0;
-  --primary-tint:#EEF3FF;
-  --danger:#E53E3E;
-  --danger-tint:#FFF0F0;
-  --r:24px;
-  --sh:0 4px 20px rgba(0,0,0,.06),-2px 2px 10px rgba(0,0,0,.04);
-  --sh-blue:0 10px 28px rgba(26,92,230,.22),-3px 3px 12px rgba(26,92,230,.1);
+  --bg:#F3F5F9;
+  --card:#FFFFFF;
+  --ink:#161A24;
+  --ink2:#565E70;
+  --muted:#98A0B0;
+  --line:#EBEEF3;
+  --primary:#2F6BFF;
+  --primary-d:#1E52E0;
+  --primary-tint:#EAF1FF;
+  --danger:#EF4444;
+  --danger-tint:#FEECEC;
+  --r:22px;
+  --sh:0 8px 24px rgba(35,50,90,.07),0 2px 6px rgba(35,50,90,.04);
+  --sh-blue:0 12px 28px rgba(47,107,255,.26);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
 html,body{height:100%;background:var(--bg);}
@@ -300,6 +300,65 @@ function mealCardsHTML(m){
     </div>`
   }).join('')}</div>`
 }
+// ── 급식 슬롯 토글 / 출석 / 달력 (신규) ──
+const ICO_GIFT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7"/><path d="M12 8S10.5 3 8 3 5 6 5 6s2 2 7 2z"/></svg>'
+const ICO_CAL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>'
+const MEAL_SLOTS=[['조식','오전 8:00'],['중식','오후 12:30'],['석식','오후 6:00']]
+function defaultMealSlot(){const n=new Date(),m=n.getHours()*60+n.getMinutes();if(m<510)return'조식';if(m<810)return'중식';return'석식'}
+let HOME_MEAL=null
+function mealPanelHTML(dateKey,slot){
+  const m=mealsOf(dateKey)||{}
+  const items=(m[slot]||[]).filter(Boolean)
+  const time=(MEAL_SLOTS.find(s=>s[0]===slot)||[])[1]||''
+  const seg=MEAL_SLOTS.map(([k])=>`<button data-slot="${k}" style="flex:1;padding:8px 0;border:none;border-radius:11px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;background:${k===slot?'var(--primary)':'transparent'};color:${k===slot?'#fff':'var(--muted)'}">${k}</button>`).join('')
+  const body=items.length
+    ?`<div style="display:flex;flex-direction:column;gap:10px">${items.map(x=>`<div style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:500;color:var(--ink)"><span style="width:5px;height:5px;border-radius:50%;background:var(--primary);opacity:.5;flex:none"></span>${esc(x)}</div>`).join('')}</div>`
+    :`<div style="padding:10px 0;font-size:14px;color:var(--muted);text-align:center">급식 정보가 없어요</div>`
+  return`<div style="background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:14px 16px 16px">
+    <div style="display:flex;gap:5px;background:var(--bg);padding:4px;border-radius:13px;margin-bottom:14px">${seg}</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--line)">
+      <div style="width:34px;height:34px;border-radius:11px;background:var(--primary-tint);color:var(--primary);display:flex;align-items:center;justify-content:center">${I.food}</div>
+      <div><div style="font-size:14px;font-weight:700;color:var(--ink)">${slot}</div><div style="font-size:11px;color:var(--muted)">${time}</div></div>
+    </div>
+    ${body}</div>`
+}
+function bindMealSeg(){document.querySelectorAll('#home-meal [data-slot]').forEach(b=>{b.onclick=()=>{HOME_MEAL=b.dataset.slot;const c=document.getElementById('home-meal');if(c){c.innerHTML=mealPanelHTML(todayKey(),HOME_MEAL);bindMealSeg()}}})}
+// 출석 체크 (+20옥, 하루 1회)
+function attDoneToday(txs){const t=todayKey();return txs.some(x=>x.type==='출석'&&x.to===SESSION.id&&(x.at||'').slice(0,10)===t)}
+async function doAttendance(){const txs=await getAllTx();if(attDoneToday(txs)){toast('오늘은 이미 출석했어요');return}const ok=await addTx({from:'u_council',to:SESSION.id,amount:20,type:'출석',reason:'출석 체크'});if(ok){toast('출석 완료! +20옥 🎉');rHome()}}
+// 달력 그리드 (모듈 스코프라 인라인 onclick 대신 data-속성 사용)
+function calGrid(y,mo,o){o=o||{}
+  const first=new Date(y,mo,1).getDay(),days=new Date(y,mo+1,0).getDate(),wd=['일','월','화','수','목','금','토']
+  let cells=wd.map((w,i)=>`<div style="text-align:center;font-size:11px;font-weight:600;color:${i===0?'#F0616B':'var(--muted)'};padding-bottom:6px">${w}</div>`).join('')
+  for(let i=0;i<first;i++)cells+='<div></div>'
+  for(let d=1;d<=days;d++){const dow=(first+d-1)%7,isT=o.today===d,isS=o.sel===d,mk=(o.events&&o.events[d])||(o.avail&&o.avail[d]);const bg=isT?'var(--primary)':isS?'var(--primary-tint)':'transparent';const col=isT?'#fff':isS?'var(--primary)':dow===0?'#F0616B':'var(--ink)';const dc=o.clickable?`data-day="${d}"`:''
+    cells+=`<div ${dc} style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;font-size:13px;font-weight:${(isT||isS)?'700':'500'};border-radius:10px;background:${bg};color:${col};cursor:${o.clickable?'pointer':'default'}">${d}${mk?`<span style="position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:${isT?'#fff':'var(--primary)'}"></span>`:''}</div>`}
+  const nav=o.nav?`<div style="display:flex;gap:4px"><button data-mcnav="-1" style="width:30px;height:30px;border:none;border-radius:9px;background:var(--bg);color:var(--ink2);cursor:pointer;font-size:16px">‹</button><button data-mcnav="1" style="width:30px;height:30px;border:none;border-radius:9px;background:var(--bg);color:var(--ink2);cursor:pointer;font-size:16px">›</button></div>`:''
+  return`<div style="background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:15px 13px"><div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px 12px"><div style="font-size:14px;font-weight:700">${y}년 ${mo+1}월</div>${nav}</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">${cells}</div></div>`
+}
+function monthEvents(){const now=new Date(),y=now.getFullYear(),mo=now.getMonth(),map={};SCHEDULE.forEach(s=>{const d=new Date(s.date);if(d.getFullYear()===y&&d.getMonth()===mo)map[d.getDate()]=s.label});return map}
+// 월간 급식 달력 화면
+let MC_OFF=0,MC_SEL=1,MC_SLOT='조식'
+function renderMealCalendar(){MC_OFF=0;MC_SEL=new Date().getDate();MC_SLOT=defaultMealSlot();drawMealCalendar()}
+function mcNav(d){MC_OFF+=d;MC_SEL=1;drawMealCalendar()}
+function mcPick(d){MC_SEL=d;drawMealCalendar()}
+function mcSlot(s){MC_SLOT=s;drawMealCalendar()}
+function drawMealCalendar(){
+  const base=new Date();base.setDate(1);base.setMonth(base.getMonth()+MC_OFF);const y=base.getFullYear(),mo=base.getMonth()
+  const pad=n=>String(n).padStart(2,'0'),key=`${y}-${pad(mo+1)}-${pad(MC_SEL)}`
+  const avail={},dim=new Date(y,mo+1,0).getDate();for(let d=1;d<=dim;d++){if(mealsOf(`${y}-${pad(mo+1)}-${pad(d)}`))avail[d]=1}
+  const today=(MC_OFF===0)?new Date().getDate():-1
+  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>급식 달력</h2></div>
+    <div style="padding:14px 20px 34px">
+      ${calGrid(y,mo,{today,sel:MC_SEL,avail,nav:true,clickable:true})}
+      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.02em;margin:20px 0 10px">${mo+1}월 ${MC_SEL}일 급식</div>
+      ${mealPanelHTML(key,MC_SLOT)}
+    </div></div>`
+  document.getElementById('bk').onclick=pop
+  document.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>mcPick(+b.dataset.day))
+  document.querySelectorAll('[data-mcnav]').forEach(b=>b.onclick=()=>mcNav(+b.dataset.mcnav))
+  document.querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>mcSlot(b.dataset.slot))
+}
 // meal.json / schedule.json 로드 (실패해도 앱은 기본값으로 정상 동작)
 async function loadSchoolData(){
   const grab=async(f)=>{try{const r=await fetch(`${DATA_BASE}/${f}?_=${Date.now()}`,{cache:'no-store'});if(!r.ok)return null;return await r.json()}catch{return null}}
@@ -426,7 +485,7 @@ async function rHome(){
         <div class="amt">${fmt(admin?issued:bal)}<small>옥</small></div>
         <div class="bal-acts">
           <button class="bal-act" id="ha-send">${I.send} ${admin?'발행':'송금'}</button>
-          ${admin?`<button class="bal-act" id="ha-recall">${I.recall} 회수</button>`:''}
+          ${admin?`<button class="bal-act" id="ha-recall">${I.recall} 회수</button>`:`<button class="bal-act" id="ha-get">${ICO_GIFT} 받기</button>`}
           <button class="bal-act" id="ha-hist">${I.hist} 내역</button>
         </div>
       </div>
@@ -442,9 +501,9 @@ async function rHome(){
       <div style="margin-bottom:18px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.02em">오늘 급식</div>
-          <div style="font-size:12px;color:var(--muted)">${new Date().toLocaleDateString('ko-KR',{month:'numeric',day:'numeric',weekday:'short'})}</div>
+          <button id="meal-cal" style="width:32px;height:32px;border-radius:10px;background:var(--card);box-shadow:var(--sh);border:none;display:flex;align-items:center;justify-content:center;color:var(--primary);cursor:pointer">${ICO_CAL}</button>
         </div>
-        ${mealCardsHTML(mealsOf(todayKey()))}
+        <div id="home-meal">${mealPanelHTML(todayKey(),(HOME_MEAL=defaultMealSlot()))}</div>
       </div>
 
       <!-- 다가오는 일정 -->
@@ -455,6 +514,12 @@ async function rHome(){
             ?upcoming.slice(0,3).map((s,i,a)=>`<div style="display:flex;align-items:center;gap:12px;padding:13px 16px${i<a.length-1?';border-bottom:1px solid var(--line)':''}"><div style="width:7px;height:7px;border-radius:50%;background:var(--primary);flex:none"></div><div style="flex:1;font-size:14px;font-weight:600;color:var(--ink)">${esc(s.label)}</div><div style="font-size:12px;color:var(--muted);white-space:nowrap">${fmtDate(s.date)}</div></div>`).join('')
             :`<div style="padding:16px;font-size:14px;color:var(--muted);text-align:center">다가오는 일정이 없어요</div>`}
         </div>
+      </div>
+
+      <!-- 이 달 일정 달력 -->
+      <div style="margin-bottom:18px">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.02em;margin-bottom:10px">이 달 일정</div>
+        ${calGrid(new Date().getFullYear(),new Date().getMonth(),{today:new Date().getDate(),events:monthEvents()})}
       </div>
 
       <!-- 학교 공지 -->
@@ -471,7 +536,10 @@ async function rHome(){
   bindNav()
   document.getElementById('ha-send').onclick=()=>{TAB='money';push(()=>fTransfer(admin?'발행':'송금'))}
   if(admin)document.getElementById('ha-recall').onclick=()=>{TAB='money';push(()=>fTransfer('회수'))}
+  const haGet=document.getElementById('ha-get');if(haGet)haGet.onclick=doAttendance
   document.getElementById('ha-hist').onclick=()=>{TAB='money';rMoney()}
+  const mcBtn=document.getElementById('meal-cal');if(mcBtn)mcBtn.onclick=()=>push(()=>renderMealCalendar())
+  bindMealSeg()
 }
 
 async function rMoney(){
