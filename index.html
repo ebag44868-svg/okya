@@ -325,7 +325,23 @@ function mealPanelHTML(dateKey,slot){
 function bindMealSeg(){document.querySelectorAll('#home-meal [data-slot]').forEach(b=>{b.onclick=()=>{HOME_MEAL=b.dataset.slot;const c=document.getElementById('home-meal');if(c){c.innerHTML=mealPanelHTML(todayKey(),HOME_MEAL);bindMealSeg()}}})}
 // 출석 체크 (+20옥, 하루 1회)
 function attDoneToday(txs){const t=todayKey();return txs.some(x=>x.type==='출석'&&x.to===SESSION.id&&(x.at||'').slice(0,10)===t)}
-async function doAttendance(){const txs=await getAllTx();if(attDoneToday(txs)){toast('오늘은 이미 출석했어요');return}const ok=await addTx({from:'u_council',to:SESSION.id,amount:20,type:'출석',reason:'출석 체크'});if(ok){toast('출석 완료! +20옥 🎉');rHome()}}
+async function doAttendance(){
+  const txs=await getAllTx()
+  if(attDoneToday(txs)){toast('오늘은 이미 출석했어요');return}
+  const wk=attWeek(txs),isFri=new Date().getDay()===5,bonus=isFri&&wk[0]&&wk[1]&&wk[2]&&wk[3]
+  const amt=bonus?40:20
+  const ok=await addTx({from:'u_council',to:SESSION.id,amount:amt,type:'출석',reason:bonus?'출석(개근 보너스)':'출석 체크'})
+  if(ok){toast(bonus?'개근 달성! +40옥 🎉':'출석 완료! +20옥 🎉');rHome()}
+}
+function attWeek(txs){const now=new Date(),day=(now.getDay()+6)%7,mon=new Date(now);mon.setDate(now.getDate()-day);const pad=n=>String(n).padStart(2,'0');const res=[];for(let i=0;i<5;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);res.push(txs.some(x=>x.type==='출석'&&x.to===SESSION.id&&(x.at||'').slice(0,10)===`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`))}return res}
+function attendancePanelHTML(txs){
+  const wk=attWeek(txs),L=['월','화','수','목','금'],done=attDoneToday(txs),tIdx=(new Date().getDay()+6)%7,isFri=new Date().getDay()===5
+  const dots=wk.map((on,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;${on?'background:var(--primary);color:#fff':(i===tIdx?'background:var(--primary-tint);color:var(--primary)':'background:var(--bg);color:var(--muted)')}">${on?'✓':(i===4?'2x':'')}</div><div style="font-size:11px;font-weight:600;color:${i===4?'var(--primary)':'var(--muted)'}">${L[i]}</div></div>`).join('')
+  const btn=done?`<button disabled style="width:100%;padding:13px;border-radius:14px;border:none;background:var(--bg);color:var(--muted);font-size:15px;font-weight:700;font-family:inherit">오늘 출석 완료 ✓</button>`:`<button id="att-btn" style="width:100%;padding:13px;border-radius:14px;border:none;background:var(--primary);color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:var(--sh-blue)">${isFri?'출석하고 40옥 받기':'출석하고 20옥 받기'}</button>`
+  return`<div style="background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:16px 18px 18px;margin-bottom:14px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:15px;font-weight:700;color:var(--ink)">매일 출석 체크</div><div style="font-size:12px;font-weight:600;color:var(--primary)">금요일 2배 🎁</div></div><div style="display:flex;gap:6px;margin-bottom:16px">${dots}</div>${btn}</div>`
+}
+function countUp(el,to,dur=900){if(!el)return;(function tk(now){const p=Math.min(1,(now-tk.s)/dur),e=1-Math.pow(1-p,3);el.textContent=fmt(Math.round(to*e));if(p<1)requestAnimationFrame(tk)})(tk.s=performance.now())}
+function yearPct(){const n=new Date(),y=n.getFullYear(),s=new Date(y,0,1),e=new Date(y+1,0,1);return Math.round((n-s)/(e-s)*100)}
 // 달력 그리드 (모듈 스코프라 인라인 onclick 대신 data-속성 사용)
 function calGrid(y,mo,o){o=o||{}
   const first=new Date(y,mo,1).getDay(),days=new Date(y,mo+1,0).getDate(),wd=['일','월','화','수','목','금','토']
@@ -420,7 +436,7 @@ function pop(){STACK.pop();if(STACK.length)STACK[STACK.length-1]();else routeTab
 async function rHome(){
   TAB='home'
   app().innerHTML=`<div class="screen fade-in">
-    <div style="padding:calc(14px + env(safe-area-inset-top)) 20px 16px;background:var(--card);border-bottom:1px solid var(--line)">
+    <div style="padding:calc(14px + env(safe-area-inset-top)) 20px 16px;background:var(--bg)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:8px">
           <img src="${LOGO}" style="width:28px;height:28px;border-radius:8px;object-fit:cover">
@@ -449,10 +465,10 @@ async function rHome(){
   const nextExam=upcoming.find(s=>s.label.includes('고사')||s.label.includes('평가')||s.label.includes('시작'))
   const ddCard=nextExam?`<div style="background:var(--primary-tint);border-radius:var(--r);padding:18px 20px;margin-bottom:14px;cursor:pointer"><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:5px">${fmtDate(nextExam.date)}</div><div style="font-size:19px;font-weight:800;color:var(--ink);letter-spacing:-.02em">${esc(nextExam.label)}&nbsp;<span style="font-size:15px;font-weight:800;color:var(--primary)">D-${Math.max(0,Math.ceil((new Date(nextExam.date)-new Date(todayStr))/86400000))}</span></div></div>`:''
 
-  app().innerHTML=`<div class="screen fade-in">
+  app().innerHTML=`<div class="screen fade-in" style="background:var(--bg)">
 
     <!-- 인사 헤더 -->
-    <div style="padding:calc(14px + env(safe-area-inset-top)) 20px 16px;background:var(--card);border-bottom:1px solid var(--line)">
+    <div style="padding:calc(14px + env(safe-area-inset-top)) 20px 16px;background:var(--bg)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:8px">
           <img src="${LOGO}" style="width:28px;height:28px;border-radius:8px;object-fit:cover">
@@ -482,20 +498,25 @@ async function rHome(){
       <!-- 잔액 카드 -->
       <div class="bal-card" style="margin:0 0 14px">
         <div class="lbl">${admin?'학생회 총 발행량':'옥야머니 잔액'}</div>
-        <div class="amt">${fmt(admin?issued:bal)}<small>옥</small></div>
-        <div class="bal-acts">
+        <div class="amt"><span id="balnum">0</span><small>옥</small></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:rgba(255,255,255,.85);margin:14px 0 7px"><span>${new Date().getFullYear()}년</span><span>${yearPct()}% 지남</span></div>
+        <div style="height:6px;border-radius:99px;background:rgba(255,255,255,.24);overflow:hidden"><div id="progbar" style="height:100%;width:0;background:#fff;border-radius:99px;transition:width 1.2s cubic-bezier(.16,1,.3,1)"></div></div>
+        <div class="bal-acts" style="margin-top:16px">
           <button class="bal-act" id="ha-send">${I.send} ${admin?'발행':'송금'}</button>
-          ${admin?`<button class="bal-act" id="ha-recall">${I.recall} 회수</button>`:`<button class="bal-act" id="ha-get">${ICO_GIFT} 받기</button>`}
+          ${admin?`<button class="bal-act" id="ha-recall">${I.recall} 회수</button>`:''}
           <button class="bal-act" id="ha-hist">${I.hist} 내역</button>
         </div>
       </div>
+
+      <!-- 출석 체크 패널 (별도) -->
+      ${admin?'':`<div id="att-panel">${attendancePanelHTML(txs)}</div>`}
 
       <!-- D-day 카드 -->
       ${ddCard}
     </div>
 
     <!-- 정보 섹션 -->
-    <div style="background:var(--bg);padding:18px 20px 24px;flex:1">
+    <div style="padding:2px 20px 24px;flex:1">
 
       <!-- 오늘 급식 -->
       <div style="margin-bottom:18px">
@@ -536,10 +557,12 @@ async function rHome(){
   bindNav()
   document.getElementById('ha-send').onclick=()=>{TAB='money';push(()=>fTransfer(admin?'발행':'송금'))}
   if(admin)document.getElementById('ha-recall').onclick=()=>{TAB='money';push(()=>fTransfer('회수'))}
-  const haGet=document.getElementById('ha-get');if(haGet)haGet.onclick=doAttendance
   document.getElementById('ha-hist').onclick=()=>{TAB='money';rMoney()}
+  const attBtn=document.getElementById('att-btn');if(attBtn)attBtn.onclick=doAttendance
   const mcBtn=document.getElementById('meal-cal');if(mcBtn)mcBtn.onclick=()=>push(()=>renderMealCalendar())
   bindMealSeg()
+  countUp(document.getElementById('balnum'),admin?issued:bal)
+  const pb=document.getElementById('progbar');if(pb)requestAnimationFrame(()=>{pb.style.width=yearPct()+'%'})
 }
 
 async function rMoney(){
