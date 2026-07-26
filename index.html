@@ -436,7 +436,7 @@ function pop(){STACK.pop();if(STACK.length)STACK[STACK.length-1]();else routeTab
 async function rHome(){
   TAB='home'
   app().innerHTML=`<div class="screen fade-in">
-    <div style="padding:calc(14px + env(safe-area-inset-top)) 20px 16px;background:var(--bg)">
+    <div style="padding:calc(14px + env(safe-area-inset-top)) 20px 16px;background:var(--card);border-bottom:1px solid var(--line)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:8px">
           <img src="${LOGO}" style="width:28px;height:28px;border-radius:8px;object-fit:cover">
@@ -465,10 +465,10 @@ async function rHome(){
   const nextExam=upcoming.find(s=>s.label.includes('고사')||s.label.includes('평가')||s.label.includes('시작'))
   const ddCard=nextExam?`<div style="background:var(--primary-tint);border-radius:var(--r);padding:18px 20px;margin-bottom:14px;cursor:pointer"><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:5px">${fmtDate(nextExam.date)}</div><div style="font-size:19px;font-weight:800;color:var(--ink);letter-spacing:-.02em">${esc(nextExam.label)}&nbsp;<span style="font-size:15px;font-weight:800;color:var(--primary)">D-${Math.max(0,Math.ceil((new Date(nextExam.date)-new Date(todayStr))/86400000))}</span></div></div>`:''
 
-  app().innerHTML=`<div class="screen fade-in" style="background:var(--bg)">
+  app().innerHTML=`<div class="screen fade-in">
 
     <!-- 인사 헤더 -->
-    <div style="padding:calc(14px + env(safe-area-inset-top)) 20px 16px;background:var(--bg)">
+    <div style="padding:calc(14px + env(safe-area-inset-top)) 20px 16px;background:var(--card);border-bottom:1px solid var(--line)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:8px">
           <img src="${LOGO}" style="width:28px;height:28px;border-radius:8px;object-fit:cover">
@@ -484,16 +484,6 @@ async function rHome(){
     </div>
 
     <div style="padding:16px 20px 0">
-
-      <!-- 공지 배너 -->
-      <div style="background:var(--primary-tint);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:14px">
-        <div style="width:40px;height:40px;border-radius:14px;background:var(--primary);display:flex;align-items:center;justify-content:center;flex:none;color:#fff">${I.bell}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:700;color:var(--primary)">오늘 공지 ${NOTICES.length}개</div>
-          <div style="font-size:12px;color:var(--ink2);margin-top:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${esc(NOTICES[0]?.title||'새 공지를 확인해보세요')}</div>
-        </div>
-        <div style="color:var(--primary);display:flex;flex:none">${I.chev}</div>
-      </div>
 
       <!-- 잔액 카드 -->
       <div class="bal-card" style="margin:0 0 14px">
