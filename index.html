@@ -30,6 +30,8 @@
   --r:22px;
   --sh:0 8px 24px rgba(35,50,90,.07),0 2px 6px rgba(35,50,90,.04);
   --sh-blue:0 14px 32px rgba(123,108,255,.38),-3px 4px 14px rgba(123,108,255,.14);
+  --sub:#8A90A0;
+  --soft:#F6F7FB;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
 html,body{height:100%;background:var(--bg);}
@@ -214,6 +216,86 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
   0%,70%,100%{background:var(--line);}
   35%{background:var(--primary);}
 }
+
+/* ===================================================================
+   preview-okya3 디자인 시스템 (.p3 스코프 — 변환된 화면만 사용)
+   =================================================================== */
+.screen.p3{background:var(--bg);padding-bottom:calc(82px + env(safe-area-inset-bottom));}
+.p3 .icn{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;}
+.p3 .icn.sm{width:18px;height:18px;}
+
+/* topbar / greet (투명, 회색 배경 위) */
+.p3 .topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 18px 8px;}
+.p3 .topbar .t{font-size:18px;font-weight:800;letter-spacing:-.4px;display:flex;align-items:center;gap:8px;color:var(--ink);}
+.p3 .topbar .t.brand{color:var(--primary);font-size:20px;}
+.p3 .topbar button{width:34px;height:34px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;color:#3a3f4b;flex:none;}
+.p3 .topbar button svg{width:21px;height:21px;}
+.p3 .greet{padding:2px 18px 14px;}
+.p3 .greet small{color:var(--sub);font-size:13px;font-weight:500;}
+.p3 .greet .nm{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-top:3px;color:var(--ink);}
+
+/* balance */
+.p3 .balance{margin:6px 18px 0;background:radial-gradient(130% 120% at 12% 0%,rgba(255,255,255,.22),rgba(255,255,255,0) 46%),var(--grad);border-radius:24px;padding:20px 20px 16px;color:#fff;box-shadow:var(--sh-blue);}
+.p3 .balance .lbl{font-size:13px;opacity:.92;font-weight:600;}
+.p3 .balance .amt{font-size:32px;font-weight:800;letter-spacing:-1px;margin:4px 0 14px;}
+.p3 .balance .amt small{font-size:16px;font-weight:700;opacity:.9;margin-left:3px;}
+.p3 .prog{height:6px;background:rgba(255,255,255,.28);border-radius:6px;overflow:hidden;margin-bottom:5px;}
+.p3 .prog i{display:block;height:100%;background:#fff;border-radius:6px;transition:width 1.2s cubic-bezier(.16,1,.3,1);}
+.p3 .prog-lbl{font-size:11px;opacity:.85;display:flex;justify-content:space-between;margin-bottom:15px;}
+.p3 .bbtns{display:flex;gap:8px;}
+.p3 .bbtn{flex:1;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:13px;padding:10px 0;color:#fff;font-size:12.5px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
+.p3 .bbtn svg{width:19px;height:19px;stroke-width:2;}
+
+/* card */
+.p3 .pcard{background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:16px;margin:12px 18px 0;}
+.p3 .pcard.tight{padding:13px 16px;}
+
+/* attendance */
+.p3 .att{display:flex;align-items:center;gap:10px;}
+.p3 .att .t{font-size:13.5px;font-weight:700;white-space:nowrap;}
+.p3 .att .dots{display:flex;gap:6px;flex:1;margin-left:2px;}
+.p3 .dot{width:22px;height:22px;border-radius:50%;background:var(--soft);color:#c2c7d2;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex:none;}
+.p3 .dot.on{background:var(--grad);color:#fff;}
+.p3 .dot svg{width:12px;height:12px;stroke-width:2.6;}
+.p3 .att .get{background:var(--grad);color:#fff;border:none;border-radius:11px;padding:8px 15px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.p3 .att .get:disabled{background:var(--soft);color:var(--sub);cursor:default;}
+
+/* pills + meal */
+.p3 .chd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.p3 .pills{display:inline-flex;background:var(--soft);border-radius:12px;padding:3px;gap:2px;}
+.p3 .ppill{padding:6px 14px;border-radius:9px;font-size:12.5px;font-weight:700;color:var(--sub);cursor:pointer;border:none;background:transparent;font-family:inherit;}
+.p3 .ppill.on{background:#fff;color:var(--primary);box-shadow:0 2px 6px rgba(0,0,0,.06);}
+.p3 .chd>button{width:30px;height:30px;border-radius:9px;background:none;color:var(--sub);display:flex;align-items:center;justify-content:center;}
+.p3 .chd>button svg{width:20px;height:20px;}
+.p3 .meal{list-style:none;}
+.p3 .meal li{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:13.5px;font-weight:500;color:var(--ink);}
+.p3 .meal li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--primary);flex-shrink:0;}
+
+/* section title */
+.p3 .sec{font-size:15px;font-weight:800;letter-spacing:-.3px;margin:0 0 10px;color:var(--ink);}
+
+/* schedule row */
+.p3 .srow{display:flex;align-items:center;justify-content:space-between;padding:9px 0;}
+.p3 .srow+.srow{border-top:1px solid var(--line);}
+.p3 .srow .l .t{font-size:14px;font-weight:700;color:var(--ink);}
+.p3 .srow .l .d{font-size:12px;color:var(--sub);margin-top:2px;}
+.p3 .dday{background:var(--primary-tint);color:var(--primary);font-size:12px;font-weight:800;padding:4px 10px;border-radius:9px;}
+
+/* list row */
+.p3 .lrow{display:flex;align-items:center;gap:12px;padding:11px 0;}
+.p3 .lrow+.lrow{border-top:1px solid var(--line);}
+.p3 .chip{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.p3 .chip svg{width:18px;height:18px;}
+.p3 .lrow .body{flex:1;min-width:0;}
+.p3 .lrow .ti{font-size:14px;font-weight:700;letter-spacing:-.2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.p3 .lrow .su{font-size:12px;color:var(--sub);margin-top:2px;}
+.p3 .ti-blue{background:var(--primary-tint);color:var(--primary);}
+
+/* bottom nav (flat, preview 스타일) */
+.p3nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;display:flex;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:9px 0 calc(10px + env(safe-area-inset-bottom));z-index:100;}
+.p3nav .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:#b6bcc8;font-size:10.5px;font-weight:600;background:none;border:none;font-family:inherit;cursor:pointer;}
+.p3nav .tab.on{color:var(--primary);}
+.p3nav .tab svg{width:22px;height:22px;}
 </style>
 </head>
 <body>
@@ -326,6 +408,16 @@ function mealPanelHTML(dateKey,slot){
     ${body}</div>`
 }
 function bindMealSeg(){document.querySelectorAll('#home-meal [data-slot]').forEach(b=>{b.onclick=()=>{HOME_MEAL=b.dataset.slot;const c=document.getElementById('home-meal');if(c){c.innerHTML=mealPanelHTML(todayKey(),HOME_MEAL);bindMealSeg()}}})}
+// preview 스타일 홈 급식 렌더 (#home-meal-seg 필/#home-meal 리스트)
+function renderHomeMeal(slot){
+  HOME_MEAL=slot
+  const seg=document.getElementById('home-meal-seg'),ul=document.getElementById('home-meal')
+  if(!seg||!ul)return
+  seg.innerHTML=MEAL_SLOTS.map(([k])=>`<button class="ppill${k===slot?' on':''}" data-slot="${k}">${k}</button>`).join('')
+  const items=((mealsOf(todayKey())||{})[slot]||[]).filter(Boolean)
+  ul.innerHTML=items.length?items.map(x=>`<li>${esc(x)}</li>`).join(''):`<div style="padding:6px 0;font-size:13.5px;color:var(--sub)">급식 정보가 없어요</div>`
+  seg.querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>renderHomeMeal(b.dataset.slot))
+}
 // 출석 체크 (+20옥, 하루 1회)
 function attDoneToday(txs){const t=todayKey();return txs.some(x=>x.type==='출석'&&x.to===SESSION.id&&(x.at||'').slice(0,10)===t)}
 async function doAttendance(){
@@ -337,11 +429,13 @@ async function doAttendance(){
   if(ok){toast(bonus?'개근 달성! +40옥 🎉':'출석 완료! +20옥 🎉');rHome()}
 }
 function attWeek(txs){const now=new Date(),day=(now.getDay()+6)%7,mon=new Date(now);mon.setDate(now.getDate()-day);const pad=n=>String(n).padStart(2,'0');const res=[];for(let i=0;i<5;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);res.push(txs.some(x=>x.type==='출석'&&x.to===SESSION.id&&(x.at||'').slice(0,10)===`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`))}return res}
+const ICO_CHECK_SM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+// preview .att 스타일 (홈 전용). 기능(주간 출석/금요일 2배 보너스)은 doAttendance에서 유지
 function attendancePanelHTML(txs){
-  const wk=attWeek(txs),L=['월','화','수','목','금'],done=attDoneToday(txs),tIdx=(new Date().getDay()+6)%7,isFri=new Date().getDay()===5
-  const dots=wk.map((on,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;${on?'background:var(--primary);color:#fff':(i===tIdx?'background:var(--primary-tint);color:var(--primary)':'background:var(--bg);color:var(--muted)')}">${on?'✓':(i===4?'2x':'')}</div><div style="font-size:11px;font-weight:600;color:${i===4?'var(--primary)':'var(--muted)'}">${L[i]}</div></div>`).join('')
-  const btn=done?`<button disabled style="width:100%;padding:13px;border-radius:14px;border:none;background:var(--bg);color:var(--muted);font-size:15px;font-weight:700;font-family:inherit">오늘 출석 완료 ✓</button>`:`<button id="att-btn" style="width:100%;padding:13px;border-radius:14px;border:none;background:var(--grad);color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:var(--sh-blue)">${isFri?'출석하고 40옥 받기':'출석하고 20옥 받기'}</button>`
-  return`<div style="background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:16px 18px 18px;margin-bottom:14px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:15px;font-weight:700;color:var(--ink)">매일 출석 체크</div><div style="font-size:12px;font-weight:600;color:var(--primary)">금요일 2배 🎁</div></div><div style="display:flex;gap:6px;margin-bottom:16px">${dots}</div>${btn}</div>`
+  const wk=attWeek(txs),L=['월','화','수','목','금'],done=attDoneToday(txs)
+  const dots=wk.map((on,i)=>`<div class="dot${on?' on':''}">${on?ICO_CHECK_SM:L[i]}</div>`).join('')
+  const btn=done?`<button class="get" disabled>완료</button>`:`<button class="get" id="att-btn">받기</button>`
+  return`<span class="t">매일 출석</span><div class="dots">${dots}</div>${btn}`
 }
 function countUp(el,to,dur=900){if(!el)return;(function tk(now){const p=Math.min(1,(now-tk.s)/dur),e=1-Math.pow(1-p,3);el.textContent=fmt(Math.round(to*e));if(p<1)requestAnimationFrame(tk)})(tk.s=performance.now())}
 function yearPct(){const n=new Date(),y=n.getFullYear(),s=new Date(y,0,1),e=new Date(y+1,0,1);return Math.round((n-s)/(e-s)*100)}
@@ -431,6 +525,11 @@ function bnav(){
   const tabs=[{k:'home',l:'홈',ic:I.home},{k:'money',l:'머니',ic:I.money},{k:'school',l:'학교',ic:I.school},{k:'comm',l:'커뮤',ic:I.comm},{k:'search',l:'검색',ic:I.search},{k:'my',l:'MY',ic:I.my}]
   return`<nav class="bnav">${tabs.map(t=>`<button class="bnav-item${TAB===t.k?' active':''}" data-tab="${t.k}">${t.ic}<span>${t.l}</span></button>`).join('')}</nav>`
 }
+// preview 스타일 하단 네비 (평평한 바) — 변환된 화면에서 사용
+function bnavP3(){
+  const tabs=[{k:'home',l:'홈',ic:I.home},{k:'money',l:'머니',ic:I.money},{k:'school',l:'학교',ic:I.school},{k:'comm',l:'소통',ic:I.comm},{k:'search',l:'검색',ic:I.search},{k:'my',l:'MY',ic:I.my}]
+  return`<nav class="p3nav">${tabs.map(t=>`<button class="tab${TAB===t.k?' on':''}" data-tab="${t.k}">${t.ic}<span>${t.l}</span></button>`).join('')}</nav>`
+}
 function bindNav(){document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;STACK=[];routeTab()})}
 function routeTab(){({home:rHome,money:rMoney,school:rSchool,comm:rComm,search:rSearch,my:rMy})[TAB]?.()}
 function push(fn){STACK.push(fn);fn()}
@@ -438,23 +537,14 @@ function pop(){STACK.pop();if(STACK.length)STACK[STACK.length-1]();else routeTab
 
 async function rHome(){
   TAB='home'
-  app().innerHTML=`<div class="screen fade-in">
-    <div style="padding:calc(14px + env(safe-area-inset-top)) 20px 16px;background:var(--card);border-bottom:1px solid var(--line)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <img src="${LOGO}" style="width:28px;height:28px;border-radius:8px;object-fit:cover">
-          <span style="font-size:16px;font-weight:800;color:var(--primary)">옥야</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:12px;color:var(--muted);font-weight:500">${new Date().toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'})}</span>
-          <button style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;display:flex;align-items:center;justify-content:center;color:var(--ink2);cursor:pointer">${I.bell}</button>
-        </div>
-      </div>
-      <div style="font-size:13px;color:var(--muted);font-weight:500;margin-bottom:3px">${cheer()}</div>
-      <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink)">${esc(SESSION.name)}님</div>
+  const headerHTML=`
+    <div class="topbar">
+      <div class="t brand"><img src="${LOGO}" style="width:26px;height:26px;border-radius:8px;object-fit:cover">옥야</div>
+      <button>${I.bell}</button>
     </div>
-    <div class="loader" style="min-height:200px"><div class="spin"></div></div>
-  </div>${bnav()}`
+    <div class="greet"><small>${cheer()}</small><div class="nm">${esc(SESSION.name)}님</div></div>`
+
+  app().innerHTML=`<div class="screen fade-in p3">${headerHTML}<div class="loader" style="min-height:200px"><div class="spin"></div></div></div>${bnavP3()}`
   bindNav()
 
   const admin=SESSION.role==='admin'
@@ -464,88 +554,47 @@ async function rHome(){
   const todayStr=new Date().toISOString().slice(0,10)
   const upcoming=SCHEDULE.filter(s=>s.date>=todayStr)
 
-  // D-day 카드
-  const nextExam=upcoming.find(s=>s.label.includes('고사')||s.label.includes('평가')||s.label.includes('시작'))
-  const ddCard=nextExam?`<div style="background:var(--primary-tint);border-radius:var(--r);padding:18px 20px;margin-bottom:14px;cursor:pointer"><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:5px">${fmtDate(nextExam.date)}</div><div style="font-size:19px;font-weight:800;color:var(--ink);letter-spacing:-.02em">${esc(nextExam.label)}&nbsp;<span style="font-size:15px;font-weight:800;color:var(--primary)">D-${Math.max(0,Math.ceil((new Date(nextExam.date)-new Date(todayStr))/86400000))}</span></div></div>`:''
+  const ddays=upcoming.slice(0,3).map(s=>{
+    const dd=Math.max(0,Math.ceil((new Date(s.date)-new Date(todayStr))/86400000))
+    return`<div class="srow"><div class="l"><div class="t">${esc(s.label)}</div><div class="d">${fmtDate(s.date)}</div></div><span class="dday">D-${dd}</span></div>`
+  }).join('')
 
-  app().innerHTML=`<div class="screen fade-in">
+  app().innerHTML=`<div class="screen fade-in p3">
+    ${headerHTML}
 
-    <!-- 인사 헤더 -->
-    <div style="padding:calc(14px + env(safe-area-inset-top)) 20px 16px;background:var(--card);border-bottom:1px solid var(--line)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <img src="${LOGO}" style="width:28px;height:28px;border-radius:8px;object-fit:cover">
-          <span style="font-size:16px;font-weight:800;color:var(--primary)">옥야</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:12px;color:var(--muted);font-weight:500">${new Date().toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'})}</span>
-          <button style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;display:flex;align-items:center;justify-content:center;color:var(--ink2);cursor:pointer">${I.bell}</button>
-        </div>
+    <!-- 잔액 카드 -->
+    <div class="balance">
+      <div class="lbl">${admin?'학생회 총 발행량':'옥야머니 잔액'}</div>
+      <div class="amt"><span id="balnum">0</span><small>옥</small></div>
+      <div class="prog"><i id="progbar" style="width:0"></i></div>
+      <div class="prog-lbl"><span>${new Date().getFullYear()}년</span><span>${yearPct()}% 지남</span></div>
+      <div class="bbtns">
+        <button class="bbtn" id="ha-send">${I.send}${admin?'발행':'송금'}</button>
+        ${admin?`<button class="bbtn" id="ha-recall">${I.recall}회수</button>`:''}
+        <button class="bbtn" id="ha-hist">${I.hist}내역</button>
       </div>
-      <div style="font-size:13px;color:var(--muted);font-weight:500;margin-bottom:3px">${cheer()}</div>
-      <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink)">${esc(SESSION.name)}님</div>
     </div>
 
-    <div style="padding:16px 20px 0">
+    <!-- 출석 -->
+    ${admin?'':`<div class="pcard tight att" id="att-panel">${attendancePanelHTML(txs)}</div>`}
 
-      <!-- 잔액 카드 -->
-      <div class="bal-card" style="margin:0 0 14px">
-        <div class="lbl">${admin?'학생회 총 발행량':'옥야머니 잔액'}</div>
-        <div class="amt"><span id="balnum">0</span><small>옥</small></div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:rgba(255,255,255,.85);margin:14px 0 7px"><span>${new Date().getFullYear()}년</span><span>${yearPct()}% 지남</span></div>
-        <div style="height:6px;border-radius:99px;background:rgba(255,255,255,.24);overflow:hidden"><div id="progbar" style="height:100%;width:0;background:#fff;border-radius:99px;transition:width 1.2s cubic-bezier(.16,1,.3,1)"></div></div>
-        <div class="bal-acts" style="margin-top:16px">
-          <button class="bal-act" id="ha-send">${I.send} ${admin?'발행':'송금'}</button>
-          ${admin?`<button class="bal-act" id="ha-recall">${I.recall} 회수</button>`:''}
-          <button class="bal-act" id="ha-hist">${I.hist} 내역</button>
-        </div>
-      </div>
-
-      <!-- 출석 체크 패널 (별도) -->
-      ${admin?'':`<div id="att-panel">${attendancePanelHTML(txs)}</div>`}
-
-      <!-- D-day 카드 -->
-      ${ddCard}
+    <!-- 오늘 급식 -->
+    <div class="pcard">
+      <div class="chd"><div class="pills" id="home-meal-seg"></div><button id="meal-cal">${ICO_CAL}</button></div>
+      <ul class="meal" id="home-meal"></ul>
     </div>
 
-    <!-- 정보 섹션 -->
-    <div style="padding:2px 20px 24px;flex:1">
+    <!-- 다가오는 일정 -->
+    ${upcoming.length?`<div class="pcard"><div class="sec">다가오는 일정</div>${ddays}</div>`:''}
 
-      <!-- 오늘 급식 -->
-      <div style="margin-bottom:18px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.02em">오늘 급식</div>
-          <button id="meal-cal" style="width:32px;height:32px;border-radius:10px;background:var(--card);box-shadow:var(--sh);border:none;display:flex;align-items:center;justify-content:center;color:var(--primary);cursor:pointer">${ICO_CAL}</button>
-        </div>
-        <div id="home-meal">${mealPanelHTML(todayKey(),(HOME_MEAL=defaultMealSlot()))}</div>
-      </div>
+    <!-- 이 달 일정 -->
+    <div class="pcard"><div class="sec">이 달 일정</div>${calGrid(new Date().getFullYear(),new Date().getMonth(),{today:new Date().getDate(),events:monthEvents()})}</div>
 
-      <!-- 다가오는 일정 -->
-      <div style="margin-bottom:18px">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.02em;margin-bottom:10px">다가오는 일정</div>
-        <div class="card-list">
-          ${upcoming.length
-            ?upcoming.slice(0,3).map((s,i,a)=>`<div style="display:flex;align-items:center;gap:12px;padding:13px 16px${i<a.length-1?';border-bottom:1px solid var(--line)':''}"><div style="width:7px;height:7px;border-radius:50%;background:var(--primary);flex:none"></div><div style="flex:1;font-size:14px;font-weight:600;color:var(--ink)">${esc(s.label)}</div><div style="font-size:12px;color:var(--muted);white-space:nowrap">${fmtDate(s.date)}</div></div>`).join('')
-            :`<div style="padding:16px;font-size:14px;color:var(--muted);text-align:center">다가오는 일정이 없어요</div>`}
-        </div>
-      </div>
+    <!-- 학교 공지 -->
+    <div class="pcard"><div class="sec">학교 공지</div>${NOTICES.map(n=>`<div class="lrow"><div class="chip ti-blue">${I.notice}</div><div class="body"><div class="ti">${esc(n.title)}</div><div class="su">${esc(n.cat)} · ${fmtDate(n.at)}</div></div></div>`).join('')}</div>
 
-      <!-- 이 달 일정 달력 -->
-      <div style="margin-bottom:18px">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.02em;margin-bottom:10px">이 달 일정</div>
-        ${calGrid(new Date().getFullYear(),new Date().getMonth(),{today:new Date().getDate(),events:monthEvents()})}
-      </div>
-
-      <!-- 학교 공지 -->
-      <div>
-        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.02em;margin-bottom:10px">학교 공지</div>
-        <div class="card-list">
-          ${NOTICES.map((n,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:13px 16px${i<NOTICES.length-1?';border-bottom:1px solid var(--line)':''}"><div style="width:36px;height:36px;border-radius:12px;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;flex:none;color:var(--primary)">${I.notice}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${esc(n.title)}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${esc(n.cat)} · ${fmtDate(n.at)}</div></div></div>`).join('')}
-        </div>
-      </div>
-
-    </div>
-  </div>${bnav()}`
+    <div style="height:6px"></div>
+  </div>${bnavP3()}`
 
   bindNav()
   document.getElementById('ha-send').onclick=()=>{TAB='money';push(()=>fTransfer(admin?'발행':'송금'))}
@@ -553,7 +602,7 @@ async function rHome(){
   document.getElementById('ha-hist').onclick=()=>{TAB='money';rMoney()}
   const attBtn=document.getElementById('att-btn');if(attBtn)attBtn.onclick=doAttendance
   const mcBtn=document.getElementById('meal-cal');if(mcBtn)mcBtn.onclick=()=>push(()=>renderMealCalendar())
-  bindMealSeg()
+  renderHomeMeal(defaultMealSlot())
   countUp(document.getElementById('balnum'),admin?issued:bal)
   const pb=document.getElementById('progbar');if(pb)requestAnimationFrame(()=>{pb.style.width=yearPct()+'%'})
 }
