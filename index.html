@@ -806,7 +806,7 @@ async function rHome(){
   const mcBtn=document.getElementById('meal-cal');if(mcBtn)mcBtn.onclick=()=>push(()=>renderMealCalendar())
   renderHomeMeal(defaultMealSlot())
   countUp(document.getElementById('balnum'),admin?issued:bal)
-  const pb=document.getElementById('progbar');if(pb)requestAnimationFrame(()=>{pb.style.width=yearPct()+'%'})
+  const pb=document.getElementById('progbar');if(pb)setTimeout(()=>{pb.style.width=yearPct()+'%'},320)
 }
 
 // 거래 1건 → preview .lrow
