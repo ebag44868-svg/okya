@@ -682,6 +682,17 @@ function attendancePanelHTML(txs){
 }
 function countUp(el,to,dur=900){if(!el)return;(function tk(now){const p=Math.min(1,(now-tk.s)/dur),e=1-Math.pow(1-p,3);el.textContent=fmt(Math.round(to*e));if(p<1)requestAnimationFrame(tk)})(tk.s=performance.now())}
 function yearPct(){const n=new Date(),y=n.getFullYear(),s=new Date(y,0,1),e=new Date(y+1,0,1);return Math.round((n-s)/(e-s)*100)}
+// 게이지바+퍼센트를 JS로 직접 이징 애니메이션(CSS transition 배칭 이슈 회피). 무조건 재생됨.
+function animateGauge(bar,pctEl,target,dur=1400,delay=280){
+  if(!bar)return
+  bar.style.transition='none';bar.style.width='0%'
+  const t0=performance.now()+delay
+  ;(function tk(now){
+    const p=Math.max(0,Math.min(1,(now-t0)/dur)),e=1-Math.pow(1-p,3)
+    if(now>=t0){bar.style.width=(target*e).toFixed(1)+'%';if(pctEl)pctEl.textContent=Math.round(target*e)}
+    if(p<1)requestAnimationFrame(tk)
+  })(performance.now())
+}
 // 달력 그리드 (모듈 스코프라 인라인 onclick 대신 data-속성 사용)
 function calGrid(y,mo,o){o=o||{}
   const first=new Date(y,mo,1).getDay(),days=new Date(y,mo+1,0).getDate(),wd=['일','월','화','수','목','금','토']
@@ -810,7 +821,7 @@ async function rHome(){
       <div class="lbl">${admin?'학생회 총 발행량':'옥야머니 잔액'}</div>
       <div class="amt"><span id="balnum">0</span><small>옥</small></div>
       <div class="prog"><i id="progbar" style="width:0"></i></div>
-      <div class="prog-lbl"><span>${new Date().getFullYear()}년</span><span>${yearPct()}% 지남</span></div>
+      <div class="prog-lbl"><span>${new Date().getFullYear()}년</span><span><b id="progpct">0</b>% 지남</span></div>
       <div class="bbtns">
         <button class="bbtn" id="ha-send">${I.send}${admin?'발행':'송금'}</button>
         ${admin?`<button class="bbtn" id="ha-recall">${I.recall}회수</button>`:''}
@@ -864,7 +875,7 @@ async function rHome(){
     draw()
   })()
   countUp(document.getElementById('balnum'),admin?issued:bal)
-  const pb=document.getElementById('progbar');if(pb){pb.style.width='0';requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(()=>{pb.style.width=yearPct()+'%'},300)))}
+  animateGauge(document.getElementById('progbar'),document.getElementById('progpct'),yearPct())
 }
 
 // 거래 1건 → preview .lrow. bal 지정 시(학생) 거래 직후 잔액 표시
