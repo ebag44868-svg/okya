@@ -410,6 +410,35 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .p3 .post .pfoot{display:flex;gap:8px;margin-top:9px;}
 .p3 .upbtn{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:20px;border:1.5px solid var(--line);background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;}
 .p3 .upbtn.on{background:var(--primary-tint);border-color:var(--primary);color:var(--primary);}
+
+/* MY */
+.p3 .prof{display:flex;flex-direction:column;align-items:center;padding:14px 0 4px;}
+.p3 .prof .av{width:80px;height:80px;border-radius:50%;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:31px;font-weight:800;box-shadow:var(--sh-blue);overflow:hidden;position:relative;}
+.p3 .prof .av img{width:100%;height:100%;object-fit:cover;}
+.p3 .prof .camera{position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #fff;}
+.p3 .prof .camera svg{width:12px;height:12px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;}
+.p3 .prof .nm{font-size:19px;font-weight:800;margin-top:12px;color:var(--ink);}
+.p3 .prof .cl{font-size:13px;color:var(--sub);margin-top:3px;}
+.p3 .stats{display:flex;gap:9px;margin:14px 18px 0;}
+.p3 .stat{flex:1;background:var(--card);border-radius:15px;box-shadow:var(--sh);padding:14px 8px;text-align:center;}
+.p3 .stat .v{font-size:16px;font-weight:800;color:var(--primary);}
+.p3 .stat .k{font-size:11px;color:var(--sub);margin-top:3px;}
+.p3 .palgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:13px 6px;}
+.p3 .palitem{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
+.p3 .palitem .c{width:38px;height:38px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.12);}
+.p3 .palitem .l{font-size:10px;font-weight:600;color:var(--sub);}
+.p3 .palitem.on .l{color:var(--ink);font-weight:800;}
+.p3 .palitem.on .c{outline:2.5px solid var(--ink);outline-offset:2px;}
+.p3 .palitem .c.pick{background:conic-gradient(from 0deg,#f87171,#fbbf24,#34d399,#38bdf8,#a78bfa,#f472b6,#f87171);display:flex;align-items:center;justify-content:center;}
+.p3 .palitem .c.pick svg{width:15px;height:15px;stroke:#fff;stroke-width:3.2;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));}
+.p3 .menu{margin:12px 18px 0;background:var(--card);border-radius:20px;box-shadow:var(--sh);overflow:hidden;}
+.p3 .mrow{display:flex;align-items:center;gap:12px;padding:15px 16px;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;}
+.p3 .mrow+.mrow{border-top:1px solid var(--line);}
+.p3 .mrow .mic{width:20px;height:20px;color:var(--sub);display:flex;flex:none;}
+.p3 .mrow .mic svg{width:20px;height:20px;}
+.p3 .mrow .cev{margin-left:auto;color:#c9cdd8;display:flex;}
+.p3 .mrow .cev svg{width:18px;height:18px;}
+.p3 .ver{text-align:center;color:#b6bcc8;font-size:12px;padding:20px 0 24px;}
 </style>
 </head>
 <body>
@@ -1677,84 +1706,54 @@ async function iPetition(){
   document.querySelectorAll('[data-react]').forEach(b=>b.onclick=async()=>{const[id,t]=b.dataset.react.split('::');try{const r=await wt(sb.from('okya_petitions').select('reacts').eq('id',id).single());const reacts={...(r.data?.reacts||{})};if(reacts[SESSION.id]===t)delete reacts[SESSION.id];else reacts[SESSION.id]=t;await wt(sb.from('okya_petitions').update({reacts}).eq('id',id))}catch{};iPetition()})
 }
 
-function rMy(){
+async function rMy(){
   TAB='my'
-  const photoSrc=SESSION.photo||null
-  const initials=SESSION.name.charAt(0)
   const isAdmin=SESSION.role==='admin'
+  app().innerHTML=`<div class="screen fade-in p3"><div class="topbar"><div class="t">MY</div><button id="my-bell">${I.bell}</button></div><div class="loader" style="min-height:220px"><div class="spin"></div></div></div>${bnav()}`
+  bindNav()
 
-  app().innerHTML=`<div class="screen fade-in">
+  const txs=await getAllTx()
+  const bal=balOf(SESSION.id,txs)
+  const issued=txs.filter(t=>t.type==='발행').reduce((s,t)=>s+t.amount,0)
+  const attend=txs.filter(t=>t.type==='출석'&&t.to===SESSION.id).length
+  let chal=0;try{const r=await wt(sb.from('okya_event_subs').select('id').eq('by_id',SESSION.id));chal=(r.data||[]).length}catch{}
 
-    <!-- MY 헤더 -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) 20px 14px;border-bottom:1px solid var(--line)">
-      <span style="font-size:18px;font-weight:800;color:var(--ink)">MY</span>
-      <button id="my-bell" style="width:34px;height:34px;border-radius:50%;background:var(--bg);border:none;display:flex;align-items:center;justify-content:center;color:var(--ink2);cursor:pointer">${I.bell}</button>
+  const photoSrc=SESSION.photo||null,initials=esc(SESSION.name.charAt(0))
+  let curPri='#7B6CFF';try{const st=JSON.parse(localStorage.getItem('okya-theme')||'null');if(st&&st.primary)curPri=st.primary}catch{}
+  const PRESETS=[['바이올렛','#7B6CFF'],['블루','#5B9BFF'],['인디고','#6C6BFF'],['스카이','#38BDF8'],['민트','#2DD4BF'],['그린','#34D399'],['라임','#A3E635'],['앰버','#FBBF24'],['코랄','#FB923C'],['로즈','#FB7185'],['핑크','#F472B6'],['라벤더','#C084FC']]
+  const grad=p=>{const[a,b]=deriveGrad(p);return`linear-gradient(135deg,${a},${b})`}
+  const swatches=PRESETS.map(([n,p])=>{const on=p.toLowerCase()===curPri.toLowerCase();return`<div class="palitem${on?' on':''}" data-pri="${p}" data-name="${n}"><div class="c" style="background:${grad(p)}"></div><div class="l">${n}</div></div>`}).join('')
+
+  app().innerHTML=`<div class="screen fade-in p3">
+    <div class="topbar"><div class="t">MY</div><button id="my-bell">${I.bell}</button></div>
+    <div class="prof">
+      <div class="av">${photoSrc?`<img src="${photoSrc}">`:initials}<label class="camera" for="my-photo-input"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></label></div>
+      <input id="my-photo-input" type="file" accept="image/*" style="display:none">
+      <div class="nm">${esc(SESSION.name)}</div>
+      <div class="cl">창녕옥야고등학교 · ${isAdmin?'학생회':'학생'}</div>
     </div>
-
-    <!-- 프로필 영역 (흰 배경) -->
-    <div style="padding:28px 20px 24px;display:flex;flex-direction:column;align-items:center;border-bottom:1px solid var(--line)">
-      <div style="position:relative;margin-bottom:16px">
-        ${photoSrc
-          ? `<img src="${photoSrc}" style="width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid var(--line)">`
-          : `<div style="width:84px;height:84px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:var(--primary)">${initials}</div>`}
-        <label for="my-photo-input" style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(26,92,230,.35)">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-        </label>
-        <input id="my-photo-input" type="file" accept="image/*" style="display:none">
-      </div>
-      <div style="font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:6px">${esc(SESSION.name)}</div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:13px;color:var(--muted);font-weight:500">창녕옥야고등학교</span>
-        <span style="width:3px;height:3px;border-radius:50%;background:var(--line)"></span>
-        <span style="font-size:13px;color:var(--primary);font-weight:700">${isAdmin?'학생회':'학생'}</span>
+    <div class="stats">
+      <div class="stat"><div class="v">${fmt(isAdmin?issued:bal)}</div><div class="k">${isAdmin?'발행량':'옥야머니'}</div></div>
+      <div class="stat"><div class="v">${attend}일</div><div class="k">출석</div></div>
+      <div class="stat"><div class="v">${chal}개</div><div class="k">챌린지</div></div>
+    </div>
+    <div class="pcard">
+      <div class="sec" style="margin-bottom:2px">색상 테마</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:14px">앱 전체 색을 바꿔보세요</div>
+      <div class="palgrid">
+        ${swatches}
+        <label class="palitem" style="position:relative"><div class="c pick">${I.plus}</div><div class="l">직접</div><input type="color" id="my-color" value="${curPri}" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer"></label>
       </div>
     </div>
-
-    <!-- 메뉴 섹션 -->
-    <div style="padding:20px 20px 0">
-
-      <div class="sec-title" style="margin-bottom:10px">테마 색상</div>
-      <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap">
-        ${(()=>{let cur=null;try{cur=JSON.parse(localStorage.getItem('okya-theme')||'null')}catch{}
-          return THEMES.map(t=>`<button data-theme='${JSON.stringify(t)}' title="${t.name}" style="width:44px;height:44px;border-radius:10px;background:${t.primary};border:${cur&&cur.primary===t.primary?'3px solid var(--ink)':'3px solid transparent'};outline:2px solid ${cur&&cur.primary===t.primary?t.primary:'transparent'};outline-offset:2px;cursor:pointer;transition:transform .15s;flex:none"></button>`).join('')
-        })()}
-      </div>
-
-      <div class="sec-title" style="margin-bottom:8px">설정</div>
-      <div class="card-list" style="margin-bottom:20px">
-        <div class="row-item" id="my-noti">
-          <div class="row-ic" style="background:#FFFAEB;color:#D97706">${I.bell}</div>
-          <div class="row-body">
-            <div class="row-title">알림 설정</div>
-            <div class="row-desc">공지·챌린지 알림 관리</div>
-          </div>
-          <div class="row-right">${I.chev}</div>
-        </div>
-        <div class="row-item" id="my-info">
-          <div class="row-ic" style="background:var(--primary-tint);color:var(--primary)">${I.school}</div>
-          <div class="row-body">
-            <div class="row-title">앱 정보</div>
-            <div class="row-desc">옥야 v1.0 · 창녕옥야고 학생회</div>
-          </div>
-          <div class="row-right">${I.chev}</div>
-        </div>
-      </div>
-
-      <div class="sec-title" style="margin-bottom:8px">계정</div>
-      <div class="card-list">
-        <div class="row-item" id="my-out">
-          <div class="row-ic" style="background:var(--danger-tint);color:var(--danger)">${I.logout}</div>
-          <div class="row-body">
-            <div class="row-title" style="color:var(--danger)">로그아웃</div>
-            <div class="row-desc" style="color:var(--danger);opacity:.7">현재 계정에서 나가기</div>
-          </div>
-        </div>
-      </div>
-
+    <div class="menu">
+      <div class="mrow" id="mm-tx"><span class="mic">${I.hist}</span>거래 내역<span class="cev">${I.chev}</span></div>
+      <div class="mrow" id="mm-chal"><span class="mic">${I.star}</span>챌린지<span class="cev">${I.chev}</span></div>
+      <div class="mrow" id="mm-peti"><span class="mic">${I.petition}</span>청원<span class="cev">${I.chev}</span></div>
+      <div class="mrow" id="mm-noti"><span class="mic">${I.bell}</span>알림 설정<span class="cev">${I.chev}</span></div>
+      <div class="mrow" id="mm-out"><span class="mic" style="color:var(--danger)">${I.logout}</span><span style="color:var(--danger)">로그아웃</span></div>
     </div>
-    <div style="height:36px"></div>
+    <div class="ver">옥야 v1.0 · 창녕옥야고 학생회</div>
   </div>${bnav()}`
-
   bindNav()
 
   document.getElementById('my-photo-input').onchange=async(e)=>{
@@ -1766,22 +1765,14 @@ function rMy(){
     try{await wt(sb.from('okya_users').update({photo:url}).eq('id',SESSION.id))}catch{}
     rMy()
   }
-
-  document.querySelectorAll('[data-theme]').forEach(btn=>{
-    btn.onclick=()=>{
-      try{applyTheme(JSON.parse(btn.dataset.theme))}catch{}
-      rMy()
-    }
-  })
-
-  document.getElementById('my-bell').onclick=()=>toast('알림 설정은 준비 중이에요')
-  document.getElementById('my-noti').onclick=()=>toast('알림 설정은 준비 중이에요')
-  document.getElementById('my-info').onclick=()=>toast('옥야 v1.0 · 창녕옥야고 학생회')
-
-  document.getElementById('my-out').onclick=async()=>{
-    try{await sb.auth.signOut()}catch{}
-    SESSION=null;USERS=[];rLogin()
-  }
+  document.querySelectorAll('[data-pri]').forEach(el=>el.onclick=()=>{applyTheme({name:el.dataset.name,primary:el.dataset.pri,v:2});rMy()})
+  document.getElementById('my-color').onchange=e=>{applyTheme({name:'커스텀',primary:e.target.value,v:2});rMy()}
+  document.getElementById('my-bell').onclick=()=>toast('알림은 준비 중이에요')
+  document.getElementById('mm-tx').onclick=()=>push(()=>rHistory())
+  document.getElementById('mm-chal').onclick=()=>push(rChallengePage)
+  document.getElementById('mm-peti').onclick=()=>push(rPetitionPage)
+  document.getElementById('mm-noti').onclick=()=>toast('알림은 준비 중이에요')
+  document.getElementById('mm-out').onclick=async()=>{try{await sb.auth.signOut()}catch{};SESSION=null;USERS=[];rLogin()}
 }
 
 function rLogin(){
