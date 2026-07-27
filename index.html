@@ -346,6 +346,38 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .p3 .succ h2{font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1.45;color:var(--ink);}
 .p3 .succ p{color:var(--sub);font-size:13px;margin-top:10px;}
 .p3 .succ .btns{display:flex;gap:10px;width:100%;max-width:340px;margin-top:30px;}
+.p3 .ti-sky{background:#E7F1FF;color:#3B82F6;}
+
+/* 학교 · 일자 네비 */
+.p3 .daynav{display:flex;align-items:center;justify-content:space-between;padding:6px 18px 2px;}
+.p3 .daynav .dn{width:34px;height:34px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;color:var(--ink2);}
+.p3 .daynav .dn svg{width:18px;height:18px;}
+.p3 .daynav .dl{font-size:15px;font-weight:800;color:var(--ink);}
+.p3 .daynav .dl small{font-size:12px;color:var(--sub);font-weight:600;margin-left:5px;}
+
+/* 회의록 썸네일 */
+.p3 .vthumb{width:62px;height:46px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;flex:none;}
+.p3 .vthumb svg{width:20px;height:20px;color:#fff;}
+
+/* 시간표 */
+.p3 .tt{width:100%;border-collapse:separate;border-spacing:3px;}
+.p3 .tt th{padding:8px 0;background:var(--soft);color:var(--sub);font-weight:700;font-size:12px;border-radius:8px;}
+.p3 .tt th.on{background:var(--grad);color:#fff;}
+.p3 .tt td{padding:10px 2px;text-align:center;font-size:12.5px;color:var(--ink);background:var(--soft);border-radius:8px;font-weight:600;}
+.p3 .tt td.on{background:var(--primary-tint);color:var(--primary);font-weight:800;}
+.p3 .tt td.pn,.p3 .tt th.pn{background:transparent;color:var(--sub);font-weight:700;font-size:11px;}
+
+/* 예약 슬롯 */
+.p3 .slot{display:flex;align-items:center;gap:12px;padding:13px 15px;border:1.5px solid var(--line);border-radius:14px;margin-bottom:9px;cursor:pointer;transition:border-color .15s,background .15s;}
+.p3 .slot.on{border-color:transparent;background:var(--grad);color:#fff;}
+.p3 .slot .sbody{flex:1;min-width:0;}
+.p3 .slot .sn{font-size:14px;font-weight:800;}
+.p3 .slot .sr{font-size:11.5px;color:var(--sub);margin-top:2px;}
+.p3 .slot.on .sr{color:rgba(255,255,255,.9);}
+.p3 .slot .chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none;}
+.p3 .slot.on .chk{border-color:#fff;background:rgba(255,255,255,.2);}
+.p3 .slot .chk svg{width:13px;height:13px;stroke:#fff;stroke-width:3;display:none;}
+.p3 .slot.on .chk svg{display:block;}
 </style>
 </head>
 <body>
@@ -662,7 +694,7 @@ function txRow(t,admin){
   else if(t.type==='발행'){tint='green';icon=I.recall}
   else if(t.type==='회수'){tint='org';icon=I.send}
   const title=admin?(t.type==='회수'?nameOf(t.from):nameOf(t.to)):(t.reason||t.type)
-  const sub=admin?(t.type+' · '+timeago(t.at)):((t.to===SESSION.id?nameOf(t.from):'→ '+nameOf(t.to))+' · '+timeago(t.at))
+  const sub=admin?(t.type+' · '+fmtDate(t.at)):((t.to===SESSION.id?nameOf(t.from):'→ '+nameOf(t.to))+' · '+fmtDate(t.at))
   return`<div class="lrow"><div class="chip ti-${tint}">${icon}</div><div class="body"><div class="ti">${esc(title)}</div><div class="su">${esc(sub)}</div></div><div class="tr ${inc?'pos':'neg'}">${inc?'+':'−'}${fmt(t.amount)}옥</div></div>`
 }
 function fmtFull(iso){if(!iso)return'';const d=new Date(iso);const w=['일','월','화','수','목','금','토'][d.getDay()];return`${d.getMonth()+1}월 ${d.getDate()}일 ${w}요일`}
@@ -878,57 +910,52 @@ function fTransferConfirm(mode,toUser,amount,reason,myBal){
 function rSchool(){
   TAB='school'
   const MENU=[
-    {id:'food',   ic:'food',    color:'#FF6B35', bg:'#FFF3EE', title:'급식',       desc:'오늘의 학교 급식'},
-    {id:'cal',    ic:'cal',     color:'#1A5CE6', bg:'#EEF3FF', title:'학사일정',    desc:'시험·행사 일정'},
-    {id:'tt',     ic:'timetable',color:'#7C3AED',bg:'#F3EEFF', title:'시간표',      desc:'학년별 수업 시간표'},
-    {id:'study',  ic:'study',   color:'#059669', bg:'#EDFAF5', title:'시험대비자료', desc:'과목별 학습 자료',soon:true},
-    {id:'notice', ic:'notice',  color:'#D97706', bg:'#FFFAEB', title:'공지방',      desc:'학교 공지 및 안내',soon:true},
-    {id:'lib',    ic:'library', color:'#0891B2', bg:'#E0F8FF', title:'도서관',      desc:'도서 검색 · 대출',soon:true},
-    {id:'room',   ic:'door',    color:'#6D28D9', bg:'#F5F0FF', title:'교실예약',    desc:'자습실·회의실 예약',soon:true},
-    {id:'mt',     ic:'video',   color:'#2563EB', bg:'#EEF4FF', title:'회의록',      desc:'대의원회 영상 목록'},
+    {id:'food',ic:'food',      tint:'org', title:'급식',       desc:'오늘의 학교 급식'},
+    {id:'cal', ic:'cal',       tint:'blue',title:'학사일정',    desc:'시험·행사 일정'},
+    {id:'tt',  ic:'timetable', tint:'pink',title:'시간표',      desc:'학년별 수업 시간표'},
+    {id:'study',ic:'study',    tint:'green',title:'시험대비자료',desc:'과목별 학습 자료'},
+    {id:'room',ic:'door',      tint:'sky', title:'교실예약',    desc:'자습실 시간대 예약'},
+    {id:'mt',  ic:'video',     tint:'blue',title:'회의록',      desc:'대의원회 영상'},
   ]
-  app().innerHTML=`<div class="screen fade-in">
-    <div class="hdr" style="border-bottom:1px solid var(--line)"><h2>학교</h2></div>
-    <div style="padding:16px 20px 0">
-      <div class="card" style="padding:16px 16px 10px">
-        <div class="school-grid">
-          ${MENU.map(m=>`<div class="school-item" data-sid="${m.id}" style="${m.soon?'opacity:.4':''}">
-            <div style="position:relative">
-              <div class="school-ic" style="background:${m.bg};color:${m.color}">${I[m.ic]}</div>
-              ${m.soon?`<div style="position:absolute;top:-3px;right:-3px;background:var(--muted);color:#fff;font-size:7px;font-weight:800;padding:2px 5px;border-radius:5px;letter-spacing:.04em">SOON</div>`:''}
-            </div>
-            <div class="school-title">${m.title}</div>
-            <div class="school-desc">${m.desc}</div>
-          </div>`).join('')}
-        </div>
-      </div>
+  app().innerHTML=`<div class="screen fade-in p3">
+    <div class="topbar"><div class="t">학교</div><div style="width:34px"></div></div>
+    <div class="pcard" style="padding:4px 16px">
+      ${MENU.map(m=>`<div class="lrow" data-sid="${m.id}" style="cursor:pointer">
+        <div class="chip ti-${m.tint}">${I[m.ic]}</div>
+        <div class="body"><div class="ti">${m.title}</div><div class="su">${m.desc}</div></div>
+        <span style="color:#c9cdd8;display:flex">${I.chev}</span>
+      </div>`).join('')}
     </div>
-    <div style="height:8px"></div>
+    <div style="height:6px"></div>
   </div>${bnav()}`
   bindNav()
-  // 메뉴 클릭 핸들러
-  document.querySelectorAll('[data-sid]').forEach(el=>{
-    el.onclick=()=>{
-      const sid=el.dataset.sid
-      if(sid==='food')push(rSchoolFood)
-      else if(sid==='cal')push(rSchoolCal)
-      else if(sid==='tt')push(rSchoolTT)
-      else if(sid==='mt')push(rMeeting)
-      else push(()=>rSchoolComingSoon(MENU.find(m=>m.id===sid)?.title||''))
-    }
+  document.querySelectorAll('[data-sid]').forEach(el=>el.onclick=()=>{
+    const sid=el.dataset.sid
+    if(sid==='food')push(rSchoolFood)
+    else if(sid==='cal')push(rSchoolCal)
+    else if(sid==='tt')push(rSchoolTT)
+    else if(sid==='study')push(rStudy)
+    else if(sid==='room')push(rRoom)
+    else if(sid==='mt')push(rMeeting)
   })
 }
 
 function rSchoolFood(){
-  app().innerHTML=`<div class="screen no-nav fade-in">
-    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>오늘 급식</h2></div>
-    <div style="padding:20px">
-      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px">${new Date().toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'})}</div>
-      ${mealCardsHTML(mealsOf(todayKey()))}
-      <div class="note" style="margin-top:12px;text-align:center">창녕옥야고 급식 · NEIS 제공</div>
-    </div>
+  const draw=(slot)=>{
+    const items=((mealsOf(todayKey())||{})[slot]||[]).filter(Boolean)
+    document.getElementById('sf-seg').innerHTML=MEAL_SLOTS.map(([k])=>`<button class="ppill${k===slot?' on':''}" data-slot="${k}">${k}</button>`).join('')
+    document.getElementById('sf-list').innerHTML=items.length?items.map(x=>`<li>${esc(x)}</li>`).join(''):`<div style="padding:8px 0;color:var(--sub);font-size:13.5px">급식 정보가 없어요</div>`
+    document.querySelectorAll('#sf-seg [data-slot]').forEach(b=>b.onclick=()=>draw(b.dataset.slot))
+  }
+  app().innerHTML=`<div class="screen no-nav fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">급식</div><button class="bk" id="sf-cal">${ICO_CAL}</button></div>
+    <div style="padding:2px 18px 0;font-size:13px;color:var(--sub);font-weight:600">${new Date().toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'})}</div>
+    <div class="pcard"><div class="chd"><div class="pills" id="sf-seg"></div></div><ul class="meal" id="sf-list"></ul></div>
+    <div style="padding:14px 18px 0;font-size:12px;color:var(--sub);text-align:center">창녕옥야고 급식 · NEIS 제공</div>
   </div>`
   document.getElementById('bk').onclick=pop
+  document.getElementById('sf-cal').onclick=()=>push(()=>renderMealCalendar())
+  draw(defaultMealSlot())
 }
 
 function rSchoolCal(){
@@ -951,16 +978,16 @@ function rSchoolCal(){
     for(let d=1;d<=days;d++)cells.push(d)
     while(cells.length%7)cells.push(null)
     const monthEvs=ALL.filter(s=>s.date.startsWith(mStr)).sort((a,b)=>a.date>b.date?1:-1)
-    app().innerHTML=`<div class="screen no-nav fade-in">
-      <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>학사일정</h2></div>
-      <div style="padding:0 20px 24px">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0 14px">
-          <button id="prev-m" style="background:none;border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink2)">${I.back}</button>
-          <div style="font-size:17px;font-weight:700">${vy}년 ${vm+1}월</div>
-          <button id="next-m" style="background:none;border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink2)">${I.chev}</button>
+    app().innerHTML=`<div class="screen no-nav fade-in p3">
+      <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">학사일정</div><div style="width:34px"></div></div>
+      <div class="pcard">
+        <div class="chd" style="margin-bottom:10px">
+          <button id="prev-m" class="bk" style="width:30px;height:30px;background:none">${I.back}</button>
+          <div style="font-size:15px;font-weight:800">${vy}년 ${vm+1}월</div>
+          <button id="next-m" class="bk" style="width:30px;height:30px;background:none">${I.chev}</button>
         </div>
         <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px">
-          ${['일','월','화','수','목','금','토'].map((d,i)=>`<div style="text-align:center;font-size:11px;font-weight:600;padding:4px 0;color:${i===0?'var(--danger)':i===6?'var(--primary)':'var(--muted)'}">${d}</div>`).join('')}
+          ${['일','월','화','수','목','금','토'].map((d,i)=>`<div style="text-align:center;font-size:10.5px;font-weight:700;padding:4px 0;color:${i===0?'var(--danger)':i===6?'var(--primary)':'var(--sub)'}">${d}</div>`).join('')}
         </div>
         <div style="display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px">
           ${cells.map((d,i)=>{
@@ -970,22 +997,13 @@ function rSchoolCal(){
             const isToday=ds===todayStr
             const hasEv=(evMap[d]||[]).length>0
             return`<div style="display:flex;flex-direction:column;align-items:center;padding:2px 0">
-              <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${isToday?'var(--primary)':'transparent'};font-size:13px;font-weight:${isToday||hasEv?700:400};color:${isToday?'#fff':dow===0?'var(--danger)':dow===6?'var(--primary)':'var(--ink)'}">${d}</div>
-              ${hasEv?`<div style="width:5px;height:5px;border-radius:50%;background:${isToday?'rgba(255,255,255,.7)':'var(--primary)'};margin-top:1px"></div>`:'<div style="height:6px"></div>'}
+              <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${isToday?'var(--grad)':'transparent'};font-size:13px;font-weight:${isToday||hasEv?800:500};color:${isToday?'#fff':dow===0?'var(--danger)':dow===6?'var(--primary)':'var(--ink)'}">${d}</div>
+              ${hasEv?`<div style="width:5px;height:5px;border-radius:50%;background:${isToday?'#fff':'var(--primary)'};margin-top:1px"></div>`:'<div style="height:6px"></div>'}
             </div>`
           }).join('')}
         </div>
-        ${monthEvs.length?`<div style="margin-top:20px">
-          <div class="sec-title" style="margin-bottom:8px">이번 달 일정</div>
-          <div class="card-list">
-            ${monthEvs.map((s,i,a)=>`<div style="display:flex;align-items:center;gap:12px;padding:13px 16px${i<a.length-1?';border-bottom:1px solid var(--line)':''}">
-              <div style="width:7px;height:7px;border-radius:50%;background:var(--primary);flex:none"></div>
-              <div style="flex:1;font-size:14px;font-weight:600;color:var(--ink)">${esc(s.label)}</div>
-              <div style="font-size:12px;color:var(--muted)">${s.date.slice(5).replace('-','/')}</div>
-            </div>`).join('')}
-          </div>
-        </div>`:`<div style="margin-top:20px;text-align:center;color:var(--muted);font-size:13px;padding:16px 0">이번 달 등록된 일정이 없어요</div>`}
       </div>
+      ${monthEvs.length?`<div class="pcard"><div class="sec">이번 달 일정</div>${monthEvs.map(s=>{const dd=Math.ceil((new Date(s.date)-new Date(todayStr))/86400000);const tag=dd>=0?`D-${dd}`:s.date.slice(5).replace('-','/');return`<div class="srow"><div class="l"><div class="t">${esc(s.label)}</div><div class="d">${s.date.slice(5).replace('-','/')}</div></div><span class="dday">${tag}</span></div>`}).join('')}</div>`:`<div class="empty">이번 달 등록된 일정이 없어요</div>`}
     </div>`
     document.getElementById('bk').onclick=pop
     document.getElementById('prev-m').onclick=()=>{vm--;if(vm<0){vm=11;vy--}render()}
@@ -996,32 +1014,93 @@ function rSchoolCal(){
 
 function rSchoolTT(){
   const days=['월','화','수','목','금']
+  const todayIdx=(new Date().getDay()+6)%7 // 0=월
   const subjects=[['국어','수학','영어','과학','체육','자습'],['수학','영어','사회','국어','음악','자습'],['영어','과학','수학','체육','국어','자습'],['사회','국어','수학','영어','미술','자습'],['체육','수학','영어','국어','과학','자습']]
-  app().innerHTML=`<div class="screen no-nav fade-in">
-    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>시간표</h2></div>
-    <div style="padding:16px 20px">
-      <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:13px">
-          <tr>${days.map(d=>`<th style="padding:8px;background:var(--primary-tint);color:var(--primary);font-weight:700;text-align:center;border-radius:8px">${d}</th>`).join('')}</tr>
-          ${[0,1,2,3,4,5].map(r=>`<tr>${days.map((_,c)=>`<td style="padding:8px 4px;text-align:center;font-size:13px;color:var(--ink2)">${subjects[c][r]}</td>`).join('')}</tr>`).join('')}
-        </table>
-      </div>
-      <div class="note" style="margin-top:12px;text-align:center">더미 시간표 — 실제 시간표는 추후 연동 예정</div>
-    </div>
+  let grade=2
+  const render=()=>{
+    document.getElementById('tt-body').innerHTML=`
+      <table class="tt">
+        <tr><th class="pn"></th>${days.map((d,i)=>`<th class="${i===todayIdx?'on':''}">${d}</th>`).join('')}</tr>
+        ${[0,1,2,3,4,5].map(r=>`<tr><td class="pn">${r+1}교시</td>${days.map((_,c)=>`<td class="${c===todayIdx?'on':''}">${subjects[c][r]}</td>`).join('')}</tr>`).join('')}
+      </table>`
+    document.querySelectorAll('#tt-grade [data-g]').forEach(b=>b.classList.toggle('on',+b.dataset.g===grade))
+  }
+  app().innerHTML=`<div class="screen no-nav fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">시간표</div><div style="width:34px"></div></div>
+    <div style="padding:2px 18px 0"><div class="pills" id="tt-grade">${[1,2,3].map(g=>`<button class="ppill${g===grade?' on':''}" data-g="${g}">${g}학년</button>`).join('')}</div></div>
+    <div class="pcard" id="tt-body"></div>
+    <div style="padding:12px 18px 0;font-size:12px;color:var(--sub);text-align:center">예시 시간표 — 실제 시간표는 추후 연동 예정</div>
   </div>`
   document.getElementById('bk').onclick=pop
+  document.querySelectorAll('#tt-grade [data-g]').forEach(b=>b.onclick=()=>{grade=+b.dataset.g;render()})
+  render()
 }
 
-function rSchoolComingSoon(title){
-  app().innerHTML=`<div class="screen no-nav fade-in">
-    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>${esc(title)}</h2></div>
-    <div style="padding:60px 20px;text-align:center">
-      <div style="width:64px;height:64px;border-radius:20px;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">${I.school}</div>
-      <div style="font-size:17px;font-weight:700;margin-bottom:8px">준비 중이에요</div>
-      <div class="note">곧 업데이트될 예정입니다.</div>
+// 시험대비자료 (preview 12) — 과목별 자료 (백엔드 연동 전 목록형)
+function rStudy(){
+  const subs=[['국어','blue'],['영어','green'],['수학','pink'],['사회','org'],['과학','sky'],['한국사','org'],['기타','gray']]
+  app().innerHTML=`<div class="screen no-nav fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">시험대비자료</div><div style="width:34px"></div></div>
+    <div class="pcard" style="padding:4px 16px">
+      ${subs.map(([s,t])=>`<div class="lrow" data-subj="${s}" style="cursor:pointer"><div class="chip ti-${t}">${I.book}</div><div class="body"><div class="ti">${s}</div><div class="su">자료 준비 중</div></div><span style="color:#c9cdd8;display:flex">${I.chev}</span></div>`).join('')}
     </div>
+    <div style="padding:12px 18px 0;font-size:12px;color:var(--sub);text-align:center">과목별 학습 자료 · 곧 업로드 기능이 추가돼요</div>
   </div>`
   document.getElementById('bk').onclick=pop
+  document.querySelectorAll('[data-subj]').forEach(el=>el.onclick=()=>toast(`${el.dataset.subj} 자료는 준비 중이에요`))
+}
+
+// 교실예약 (자습실 시간대) — 월~금: 야자1·2 / 토·일: 오전1·2 오후1·2·3 야자1·2 (중복 선택)
+async function rRoom(){
+  const dow2slots=dow=>(dow===0||dow===6)?['오전1','오전2','오후1','오후2','오후3','야자1','야자2']:['야자1','야자2']
+  const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+  const WD=['일','월','화','수','목','금','토']
+  let off=0
+  const render=async()=>{
+    app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk0">${I.back}</button><div class="ttl">교실예약</div><div style="width:34px"></div></div><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>`
+    document.getElementById('bk0').onclick=pop
+    const d=new Date();d.setDate(d.getDate()+off);const ds=iso(d),dow=d.getDay()
+    const slots=dow2slots(dow)
+    let rows=[];try{const r=await wt(sb.from('okya_reservations').select('*').eq('date',ds));rows=r.data||[]}catch{}
+    const sel=new Set(rows.filter(x=>x.user_id===SESSION.id).map(x=>x.slot))
+    const byMe=new Set(sel)
+    const drawSlots=()=>document.getElementById('rm-slots').innerHTML=slots.map(s=>{
+      const who=rows.filter(x=>x.slot===s).map(x=>x.user_name)
+      const on=sel.has(s)
+      const sr=who.length?`예약 ${who.length}명 · ${who.slice(0,3).join(', ')}${who.length>3?' 외':''}`:'예약 없음'
+      return`<div class="slot${on?' on':''}" data-slot="${s}"><div class="sbody"><div class="sn">${s}</div><div class="sr">${esc(sr)}</div></div><div class="chk">${ICO_CHECK_SM}</div></div>`
+    }).join('')
+    app().innerHTML=`<div class="screen no-nav fade-in p3">
+      <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">교실예약</div><div style="width:34px"></div></div>
+      <div class="daynav">
+        <button class="dn" id="rm-prev">${I.back}</button>
+        <div class="dl">${d.getMonth()+1}월 ${d.getDate()}일<small>${WD[dow]}요일${off===0?' · 오늘':''}</small></div>
+        <button class="dn" id="rm-next">${I.chev}</button>
+      </div>
+      <div class="pcard"><div class="sec">시간대 선택 <span style="font-size:12px;font-weight:600;color:var(--sub)">(중복 가능)</span></div><div id="rm-slots"></div></div>
+      <div style="padding:10px 18px calc(16px + env(safe-area-inset-bottom))"><button class="pbtn pri" id="rm-save">예약 저장</button></div>
+    </div>`
+    document.getElementById('bk').onclick=pop
+    document.getElementById('rm-prev').onclick=()=>{off--;render()}
+    document.getElementById('rm-next').onclick=()=>{off++;render()}
+    drawSlots()
+    document.getElementById('rm-slots').onclick=e=>{
+      const el=e.target.closest('[data-slot]');if(!el)return
+      const s=el.dataset.slot;sel.has(s)?sel.delete(s):sel.add(s)
+      el.classList.toggle('on')
+    }
+    document.getElementById('rm-save').onclick=async()=>{
+      const btn=document.getElementById('rm-save');btn.disabled=true;btn.textContent='저장 중...'
+      const add=[...sel].filter(s=>!byMe.has(s)),del=[...byMe].filter(s=>!sel.has(s))
+      try{
+        if(add.length)await wt(sb.from('okya_reservations').insert(add.map(s=>({id:uid('rv'),date:ds,slot:s,user_id:SESSION.id,user_name:SESSION.name,at:nowISO()}))))
+        for(const s of del)await wt(sb.from('okya_reservations').delete().eq('date',ds).eq('slot',s).eq('user_id',SESSION.id))
+        toast('예약을 저장했어요')
+      }catch{toast('저장 실패 — 잠시 후 다시')}
+      render()
+    }
+  }
+  render()
 }
 
 async function rPrint(){
@@ -1056,20 +1135,22 @@ async function rMeeting(){
   document.getElementById('bk').onclick=pop
   let ms=[]
   try{const r=await wt(sb.from('okya_meetings').select('*').order('at',{ascending:false}));ms=r.data||[]}catch{}
-  const list=ms.length?ms.map(m=>`<div class="ldg-item"><div class="ldg-ic" style="background:#EEF4FF;color:#2563EB;font-size:16px">🎬</div><div class="ldg-body"><b>${esc(m.title)}</b><span><a href="${esc(m.url)}" target="_blank" style="color:var(--primary)">영상 보기 ↗</a> · ${timeago(m.at)}</span></div>${admin?`<button class="btn danger sm" data-del="${m.id}">삭제</button>`:''}</div>`).join(''):'<div class="empty">등록된 영상이 없어요.</div>'
-  app().innerHTML=`<div class="screen no-nav fade-in">
-    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>회의록</h2></div>
-    ${admin?`<div style="padding:20px 20px 0"><div class="card"><div style="font-size:15px;font-weight:700;margin-bottom:12px">영상 등록</div><div class="field"><label>제목</label><input id="mt" placeholder="예: 2학기 2차 대의원회"></div><div class="field"><label>유튜브 링크</label><input id="mu" placeholder="https://youtube.com/..."></div><button class="btn" id="madd">등록</button></div></div>`:''}
-    <div style="padding:16px 20px 0"><div class="sec-title">회의 영상</div><div class="card-list">${list}</div></div>
+  const play='<svg viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M8 5v14l11-7z"/></svg>'
+  const list=ms.length?ms.map(m=>`<div class="lrow" data-url="${esc(m.url)}" style="cursor:pointer"><div class="vthumb">${play}</div><div class="body"><div class="ti">${esc(m.title)}</div><div class="su">${fmtDate(m.at)} 게시</div></div>${admin?`<button class="pbtn out" data-del="${m.id}" style="width:auto;padding:7px 12px;font-size:12px">삭제</button>`:`<span style="color:#c9cdd8;display:flex">${I.chev}</span>`}</div>`).join(''):'<div class="empty">등록된 영상이 없어요.</div>'
+  app().innerHTML=`<div class="screen no-nav fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">회의록</div><div style="width:34px"></div></div>
+    ${admin?`<div class="pcard"><div class="sec">영상 등록</div><div class="field"><label>제목</label><input id="mt" placeholder="예: 2학기 2차 대의원회"></div><div class="field"><label>유튜브 링크</label><input id="mu" placeholder="https://youtube.com/..."></div><button class="pbtn pri" id="madd">등록</button></div>`:''}
+    <div class="pcard"><div class="sec">회의 영상</div>${list}</div>
   </div>`
   document.getElementById('bk').onclick=pop
+  document.querySelectorAll('[data-url]').forEach(el=>el.onclick=()=>{const u=el.dataset.url;if(u)window.open(u,'_blank')})
   const a=document.getElementById('madd')
   if(a)a.onclick=async()=>{
     const title=document.getElementById('mt').value.trim();if(!title){toast('제목을 입력해줘');return}
     try{await wt(sb.from('okya_meetings').insert({id:uid('m'),title,url:document.getElementById('mu').value.trim()||'https://youtube.com/',at:nowISO()}))}catch{}
     rMeeting()
   }
-  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_meetings').delete().eq('id',b.dataset.del))}catch{};toast('삭제');rMeeting()})
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=async(e)=>{e.stopPropagation();try{await wt(sb.from('okya_meetings').delete().eq('id',b.dataset.del))}catch{};toast('삭제');rMeeting()})
 }
 
 function rComm(){
