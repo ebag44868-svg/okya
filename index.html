@@ -1383,20 +1383,12 @@ function showLostMap(){
 // ── 검색 탭 ──
 async function rSearch(){
   TAB='search'
-  app().innerHTML=`<div class="screen fade-in">
-    <div class="hdr" style="border-bottom:1px solid var(--line)"><h2>검색</h2></div>
-    <div style="padding:14px 20px 8px">
-      <div style="background:var(--bg);border-radius:14px;padding:10px 16px;display:flex;align-items:center;gap:10px">
-        <div style="color:var(--muted);display:flex">${I.search}</div>
-        <input id="srch-inp" placeholder="이름으로 검색..." style="flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--ink);font-family:inherit">
-        <button id="srch-clear" style="display:none;background:none;border:none;color:var(--muted);cursor:pointer;display:flex">${I.close}</button>
-      </div>
-    </div>
-    <div id="srch-res" style="padding:4px 0"></div>
-    <div id="dm-hist" style="padding:0 0 8px">
-      <div style="padding:8px 20px 6px;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase">최근 대화</div>
-      <div id="dm-hist-list"><div class="loader" style="min-height:80px"><div class="spin"></div></div></div>
-    </div>
+  const personRow=(u,sub)=>`<div class="lrow" data-uid="${u.id}" style="cursor:pointer"><div class="chip ti-blue" style="border-radius:50%;overflow:hidden;font-weight:800">${u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover">`:esc((u.name||'?').charAt(0))}</div><div class="body"><div class="ti">${esc(u.name)}</div><div class="su">${sub}</div></div><span style="color:#c9cdd8;display:flex">${I.chev}</span></div>`
+  app().innerHTML=`<div class="screen fade-in p3">
+    <div class="topbar"><div class="t">검색</div><div style="width:34px"></div></div>
+    <div style="padding:2px 18px 0"><div style="display:flex;align-items:center;gap:9px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:12px 15px"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--sub);fill:none;stroke-width:2;stroke-linecap:round;flex:none"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="srch-inp" placeholder="이름으로 검색" style="flex:1;background:none;border:none;outline:none;font-size:14px;padding:0" autocomplete="off"></div></div>
+    <div id="srch-res"></div>
+    <div id="dm-hist"><div class="pcard"><div class="sec">최근 대화</div><div id="dm-hist-list"><div class="loader" style="min-height:80px"><div class="spin"></div></div></div></div></div>
   </div>${bnav()}`
   bindNav()
 
@@ -1410,15 +1402,10 @@ async function rSearch(){
     if(!trimmed){res.innerHTML='';return}
     const found=USERS.filter(u=>u.id!==SESSION.id&&u.name.includes(trimmed))
     res.innerHTML=found.length
-      ?found.map(u=>`<div class="row-item" data-uid="${u.id}" style="padding:12px 20px;cursor:pointer">
-          <div style="width:42px;height:42px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--primary);flex:none">${u.photo?`<img src="${u.photo}" style="width:42px;height:42px;border-radius:50%;object-fit:cover">`:esc(u.name.charAt(0))}</div>
-          <div class="row-body"><div class="row-title">${esc(u.name)}</div><div class="row-desc">${u.role==='admin'?'학생회':'학생'}</div></div>
-          <div class="row-right">${I.chev}</div>
-        </div>`).join('')
-      :`<div style="padding:32px 20px;text-align:center;color:var(--muted);font-size:14px">검색 결과가 없어요</div>`
+      ?`<div class="pcard">${found.map(u=>personRow(u,u.role==='admin'?'학생회':'학생')).join('')}</div>`
+      :`<div class="empty">검색 결과가 없어요</div>`
     res.querySelectorAll('[data-uid]').forEach(el=>{el.onclick=()=>push(()=>rUserProfile(el.dataset.uid))})
   }
-
   inp.oninput=()=>showResults(inp.value)
 
   // 최근 DM 로드
@@ -1426,26 +1413,16 @@ async function rSearch(){
   try{
     const{data}=await wt(sb.from('okya_dm').select('*').or(`from_id.eq.${SESSION.id},to_id.eq.${SESSION.id}`).order('at',{ascending:false}),5000)
     const seen=new Set()
-    dms=(data||[]).filter(dm=>{
-      const other=dm.from_id===SESSION.id?dm.to_id:dm.from_id
-      if(seen.has(other))return false
-      seen.add(other)
-      return true
-    })
+    dms=(data||[]).filter(dm=>{const other=dm.from_id===SESSION.id?dm.to_id:dm.from_id;if(seen.has(other))return false;seen.add(other);return true})
   }catch{}
   const histList=document.getElementById('dm-hist-list')
   if(!histList)return
-  if(!dms.length){histList.innerHTML=`<div style="padding:20px;text-align:center;color:var(--muted);font-size:14px">아직 대화가 없어요</div>`;return}
+  if(!dms.length){histList.innerHTML=`<div style="padding:14px 2px;text-align:center;color:var(--sub);font-size:13.5px">아직 대화가 없어요</div>`;return}
   histList.innerHTML=dms.map(dm=>{
     const otherId=dm.from_id===SESSION.id?dm.to_id:dm.from_id
-    const other=USERS.find(u=>u.id===otherId)
-    const name=other?.name||'알 수 없음'
+    const other=USERS.find(u=>u.id===otherId)||{id:otherId,name:'알 수 없음'}
     const preview=dm.text?dm.text.slice(0,22)+(dm.text.length>22?'…':''):'사진'
-    return`<div class="row-item" data-uid="${otherId}" style="padding:12px 20px;cursor:pointer">
-      <div style="width:42px;height:42px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--primary);flex:none">${other?.photo?`<img src="${other.photo}" style="width:42px;height:42px;border-radius:50%;object-fit:cover">`:esc(name.charAt(0))}</div>
-      <div class="row-body"><div class="row-title">${esc(name)}</div><div class="row-desc">${esc(preview)} · ${timeago(dm.at)}</div></div>
-      <div class="row-right">${I.chev}</div>
-    </div>`
+    return personRow(other,`${esc(preview)} · ${timeago(dm.at)}`)
   }).join('')
   histList.querySelectorAll('[data-uid]').forEach(el=>{el.onclick=()=>push(()=>rUserProfile(el.dataset.uid))})
 }
@@ -1453,18 +1430,15 @@ async function rSearch(){
 function rUserProfile(userId){
   const user=USERS.find(u=>u.id===userId)
   if(!user){toast('사용자를 찾을 수 없어요');return}
-  const isMe=userId===SESSION.id
-  const name=user.name
-  app().innerHTML=`<div class="screen no-nav fade-in">
-    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>프로필</h2><div></div></div>
-    <div style="padding:40px 20px 28px;text-align:center;border-bottom:1px solid var(--line)">
-      <div style="width:80px;height:80px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:var(--primary);margin:0 auto 16px;overflow:hidden">${user.photo?`<img src="${user.photo}" style="width:80px;height:80px;border-radius:50%;object-fit:cover">`:esc(name.charAt(0))}</div>
-      <div style="font-size:22px;font-weight:800;color:var(--ink);margin-bottom:6px">${esc(name)}</div>
-      <div style="font-size:13px;color:var(--muted)">창녕옥야고등학교 · ${user.role==='admin'?'학생회':'학생'}</div>
+  const isMe=userId===SESSION.id,name=user.name
+  app().innerHTML=`<div class="screen no-nav fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">프로필</div><div style="width:34px"></div></div>
+    <div class="prof" style="padding:24px 0 6px">
+      <div class="av">${user.photo?`<img src="${user.photo}">`:esc(name.charAt(0))}</div>
+      <div class="nm">${esc(name)}</div>
+      <div class="cl">창녕옥야고등학교 · ${user.role==='admin'?'학생회':'학생'}</div>
     </div>
-    ${!isMe?`<div style="padding:20px">
-      <button id="dm-btn" style="width:100%;padding:14px;border-radius:14px;background:var(--primary);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">${I.msg}<span>메시지 보내기</span></button>
-    </div>`:'<div style="padding:20px;text-align:center;color:var(--muted);font-size:14px">내 프로필이에요</div>'}
+    ${!isMe?`<div style="padding:18px"><button class="pbtn pri" id="dm-btn">메시지 보내기</button></div>`:`<div style="padding:24px;text-align:center;color:var(--sub);font-size:14px">내 프로필이에요</div>`}
   </div>`
   document.getElementById('bk').onclick=pop
   if(!isMe)document.getElementById('dm-btn').onclick=()=>push(()=>rDmChat(userId))
