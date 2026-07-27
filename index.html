@@ -536,6 +536,15 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .p3 .prog i,.p3 [data-day]{will-change:transform;}
 .p3 [data-day]{transition:transform .13s var(--ease),background .2s,color .2s;}
 .p3 [data-day]:active{transform:scale(.88);}
+
+/* ===== 알림 벨 배지 & 알림센터 ===== */
+[data-bell]{position:relative;}
+.nbadge{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:#FF4D4F;color:#fff;font-size:10px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px var(--card);animation:badgePop .4s var(--ease) both;}
+@keyframes badgePop{0%{transform:scale(0);}60%{transform:scale(1.25);}100%{transform:scale(1);}}
+.p3 .ntrow{position:relative;}
+.p3 .ntrow.unread{background:linear-gradient(90deg,var(--primary-tint),transparent 70%);border-radius:12px;margin:0 -6px;padding-left:6px;padding-right:6px;}
+.p3 .ntrow.unread+.lrow{border-top-color:transparent;}
+.p3 .ntrow .ntdot{width:8px;height:8px;border-radius:50%;background:#FF4D4F;flex:none;align-self:center;box-shadow:0 0 0 3px rgba(255,77,79,.14);}
 </style>
 </head>
 <body>
@@ -588,11 +597,33 @@ const app=()=>document.getElementById('app')
 function toast(m){const t=document.getElementById('toast');if(!t)return;t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500)}
 const nameOf=id=>(USERS.find(u=>u.id===id)||{name:'학생회'}).name
 
+// ── 알림 (okya_notifications). 테이블 없으면 조용히 무시(앱 흐름 방해 X) ──
+let NOTIFS=[]
+async function notify(userId,type,title,body,link){
+  if(!userId||userId===(SESSION&&SESSION.id))return   // 자기 자신에겐 알림 안 만듦
+  try{await wt(sb.from('okya_notifications').insert({id:uid('nt'),user_id:userId,type,title,body:body||'',link:link||'',read:false,at:nowISO()}),5000)}catch{}
+}
+async function loadNotifs(){try{const{data}=await wt(sb.from('okya_notifications').select('*').eq('user_id',SESSION.id).order('at',{ascending:false}).limit(50),5000);NOTIFS=data||[]}catch{NOTIFS=[]}return NOTIFS}
+function unreadCount(){return NOTIFS.filter(n=>!n.read).length}
+async function markNotifsRead(){const uns=NOTIFS.filter(n=>!n.read);if(!uns.length)return;uns.forEach(n=>n.read=true);try{await wt(sb.from('okya_notifications').update({read:true}).eq('user_id',SESSION.id).eq('read',false),5000)}catch{}}
+// 벨 버튼([data-bell])에 클릭·배지 반영
+function wireBell(){document.querySelectorAll('[data-bell]').forEach(b=>{
+  b.onclick=()=>push(()=>rNotifications())
+  const old=b.querySelector('.nbadge');if(old)old.remove()
+  const c=unreadCount();if(c>0){const s=document.createElement('span');s.className='nbadge';s.textContent=c>9?'9+':c;b.appendChild(s)}
+})}
+
 async function getAllTx(){try{const{data}=await wt(sb.from('okya_tx').select('*').order('at',{ascending:false}));return data||[]}catch{return[]}}
 function balOf(id,txs){return txs.filter(t=>t.to===id).reduce((s,t)=>s+t.amount,0)-txs.filter(t=>t.from===id).reduce((s,t)=>s+t.amount,0)}
 // 내 거래목록(최신순)에서 각 거래 직후의 잔액을 {거래id: 잔액}으로. curBal=현재 총잔액.
 function runningBal(mine,curBal){const map={};let run=curBal;for(const t of mine){map[t.id]=run;run-=(t.to===SESSION.id?t.amount:-t.amount)}return map}
-async function addTx(tx){try{const{error}=await wt(sb.from('okya_tx').insert({id:uid('tx'),at:nowISO(),...tx}));if(error)toast('오류: '+error.message);return!error}catch{toast('네트워크 오류');return false}}
+async function addTx(tx){try{const{error}=await wt(sb.from('okya_tx').insert({id:uid('tx'),at:nowISO(),...tx}));if(error){toast('오류: '+error.message);return false}
+  // 거래 알림(받는 사람에게)
+  if(tx.type==='송금'&&tx.to)notify(tx.to,'money','옥야머니 받음',`${nameOf(tx.from)}님이 ${fmt(tx.amount)}옥을 보냈어요`+(tx.reason?` · ${tx.reason}`:''))
+  else if(tx.type==='발행'&&tx.to)notify(tx.to,'money','옥야머니 발행',`학생회가 ${fmt(tx.amount)}옥을 발행했어요`)
+  else if(tx.type==='회수'&&tx.from)notify(tx.from,'money','옥야머니 회수',`학생회가 ${fmt(tx.amount)}옥을 회수했어요`)
+  return true
+}catch{toast('네트워크 오류');return false}}
 
 const LOGO='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAAROklEQVR4nO2deZQdVZ3HP/fW8vZ+vWQhAUyaQCALAhMNZGE4gKCIGFQgQyDIgIBDROXIQWUcdVyAAYIgJKigyXGcgSMkomwBJqBgIsQcksTsCVvSJIF099u3qrp3/qjXne10A+nOwlhTn3N6fVV1b93v/f5+d6l+LZRSGkAIQUjwkB92BUIOLGbo3GATOjjghAIHnFDggBMKHHBCgQNOKHDACQUOOKHAAScUOOCEAgecU2v9/+6thKuOR3ve7f7ZlJqWtI0hgtffzYNTjAZE/Sv17z88lm8ocMVPFTXDBg9ah+RY9O1GhqRiH2q9DgQH7O2Es2WH5etLLN/gsbnNoz1vYAjNsCbN8UcYnDbR4rjRMcA4IOW/H5Wa4LV3YmgzCp7GkBWUCmYU2+8OLtUcfr00yz1PwuqtFtpJgDTqBhagNb9+ukqyweOs4zu5dkaEKWOTHExXC6ExDY0j/YhiSOOgln8w2a85eF1bia/9osTTqxIgImCAjNa11aC1QAjQOkGhCg8ud3j61Tz/et4urp3RclBzYLdhNbszRwDZbw5euaXIRXPLbNyaRtoW2tAIpUGDFsJ3r9D1tlRIIdCmJFNOcf3CIrlCJ9+/qBEpDlLI/qA+rffimL8D9ovA67YVmXVrgU1vp5ARiUaDAt3VQrr+qdspAn8TSyCERBspblxc4pChOa7+ZCN727JKe2zcXmPV6w47Ol20p2hO23y01WD8oRaWae/dDfRXnFBkig6FKggBAoGrNElb0pyyeh2aKdV49Y0qG7a5FEsKw4QRTTYfPcJk7IgI4gNmo7myw6o3aqzfViNX8JCGZHizwbFjbCaMsBH7ME7Z50FWpuhw1bw8m7Y1IqIGekBTa4EvssLTCX74QI7Tj61w9MgPGs16PLO6wJ2P1PjTGoNcJY5WUf8lQ5OMlDlxTJlrPm0x46RUdzm96NHpVD9bpi+/UeKKn+bZ2hHBNAWeYzA02cnP5zQwdXwTADXX5b6nstyzxGNDWwRHReuRCjAEjfEyp04sct2MIFOPTvYpw/UUC57JcvfjsL7NpuZGd5tAQipe4YwJWa7/XJwTj27Y69btyT46WHPzohzPr05DxGDw6yYCYcCOjgQ/fTzDvMujvm36wVMeNy/q5KaHIhQrTWBphCERhvAjhoZCzWbpasVz64pcc9a7/Hh2C1HL3LPIuua6j/x/e6vIrFuKrN82BCwBriCRyHP3xU1MHZ9CAxXHZc78dhYsjYBsAEN2NUkdSbZs8btlHn98Nc+dV7Yz+5SW7jJqrse1C9qZ/2gEZMovRwJK1TsI5Ks2i19w+eOaAj+5rJNLTm1koHljn0Y1f1lfZN4TEmz7PQdqQghkj4/+qedoU/L7Fw22dtbe4zjNLYs7+c5/RSl6KWTE8HO5o9GuC44Hbn1kbIFLnNsfjvPNhR14Su15qW4xRA8Db95ZZvbtRdZva0BGDECTiue972raedOSgEKg+dlTORY8m0JEEkhLgHA46tAC0yZ2MmF0BosSuCAtk848iivvqvHsqvbucv7zjxnm/0EirATSBpTDkYfkOXlCluNGZ4lRBqUhakiZTShFvP/LmxoWtaZR5DkMaAAAAAElFTkSuQmCC'
 ;(()=>{const sl=document.getElementById('splash-logo');if(sl)sl.src=LOGO})()
@@ -794,7 +825,7 @@ async function rHome(){
   const headerHTML=`
     <div class="topbar">
       <div class="t brand"><img src="${LOGO}" style="width:26px;height:26px;border-radius:8px;object-fit:cover">okya</div>
-      <button>${I.bell}</button>
+      <button data-bell>${I.bell}</button>
     </div>
     <div class="greet"><small>${cheer()}</small><div class="nm">${esc(SESSION.name)}님</div></div>`
 
@@ -802,7 +833,7 @@ async function rHome(){
   bindNav()
 
   const admin=SESSION.role==='admin'
-  const txs=await getAllTx()
+  const[txs]=await Promise.all([getAllTx(),loadNotifs()])
   const bal=balOf(SESSION.id,txs)
   const issued=txs.filter(t=>t.type==='발행').reduce((s,t)=>s+t.amount,0)
   const todayStr=new Date().toISOString().slice(0,10)
@@ -876,6 +907,7 @@ async function rHome(){
   })()
   countUp(document.getElementById('balnum'),admin?issued:bal)
   animateGauge(document.getElementById('progbar'),document.getElementById('progpct'),yearPct())
+  wireBell()
 }
 
 // 거래 1건 → preview .lrow. bal 지정 시(학생) 거래 직후 잔액 표시
@@ -960,6 +992,29 @@ async function rHistory(){
   }
   document.querySelectorAll('#hist-tags [data-f]').forEach(el=>el.onclick=()=>{cur=el.dataset.f;document.querySelectorAll('#hist-tags [data-f]').forEach(x=>x.className='tag '+(x.dataset.f===cur?'b':'off'));render()})
   render()
+}
+
+// 알림 센터
+const NT_META={money:{ic:'money',tint:'green'},dm:{ic:'send',tint:'blue'},petition:{ic:'notice',tint:'org'},notice:{ic:'notice',tint:'blue'}}
+async function rNotifications(){
+  app().innerHTML=`<div class="screen no-nav fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">알림</div><button id="nt-clear" style="font-size:12.5px;font-weight:700;color:var(--primary);background:none">모두 읽음</button></div>
+    <div id="nt-body"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
+    <div style="height:12px"></div>
+  </div>`
+  document.getElementById('bk').onclick=pop
+  await loadNotifs()
+  const render=()=>{
+    const b=document.getElementById('nt-body');if(!b)return
+    if(!NOTIFS.length){b.innerHTML=`<div class="empty" style="padding:64px 20px;text-align:center;color:var(--muted);font-size:14px">아직 알림이 없어요</div>`;return}
+    b.innerHTML=`<div class="pcard" style="margin-top:8px">`+NOTIFS.map(n=>{
+      const m=NT_META[n.type]||{ic:'bell',tint:'gray'}
+      return`<div class="lrow ntrow${n.read?'':' unread'}"><div class="chip ti-${m.tint}">${I[m.ic]||I.bell}</div><div class="body"><div class="ti">${esc(n.title)}</div><div class="su">${esc(n.body)}${n.body?' · ':''}${timeago(n.at)}</div></div>${n.read?'':'<span class="ntdot"></span>'}</div>`
+    }).join('')+`</div>`
+  }
+  render()
+  markNotifsRead()   // 화면 열면 읽음 처리
+  document.getElementById('nt-clear').onclick=async()=>{await markNotifsRead();render()}
 }
 
 async function fTransfer(mode){
@@ -1614,6 +1669,7 @@ async function rDmChat(userId){
     const btn=document.getElementById('dm-snd');btn.disabled=true
     try{
       await wt(sb.from('okya_dm').insert({id:uid('dm'),from_id:myId,to_id:userId,text,at:nowISO()}))
+      notify(userId,'dm','새 메시지',`${nameOf(myId)}님: ${text.length>30?text.slice(0,30)+'…':text}`)
       dmtxt.value='';dmtxt.style.height='auto'
       await loadDms()
     }catch{toast('전송 실패')}
@@ -1822,10 +1878,10 @@ async function iPetition(){
 async function rMy(){
   TAB='my'
   const isAdmin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen fade-in p3"><div class="topbar"><div class="t">MY</div><button id="my-bell">${I.bell}</button></div><div class="loader" style="min-height:220px"><div class="spin"></div></div></div>${bnav()}`
+  app().innerHTML=`<div class="screen fade-in p3"><div class="topbar"><div class="t">MY</div><button id="my-bell" data-bell>${I.bell}</button></div><div class="loader" style="min-height:220px"><div class="spin"></div></div></div>${bnav()}`
   bindNav()
 
-  const txs=await getAllTx()
+  const[txs]=await Promise.all([getAllTx(),loadNotifs()])
   const bal=balOf(SESSION.id,txs)
   const issued=txs.filter(t=>t.type==='발행').reduce((s,t)=>s+t.amount,0)
   const attend=txs.filter(t=>t.type==='출석'&&t.to===SESSION.id).length
@@ -1838,7 +1894,7 @@ async function rMy(){
   const pfis=PRESETS.map(([n,p])=>{const on=p.toLowerCase()===curPri.toLowerCase();return`<div class="pfi${on?' on':''}" data-pri="${p}" data-name="${n}" style="background:${grad(p)}"><div class="pl">${n}</div></div>`}).join('')
 
   app().innerHTML=`<div class="screen fade-in p3">
-    <div class="topbar"><div class="t">MY</div><button id="my-bell">${I.bell}</button></div>
+    <div class="topbar"><div class="t">MY</div><button id="my-bell" data-bell>${I.bell}</button></div>
     <div class="prof">
       <div class="av">${photoSrc?`<img src="${photoSrc}">`:initials}<label class="camera" for="my-photo-input"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></label></div>
       <input id="my-photo-input" type="file" accept="image/*" style="display:none">
@@ -1863,7 +1919,7 @@ async function rMy(){
       <div class="mrow" id="mm-tx"><span class="mic">${I.hist}</span>거래 내역<span class="cev">${I.chev}</span></div>
       <div class="mrow" id="mm-chal"><span class="mic">${I.star}</span>챌린지<span class="cev">${I.chev}</span></div>
       <div class="mrow" id="mm-peti"><span class="mic">${I.petition}</span>청원<span class="cev">${I.chev}</span></div>
-      <div class="mrow" id="mm-noti"><span class="mic">${I.bell}</span>알림 설정<span class="cev">${I.chev}</span></div>
+      <div class="mrow" id="mm-noti"><span class="mic">${I.bell}</span>알림<span class="cev">${I.chev}</span></div>
       <div class="mrow" id="mm-out"><span class="mic" style="color:var(--danger)">${I.logout}</span><span style="color:var(--danger)">로그아웃</span></div>
     </div>
     <div class="ver">옥야 v1.0 · 창녕옥야고 학생회</div>
@@ -1887,11 +1943,11 @@ async function rMy(){
   document.getElementById('palfan-btn').onclick=()=>fan.classList.toggle('open')
   document.querySelectorAll('[data-pri]').forEach(el=>el.onclick=()=>{applyTheme({name:el.dataset.name,primary:el.dataset.pri,v:2});rMy()})
   document.getElementById('my-color').onchange=e=>{applyTheme({name:'커스텀',primary:e.target.value,v:2});rMy()}
-  document.getElementById('my-bell').onclick=()=>toast('알림은 준비 중이에요')
+  wireBell()
   document.getElementById('mm-tx').onclick=()=>push(()=>rHistory())
   document.getElementById('mm-chal').onclick=()=>push(rChallengePage)
   document.getElementById('mm-peti').onclick=()=>push(rPetitionPage)
-  document.getElementById('mm-noti').onclick=()=>toast('알림은 준비 중이에요')
+  document.getElementById('mm-noti').onclick=()=>push(()=>rNotifications())
   document.getElementById('mm-out').onclick=async()=>{try{await sb.auth.signOut()}catch{};SESSION=null;USERS=[];rLogin()}
 }
 
