@@ -378,6 +378,38 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .p3 .slot.on .chk{border-color:#fff;background:rgba(255,255,255,.2);}
 .p3 .slot .chk svg{width:13px;height:13px;stroke:#fff;stroke-width:3;display:none;}
 .p3 .slot.on .chk svg{display:block;}
+
+/* 소통 그리드 */
+.p3 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.p3 .gcard{background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:16px;cursor:pointer;}
+.p3 .gcard .gic{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.p3 .gcard .gic svg{width:22px;height:22px;}
+.p3 .gcard .gt{font-size:14px;font-weight:800;color:var(--ink);}
+.p3 .gcard .gs{font-size:11.5px;color:var(--sub);margin-top:3px;}
+/* 챌린지/청원 보조 */
+.p3 .reward{background:var(--grad);color:#fff;border-radius:11px;padding:7px 11px;font-size:14px;font-weight:800;text-align:center;flex:none;line-height:1.1;}
+.p3 .reward small{display:block;font-size:9px;opacity:.85;font-weight:700;}
+.p3 .minibtn{font-size:12.5px;font-weight:700;padding:7px 12px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;}
+.p3 .minibtn.soft{background:var(--primary-tint);color:var(--primary);}
+.p3 .minibtn.out{background:#fff;border:1.5px solid var(--line);color:var(--ink);}
+.p3 .minibtn.danger{background:var(--danger-tint);color:var(--danger);}
+/* 사진 업로드 박스 */
+.p3 .upload{display:block;border:1.6px dashed #cfd4e0;border-radius:14px;padding:20px;text-align:center;color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;}
+.p3 .upload svg{width:26px;height:26px;margin:0 auto 6px;color:#b6bcc8;display:block;}
+.p3 .upload span{display:block;}
+.p3 .upload.has{padding:0;border-style:solid;border-color:var(--line);overflow:hidden;}
+.p3 .upload.has img{width:100%;display:block;max-height:220px;object-fit:cover;}
+/* 책 썸네일 */
+.p3 .bthumb{width:46px;height:60px;border-radius:8px;flex-shrink:0;object-fit:cover;background:var(--grad);}
+/* 게시판 */
+.p3 .post{padding:14px 2px;}
+.p3 .post+.post{border-top:1px solid var(--line);}
+.p3 .post .pmeta{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--sub);margin-bottom:5px;}
+.p3 .post .pnick{font-weight:800;color:var(--primary);}
+.p3 .post .pbody{font-size:14px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word;}
+.p3 .post .pfoot{display:flex;gap:8px;margin-top:9px;}
+.p3 .upbtn{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:20px;border:1.5px solid var(--line);background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;}
+.p3 .upbtn.on{background:var(--primary-tint);border-color:var(--primary);color:var(--primary);}
 </style>
 </head>
 <body>
@@ -1156,42 +1188,29 @@ async function rMeeting(){
 function rComm(){
   TAB='comm'
   const CARDS=[
-    {id:'challenge', ic:'star',    color:'#D97706', bg:'#FFFAEB', title:'챌린지',    desc:'옥야머니 이벤트'},
-    {id:'book',      ic:'book',    color:'#059669', bg:'#EDFAF5', title:'책 교환',   desc:'읽은 책 나누기'},
-    {id:'petition',  ic:'petition',color:'#1A5CE6', bg:'#EEF3FF', title:'청원',      desc:'학교에 건의하기'},
-    {id:'binding',   ic:'binding', color:'#7C3AED', bg:'#F3EEFF', title:'옥야제본소', desc:'제본 신청 · 100옥'},
+    {id:'challenge',ic:'star',    tint:'org', title:'챌린지',   desc:'옥야머니 이벤트'},
+    {id:'book',     ic:'book',    tint:'green',title:'책 교환',  desc:'교재 나눔·교환'},
+    {id:'petition', ic:'petition',tint:'blue',title:'청원',     desc:'학교에 건의하기'},
+    {id:'board',    ic:'comm',    tint:'pink',title:'게시판',   desc:'익명 자유게시판'},
+    {id:'binding',  ic:'binding', tint:'sky', title:'옥야제본소',desc:'제본 신청 · 100옥'},
+    {id:'lost',     ic:'lost',    tint:'org', title:'분실물',   desc:'분실물 신고·찾기'},
   ]
-  app().innerHTML=`<div class="screen fade-in">
-    <div class="hdr" style="border-bottom:1px solid var(--line)"><h2>커뮤니티</h2></div>
-    <div style="padding:16px 20px 20px">
-      <div class="comm-grid" style="margin-bottom:14px">
-        ${CARDS.map(c=>`<div class="comm-card" data-cid="${c.id}">
-          <div class="comm-ic" style="background:${c.bg};color:${c.color}">${I[c.ic]}</div>
-          <div class="comm-title">${c.title}</div>
-          <div class="comm-desc">${c.desc}</div>
-        </div>`).join('')}
-      </div>
-      <!-- 분실물 - 전체 너비 카드 -->
-      <div class="comm-card" data-cid="lost" style="flex-direction:row;align-items:center;text-align:left;padding:18px 20px;gap:16px">
-        <div class="comm-ic" style="background:#FFF0F0;color:var(--danger);margin-bottom:0;flex:none">${I.lost}</div>
-        <div style="flex:1">
-          <div class="comm-title" style="margin-bottom:2px">분실물</div>
-          <div class="comm-desc">분실물 신고 · 찾아주기</div>
-        </div>
-        <div style="color:var(--muted);display:flex;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M9 6l6 6-6 6"/></svg></div>
-      </div>
-    </div>
+  app().innerHTML=`<div class="screen fade-in p3">
+    <div class="topbar"><div class="t">소통</div><div style="width:34px"></div></div>
+    <div style="padding:12px 18px 0"><div class="grid2">
+      ${CARDS.map(c=>`<div class="gcard" data-cid="${c.id}"><div class="gic ti-${c.tint}">${I[c.ic]}</div><div class="gt">${c.title}</div><div class="gs">${c.desc}</div></div>`).join('')}
+    </div></div>
+    <div style="height:8px"></div>
   </div>${bnav()}`
   bindNav()
-  document.querySelectorAll('[data-cid]').forEach(el=>{
-    el.onclick=()=>{
-      const id=el.dataset.cid
-      if(id==='challenge')push(rChallengePage)
-      else if(id==='book')push(rBookPage)
-      else if(id==='petition')push(rPetitionPage)
-      else if(id==='binding')push(rPrint)
-      else if(id==='lost')push(rLost)
-    }
+  document.querySelectorAll('[data-cid]').forEach(el=>el.onclick=()=>{
+    const id=el.dataset.cid
+    if(id==='challenge')push(rChallengePage)
+    else if(id==='book')push(rBookPage)
+    else if(id==='petition')push(rPetitionPage)
+    else if(id==='board')push(rBoardPage)
+    else if(id==='binding')push(rPrint)
+    else if(id==='lost')push(rLost)
   })
 }
 
@@ -1476,22 +1495,38 @@ async function rDmChat(userId){
 }
 
 
-async function rChallengePage(){
-  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>챌린지</h2></div><div id="cb"><div class="loader" style="min-height:160px"><div class="spin"></div></div></div></div>`
-  document.getElementById('bk').onclick=pop
-  await iChallenge()
-}
+const _cbPage=(title)=>{app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${title}</div><div style="width:34px"></div></div><div id="cb"><div class="loader" style="min-height:160px"><div class="spin"></div></div></div></div>`;document.getElementById('bk').onclick=pop}
+async function rChallengePage(){_cbPage('챌린지');await iChallenge()}
+async function rBookPage(){_cbPage('책 교환');await iBook()}
+async function rPetitionPage(){_cbPage('청원');await iPetition()}
+async function rBoardPage(){_cbPage('게시판');await rBoard()}
 
-async function rBookPage(){
-  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>책 교환</h2></div><div id="cb"><div class="loader" style="min-height:160px"><div class="spin"></div></div></div></div>`
-  document.getElementById('bk').onclick=pop
-  await iBook()
-}
-
-async function rPetitionPage(){
-  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>청원</h2></div><div id="cb"><div class="loader" style="min-height:160px"><div class="spin"></div></div></div></div>`
-  document.getElementById('bk').onclick=pop
-  await iPetition()
+// 익명 자유게시판 (DC 느낌)
+async function rBoard(){
+  const admin=SESSION.role==='admin'
+  let posts=[]
+  try{const r=await wt(sb.from('okya_board').select('*').order('at',{ascending:false}));posts=r.data||[]}catch{}
+  const list=posts.length?posts.map(p=>{
+    const ups=Object.keys(p.ups||{}).length,mine=(p.ups||{})[SESSION.id]
+    const canDel=admin||p.by_id===SESSION.id
+    return`<div class="post"><div class="pmeta"><span class="pnick">${esc(p.nick||'ㅇㅇ')}</span><span>·</span><span>${timeago(p.at)}</span></div><div class="pbody">${esc(p.body)}</div><div class="pfoot"><button class="upbtn${mine?' on':''}" data-up="${p.id}">▲ 추천 ${ups}</button>${canDel?`<button class="upbtn" data-bdel="${p.id}">삭제</button>`:''}</div></div>`
+  }).join(''):'<div class="empty">아직 글이 없어요. 첫 글을 남겨보세요.</div>'
+  document.getElementById('cb').innerHTML=`
+    <div class="pcard"><div class="sec">글쓰기 <span style="font-size:12px;font-weight:600;color:var(--sub)">· 익명</span></div>
+      <div class="field"><input id="bd-nick" maxlength="12" placeholder="닉네임 (선택 · 기본 ㅇㅇ)"></div>
+      <div class="field" style="margin-bottom:0"><textarea id="bd-body" rows="3" placeholder="자유롭게 남겨보세요" style="resize:none"></textarea></div>
+      <button class="pbtn pri" id="bd-sub" style="margin-top:12px">등록</button>
+    </div>
+    <div class="pcard">${list}</div>
+    <div style="height:8px"></div>`
+  document.getElementById('bd-sub').onclick=async()=>{
+    const body=document.getElementById('bd-body').value.trim();if(!body){toast('내용을 입력해줘');return}
+    const nick=document.getElementById('bd-nick').value.trim()||'ㅇㅇ'
+    try{await wt(sb.from('okya_board').insert({id:uid('bd'),nick,body,by_id:SESSION.id,ups:{},at:nowISO()}))}catch{toast('등록 실패 · okya_board 테이블이 필요해요');return}
+    rBoard()
+  }
+  document.querySelectorAll('[data-up]').forEach(b=>b.onclick=async()=>{const id=b.dataset.up;try{const r=await wt(sb.from('okya_board').select('ups').eq('id',id).single());const ups={...(r.data?.ups||{})};if(ups[SESSION.id])delete ups[SESSION.id];else ups[SESSION.id]=1;await wt(sb.from('okya_board').update({ups}).eq('id',id))}catch{};rBoard()})
+  document.querySelectorAll('[data-bdel]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_board').delete().eq('id',b.dataset.bdel))}catch{};toast('삭제');rBoard()})
 }
 
 async function iChallenge(){
@@ -1505,9 +1540,9 @@ async function iChallenge(){
   }
   try{const r=await wt(sb.from('okya_event_subs').select('id,event_id'));subs=r.data||[]}catch{}
   function ddTag(dl){if(!dl)return'';const d=Math.ceil((new Date(dl)-new Date())/86400000);const red=d<=1;return`<span style="font-size:11px;font-weight:700;color:${red?'var(--danger)':'var(--muted)'};background:${red?'#FEF0F1':'var(--line)'};padding:2px 7px;border-radius:6px">${red?'D-day':'D-'+d}</span>`}
-  const cards=evs.length?evs.map(e=>{const cnt=subs.filter(s=>s.event_id===e.id).length;return`<div style="padding:16px 20px;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:7px;margin-bottom:5px"><span class="pill blue">챌린지</span>${e.deadline?`<span style="font-size:11.5px;color:var(--muted)">~${fmtDate(e.deadline)}</span>`:''}${ddTag(e.deadline)}</div><div style="font-size:15px;font-weight:700;margin-bottom:3px">${esc(e.title)}</div>${e.descr?`<div style="font-size:13px;color:var(--ink2);line-height:1.5">${esc(e.descr)}</div>`:''}</div><div style="background:var(--primary);color:#fff;border-radius:11px;padding:7px 11px;font-size:14px;font-weight:800;text-align:center;flex:none">${fmt(e.reward)}<div style="font-size:10px;opacity:.8">옥</div></div></div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)"><button style="font-size:13px;font-weight:600;color:var(--primary);background:var(--primary-tint);padding:7px 12px;border-radius:10px" data-gallery="${e.id}">📷 인증 사진 (${cnt})</button>${admin?`<button class="btn danger sm" data-cancel="${e.id}">취소</button>`:`<button class="btn out sm" data-verify="${e.id}">인증하기</button>`}</div></div>`}).join(''):'<div class="empty">진행 중인 챌린지가 없어요.</div>'
-  const aform=admin?`<div style="padding:0 20px 16px"><div class="card"><div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:12px">새 챌린지 만들기</div><div class="field"><label>제목</label><input id="et" placeholder="예: 등교 스트레칭 챌린지"></div><div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>보상(옥)</label><input id="er" type="number" placeholder="100"></div><div class="field" style="flex:1"><label>마감일</label><input id="edd" type="date"></div></div><div class="field"><label>설명</label><input id="edesc" placeholder="간단 설명"></div><button class="btn sm" id="eadd">등록</button></div></div>`:''
-  document.getElementById('cb').innerHTML=`<div class="card-list" style="margin:0 20px 12px">${cards}</div>${aform}`
+  const cards=evs.length?evs.map(e=>{const cnt=subs.filter(s=>s.event_id===e.id).length;return`<div class="pcard"><div style="display:flex;gap:10px;align-items:flex-start"><div class="chip ti-org">${I.star}</div><div style="flex:1;min-width:0"><div class="ti" style="font-size:15px;white-space:normal">${esc(e.title)}</div>${e.descr?`<div class="su" style="font-size:13px;line-height:1.5;white-space:normal;margin-top:3px">${esc(e.descr)}</div>`:''}${e.deadline?`<div style="margin-top:6px;display:flex;align-items:center;gap:6px"><span class="tag off" style="padding:3px 9px;font-size:11px">~${fmtDate(e.deadline)}</span>${ddTag(e.deadline)}</div>`:''}</div><div class="reward">${fmt(e.reward)}<small>옥</small></div></div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)"><button class="minibtn soft" data-gallery="${e.id}">인증 사진 ${cnt}</button>${admin?`<button class="minibtn danger" data-cancel="${e.id}">취소</button>`:`<button class="minibtn out" data-verify="${e.id}">인증하기</button>`}</div></div>`}).join(''):'<div class="empty">진행 중인 챌린지가 없어요.</div>'
+  const aform=admin?`<div class="pcard"><div class="sec">새 챌린지 만들기</div><div class="field"><label>제목</label><input id="et" placeholder="예: 등교 스트레칭 챌린지"></div><div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>보상(옥)</label><input id="er" type="number" placeholder="100"></div><div class="field" style="flex:1"><label>마감일</label><input id="edd" type="date"></div></div><div class="field" style="margin-bottom:0"><label>설명</label><input id="edesc" placeholder="간단 설명"></div><button class="pbtn pri" id="eadd" style="margin-top:12px">등록</button></div>`:''
+  document.getElementById('cb').innerHTML=`${aform}${cards}<div style="height:8px"></div>`
   const add=document.getElementById('eadd')
   if(add)add.onclick=async()=>{
     const title=document.getElementById('et').value.trim();if(!title){toast('제목을 입력해줘');return}
@@ -1526,17 +1561,21 @@ async function rVerify(eid){
   let e=null
   try{const r=await wt(sb.from('okya_events').select('*').eq('id',eid).single());e=r.data}catch{}
   if(!e){toast('챌린지를 찾을 수 없어요');return}
-  app().innerHTML=`<div class="screen no-nav fade-in">
-    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>챌린지 인증</h2></div>
-    <div style="padding:20px">
-      <div class="card" style="background:var(--primary-tint);margin-bottom:16px"><div style="font-weight:700;font-size:15px;margin-bottom:3px">${esc(e.title)}</div><div style="font-size:13px;color:var(--primary)">보상 ${fmt(e.reward)}옥 · ${fmtDate(e.deadline)}</div></div>
+  app().innerHTML=`<div class="screen no-nav fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지 인증</div><div style="width:34px"></div></div>
+    <div class="pcard"><div style="display:flex;gap:10px;align-items:center"><div class="chip ti-org">${I.star}</div><div style="flex:1"><div class="ti">${esc(e.title)}</div><div class="su">보상 ${fmt(e.reward)}옥 · ${fmtDate(e.deadline)}</div></div></div></div>
+    <div class="pcard">
       <div class="field"><label>참여 학생 이름</label><input id="vn" placeholder="예: 박은찬, 김옥야"></div>
-      <div class="field"><label>인증 사진</label><input id="vf" type="file" accept="image/*"></div>
-      <button class="btn" id="vsub">인증 제출</button>
-      <p class="note" style="margin-top:12px">학생회가 확인하고 옥야머니를 지급해요.</p>
+      <div class="field" style="margin-bottom:0"><label>인증 사진</label>
+        <label for="vf" class="upload" id="vfl">${I.image}<span>사진 추가하기</span></label>
+        <input id="vf" type="file" accept="image/*" style="display:none">
+      </div>
+      <button class="pbtn pri" id="vsub" style="margin-top:14px">인증 제출</button>
+      <p style="font-size:12px;color:var(--sub);margin-top:12px;text-align:center">학생회가 확인하고 옥야머니를 지급해요.</p>
     </div>
   </div>`
   document.getElementById('bk').onclick=pop
+  document.getElementById('vf').onchange=e2=>{const f=e2.target.files[0];if(f){const l=document.getElementById('vfl');l.classList.add('has');l.innerHTML=`<img src="${URL.createObjectURL(f)}">`}}
   document.getElementById('vsub').onclick=async()=>{
     const names=document.getElementById('vn').value.trim()
     const f=document.getElementById('vf').files[0];let photo=null
@@ -1593,13 +1632,17 @@ async function iBook(){
     else if(b.status==='matched'){if(b.recipient===SESSION.id)act=`<button class="btn green sm" data-complete="${b.id}">완료</button>`;else act=`<span class="pill green">${esc(b.recipient_name)}와 확정</span>`}
     const apps=(b.status==='open'&&b.applicants?.length)?`<div style="font-size:12px;color:var(--muted);margin-top:3px">신청: ${b.applicants.map(a=>esc(a.name)).join(', ')}</div>`:''
     const open=openBooks.has(b.id),cs=b.comments||[]
-    return`<div style="padding:14px 20px;border-bottom:1px solid var(--line)"><div style="display:flex;align-items:flex-start;gap:10px"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="pill ${b.kind==='나눔'?'green':'gold'}">${b.kind}</span><span style="font-size:12px;color:var(--muted)">${esc(b.grade)}</span></div><div style="font-size:15px;font-weight:600">${esc(b.title)}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${esc(b.owner_name)} · ${timeago(b.at)}</div>${apps}</div><div style="flex:none">${act}</div></div><div style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px"><button style="font-size:13px;font-weight:600;color:var(--primary)" data-ctoggle="${b.id}">💬 댓글 ${cs.length} · ${open?'접기':'열기'}</button>${open?`<div style="margin-top:8px">${cs.length?cs.map(c=>`<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div style="display:flex;gap:7px;align-items:center;margin-bottom:3px"><span style="font-size:13px;font-weight:700">${esc(c.byName)}</span><span style="font-size:11px;color:var(--muted)">${timeago(c.at)}</span></div><div style="font-size:13.5px;line-height:1.5;color:var(--ink2)">${esc(c.text)}</div></div>`).join(''):'<div style="font-size:13px;color:var(--muted);padding:8px 0">첫 댓글을 남겨보세요.</div>'}<div style="display:flex;gap:8px;margin-top:8px"><input data-cbook="${b.id}" placeholder="댓글 입력" style="flex:1;padding:9px 12px;font-size:14px"><button class="btn sm" data-csend="${b.id}">등록</button></div></div>`:''}</div></div>`
+    const thumb=b.photo?`<img class="bthumb" src="${b.photo}">`:`<div class="bthumb"></div>`
+    return`<div class="pcard" style="padding:14px 16px"><div style="display:flex;align-items:flex-start;gap:12px">${thumb}<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${b.kind==='나눔'?'b':'off'}" style="padding:3px 9px;font-size:11px">${b.kind}</span><span class="tag off" style="padding:3px 9px;font-size:11px">${esc(b.grade)}</span></div><div class="ti" style="font-size:15px;white-space:normal">${esc(b.title)}</div><div class="su">${esc(b.owner_name)} · ${timeago(b.at)}</div>${apps}</div><div style="flex:none">${act}</div></div><div style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px"><button style="font-size:13px;font-weight:700;color:var(--primary)" data-ctoggle="${b.id}">💬 댓글 ${cs.length} · ${open?'접기':'열기'}</button>${open?`<div style="margin-top:8px">${cs.length?cs.map(c=>`<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div style="display:flex;gap:7px;align-items:center;margin-bottom:3px"><span style="font-size:13px;font-weight:700">${esc(c.byName)}</span><span style="font-size:11px;color:var(--sub)">${timeago(c.at)}</span></div><div style="font-size:13.5px;line-height:1.5;color:var(--ink2)">${esc(c.text)}</div></div>`).join(''):'<div style="font-size:13px;color:var(--sub);padding:8px 0">첫 댓글을 남겨보세요.</div>'}<div style="display:flex;gap:8px;margin-top:8px"><input data-cbook="${b.id}" placeholder="댓글 입력" style="flex:1;padding:9px 12px;font-size:14px"><button class="minibtn soft" data-csend="${b.id}">등록</button></div></div>`:''}</div></div>`
   }
   const rows=books.length?books.map(bRow).join(''):'<div class="empty">등록된 책이 없어요.</div>'
-  document.getElementById('cb').innerHTML=`<div style="padding:0 20px 12px"><div class="card"><div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:10px">책 올리기</div><div class="field"><label>교재명</label><input id="bt" placeholder="예: 통합사회1 (비상)"></div><div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>학년</label><select id="bg"><option>1학년</option><option>2학년</option><option>3학년</option></select></div><div class="field" style="flex:1"><label>구분</label><select id="bk2"><option>나눔</option><option>교환</option></select></div></div><button class="btn" id="badd">등록하기</button></div></div><div class="card-list" style="margin:0 20px">${rows}</div>`
+  document.getElementById('cb').innerHTML=`<div class="pcard"><div class="sec">책 올리기</div><div class="field"><label>교재명</label><input id="bt" placeholder="예: 통합사회1 (비상)"></div><div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>학년</label><select id="bg"><option>1학년</option><option>2학년</option><option>3학년</option></select></div><div class="field" style="flex:1"><label>구분</label><select id="bk2"><option>나눔</option><option>교환</option></select></div></div><div class="field" style="margin-bottom:0"><label>책 사진 (선택)</label><label for="bf" class="upload" id="bfl">${I.image}<span>사진 추가하기</span></label><input id="bf" type="file" accept="image/*" style="display:none"></div><button class="pbtn pri" id="badd" style="margin-top:12px">등록하기</button></div>${rows}<div style="height:8px"></div>`
+  document.getElementById('bf').onchange=e2=>{const f=e2.target.files[0];if(f){const l=document.getElementById('bfl');l.classList.add('has');l.innerHTML=`<img src="${URL.createObjectURL(f)}">`}}
   document.getElementById('badd').onclick=async()=>{
     const title=document.getElementById('bt').value.trim();if(!title){toast('교재명을 입력해줘');return}
-    try{await wt(sb.from('okya_books').insert({id:uid('b'),title,grade:document.getElementById('bg').value,kind:document.getElementById('bk2').value,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}))}catch{toast('등록 실패');return}
+    let photo=null;const f=document.getElementById('bf').files[0]
+    if(f){toast('사진 업로드 중...');photo=await uploadImg(f,'book');if(!photo)return}
+    try{await wt(sb.from('okya_books').insert({id:uid('b'),title,grade:document.getElementById('bg').value,kind:document.getElementById('bk2').value,photo,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}))}catch{toast('등록 실패 · okya_books에 photo 컬럼이 필요해요');return}
     toast('등록 완료');iBook()
   }
   document.querySelectorAll('[data-apply]').forEach(b=>b.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',b.dataset.apply).single());const apps=[...(r.data?.applicants||[])];if(!apps.some(a=>a.id===SESSION.id))apps.push({id:SESSION.id,name:SESSION.name,at:nowISO()});await wt(sb.from('okya_books').update({applicants:apps}).eq('id',b.dataset.apply))}catch{toast('오류');return};toast('신청했어요');iBook()})
@@ -1624,9 +1667,9 @@ async function iPetition(){
   try{const r=await wt(sb.from('okya_petitions').select('*').order('at',{ascending:false}));ps=r.data||[]}catch{}
   const pub=ps.filter(p=>p.status==='approved'),pend=ps.filter(p=>p.status==='pending')
   const rv=(p,t)=>Object.values(p.reacts||{}).filter(v=>v===t).length
-  const pubList=pub.length?pub.map(p=>{const mine=(p.reacts||{})[SESSION.id];return`<div style="padding:14px 20px;border-bottom:1px solid var(--line)"><div style="font-size:15px;font-weight:600;margin-bottom:3px">${esc(p.txt)}</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px">공개됨 · ${timeago(p.approved_at||p.at)}</div><div class="reacts"><button class="react-btn${mine==='up'?' on-r':''}" data-react="${p.id}::up">👍 ${rv(p,'up')}</button><button class="react-btn${mine==='down'?' on-b':''}" data-react="${p.id}::down">👎 ${rv(p,'down')}</button><button class="react-btn${mine==='meh'?' on-g':''}" data-react="${p.id}::meh">⋯ ${rv(p,'meh')}</button></div></div>`}).join(''):'<div class="empty">아직 공개된 청원이 없어요.</div>'
-  const pendList=admin&&pend.length?pend.map(p=>`<div style="padding:14px 20px;border-bottom:1px solid var(--line)"><div style="font-size:15px;font-weight:600;margin-bottom:3px">${esc(p.txt)}</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px">검토 대기 · ${timeago(p.at)}</div><div style="display:flex;gap:8px"><button class="btn out sm" data-ap="${p.id}">공개</button><button class="btn danger sm" data-rj="${p.id}">반려</button></div></div>`).join(''):''
-  document.getElementById('cb').innerHTML=`<div style="padding:0 20px 12px">${!admin?`<div class="card"><div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:10px">청원 올리기 (익명)</div><div class="field"><textarea id="pt" rows="3" placeholder="건의하고 싶은 내용을 적어줘" style="resize:none"></textarea></div><button class="btn" id="psub">제출하기</button><p class="note" style="margin-top:10px">제출한 청원은 학생회 검토 후 공개됩니다.</p></div>`:''}${admin&&pend.length?`<div class="sec-title" style="margin-top:4px">검토 대기 (${pend.length})</div><div class="card-list" style="margin-bottom:12px">${pendList}</div>`:''}<div class="sec-title" style="margin-top:4px">공개된 청원</div><div class="card-list">${pubList}</div></div>`
+  const pubList=pub.length?pub.map(p=>{const mine=(p.reacts||{})[SESSION.id];return`<div class="post"><div class="pbody">${esc(p.txt)}</div><div class="pmeta" style="margin:6px 0 0">공개됨 · ${timeago(p.approved_at||p.at)}</div><div class="reacts" style="margin-top:9px"><button class="react-btn${mine==='up'?' on-r':''}" data-react="${p.id}::up">👍 ${rv(p,'up')}</button><button class="react-btn${mine==='down'?' on-b':''}" data-react="${p.id}::down">👎 ${rv(p,'down')}</button><button class="react-btn${mine==='meh'?' on-g':''}" data-react="${p.id}::meh">⋯ ${rv(p,'meh')}</button></div></div>`}).join(''):'<div class="empty">아직 공개된 청원이 없어요.</div>'
+  const pendList=admin&&pend.length?pend.map(p=>`<div class="post"><div class="pbody">${esc(p.txt)}</div><div class="pmeta" style="margin:6px 0 8px">검토 대기 · ${timeago(p.at)}</div><div style="display:flex;gap:8px"><button class="minibtn soft" data-ap="${p.id}">공개</button><button class="minibtn danger" data-rj="${p.id}">반려</button></div></div>`).join(''):''
+  document.getElementById('cb').innerHTML=`${!admin?`<div class="pcard"><div class="sec">청원 올리기 · 익명</div><div class="field" style="margin-bottom:0"><textarea id="pt" rows="3" placeholder="건의하고 싶은 내용을 적어줘" style="resize:none"></textarea></div><button class="pbtn pri" id="psub" style="margin-top:12px">제출하기</button><p style="font-size:12px;color:var(--sub);margin-top:10px">제출한 청원은 학생회 검토 후 공개돼요.</p></div>`:''}${admin&&pend.length?`<div class="pcard"><div class="sec">검토 대기 (${pend.length})</div>${pendList}</div>`:''}<div class="pcard"><div class="sec">공개된 청원</div>${pubList}</div><div style="height:8px"></div>`
   const psub=document.getElementById('psub')
   if(psub)psub.onclick=async()=>{const txt=document.getElementById('pt').value.trim();if(!txt){toast('내용을 입력해줘');return};try{await wt(sb.from('okya_petitions').insert({id:uid('p'),txt,status:'pending',by_id:SESSION.id,at:nowISO(),reacts:{}}))}catch{toast('제출 실패');return};toast('제출 완료 · 검토 후 공개돼요');iPetition()}
   document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_petitions').update({status:'approved',approved_at:nowISO()}).eq('id',b.dataset.ap))}catch{};iPetition()})
