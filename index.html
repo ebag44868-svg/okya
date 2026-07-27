@@ -32,6 +32,7 @@
   --sh-blue:0 14px 32px rgba(123,108,255,.38),-3px 4px 14px rgba(123,108,255,.14);
   --sub:#8A90A0;
   --soft:#F6F7FB;
+  --ease:cubic-bezier(.16,1,.3,1);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
 html,body{height:100%;background:var(--bg);}
@@ -439,6 +440,65 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .p3 .mrow .cev{margin-left:auto;color:#c9cdd8;display:flex;}
 .p3 .mrow .cev svg{width:18px;height:18px;}
 .p3 .ver{text-align:center;color:#b6bcc8;font-size:12px;padding:20px 0 24px;}
+
+/* ===== 애니메이션 (부드러운) ===== */
+/* 화면 진입: p3 화면은 컨테이너 통짜 애니 끄고, 자식들이 순차 rise */
+.fade-in.p3{animation:none;}
+@keyframes p3rise{from{opacity:0;transform:translateY(15px);}to{opacity:1;transform:none;}}
+.screen.p3>*{animation:p3rise .5s var(--ease) both;}
+.screen.p3>*:nth-child(1){animation-delay:.02s;}
+.screen.p3>*:nth-child(2){animation-delay:.07s;}
+.screen.p3>*:nth-child(3){animation-delay:.12s;}
+.screen.p3>*:nth-child(4){animation-delay:.17s;}
+.screen.p3>*:nth-child(5){animation-delay:.22s;}
+.screen.p3>*:nth-child(6){animation-delay:.27s;}
+.screen.p3>*:nth-child(7){animation-delay:.31s;}
+.screen.p3>*:nth-child(n+8){animation-delay:.35s;}
+/* 눌림 피드백 */
+.p3 .pbtn,.p3 .minibtn,.p3 .bbtn,.p3 .gcard,.p3 .lrow,.p3 .slot,.p3 .ppill,.p3 .bk,.p3 .upbtn,.p3 .key,.p3 .kpnext,.p3 .kpquick span,.p3 .palitem,.bnav-item,.p3 .stat,.p3 .mrow,.p3 .tag,.react-btn{transition:transform .13s var(--ease),background .15s,color .15s,border-color .15s,box-shadow .15s;}
+.p3 .pbtn:active,.p3 .kpnext:active,.p3 .bbtn:active,.p3 .gcard:active,.p3 .slot:active,.p3 .bk:active,.p3 .minibtn:active,.p3 .kpquick span:active,.bnav-item:active{transform:scale(.94);}
+.p3 .lrow:active,.p3 .mrow:active,.p3 .stat:active,.react-btn:active{transform:scale(.98);}
+.p3 .key:active{transform:scale(.86);}
+.bnav-item svg{transition:transform .2s var(--ease);}
+.bnav-item.active svg{transform:translateY(-1px);}
+/* 잔액 카드 무늬(원형) + 진입 */
+.p3 .balance{position:relative;overflow:hidden;}
+.p3 .balance::before{content:'';position:absolute;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.10);top:-78px;right:-48px;pointer-events:none;}
+.p3 .balance::after{content:'';position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.07);bottom:-48px;right:56px;pointer-events:none;}
+.p3 .balance>*{position:relative;}
+/* 키패드 금액 펄스 */
+.p3 .kp-amt.pulse{animation:kppulse .16s ease;}
+@keyframes kppulse{50%{transform:scale(1.05);}}
+/* 성공 링 드로우 */
+.p3 .ring2{width:92px;height:92px;margin-bottom:22px;}
+.p3 .ring2 .bgc{stroke:var(--line);}
+.p3 .ring2 .arc{stroke:var(--primary);stroke-dasharray:264;stroke-dashoffset:264;animation:drawArc .9s var(--ease) .12s forwards;}
+.p3 .ring2 .chk{stroke:var(--primary);stroke-dasharray:44;stroke-dashoffset:44;animation:drawArc .5s ease .72s forwards;}
+@keyframes drawArc{to{stroke-dashoffset:0;}}
+.p3 .succ h2{animation:riseIn .6s .35s both;}
+.p3 .succ p{animation:riseIn .6s .5s both;}
+.p3 .succ .btns{animation:riseIn .6s .62s both;}
+@keyframes riseIn{from{opacity:0;transform:translateY(13px);}to{opacity:1;transform:none;}}
+/* 바텀 시트 슬라이드 */
+.p3sheet-ov{position:fixed;inset:0;background:rgba(20,26,40,.45);z-index:200;display:flex;align-items:flex-end;opacity:0;transition:opacity .3s;}
+.p3sheet-ov.show{opacity:1;}
+.p3sheet{width:100%;max-width:430px;margin:0 auto;background:var(--card);border-radius:26px 26px 0 0;padding:14px 24px calc(28px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .42s var(--ease);}
+.p3sheet-ov.show .p3sheet{transform:none;}
+.p3sheet .grab{width:38px;height:4px;border-radius:99px;background:#DDE2EC;margin:0 auto 18px;}
+
+/* ===== MY 스펙트럼 팔레트 (원형 펼침) ===== */
+.palfan{position:relative;height:70px;transition:height .45s var(--ease);margin:8px 0 2px;}
+.palfan.open{height:256px;}
+.palfan-btn{position:absolute;left:50%;top:35px;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:conic-gradient(from 0deg,#f87171,#fbbf24,#34d399,#38bdf8,#a78bfa,#f472b6,#f87171);cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;z-index:2;transition:top .45s var(--ease),transform .4s var(--ease);}
+.palfan.open .palfan-btn{top:128px;transform:translate(-50%,-50%) rotate(135deg);}
+.palfan-btn svg{width:22px;height:22px;stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));}
+.pfi{position:absolute;left:50%;top:35px;width:40px;height:40px;margin:-20px;border-radius:13px;box-shadow:0 5px 12px rgba(0,0,0,.16);cursor:pointer;opacity:0;transform:translate(0,0) scale(.2);transition:transform .5s var(--ease),opacity .3s,top .45s var(--ease);display:flex;align-items:center;justify-content:center;}
+.palfan.open .pfi{top:128px;opacity:1;transform:translate(var(--tx),var(--ty)) scale(1);}
+.pfi.on{outline:3px solid var(--ink);outline-offset:2px;}
+.pfi .pl{position:absolute;bottom:-16px;font-size:9px;font-weight:700;color:var(--sub);white-space:nowrap;opacity:0;transition:opacity .3s .2s;}
+.palfan.open .pfi.on .pl{opacity:1;color:var(--ink);}
+.pfi.pick{background:conic-gradient(from 0deg,#f87171,#fbbf24,#34d399,#38bdf8,#a78bfa,#f472b6,#f87171);}
+.pfi.pick svg{width:15px;height:15px;stroke:#fff;stroke-width:3.4;fill:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));}
 </style>
 </head>
 <body>
@@ -605,16 +665,19 @@ function drawMealCalendar(){
   const pad=n=>String(n).padStart(2,'0'),key=`${y}-${pad(mo+1)}-${pad(MC_SEL)}`
   const avail={},dim=new Date(y,mo+1,0).getDate();for(let d=1;d<=dim;d++){if(mealsOf(`${y}-${pad(mo+1)}-${pad(d)}`))avail[d]=1}
   const today=(MC_OFF===0)?new Date().getDate():-1
-  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>급식 달력</h2></div>
-    <div style="padding:14px 20px 34px">
-      ${calGrid(y,mo,{today,sel:MC_SEL,avail,nav:true,clickable:true})}
-      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.02em;margin:20px 0 10px">${mo+1}월 ${MC_SEL}일 급식</div>
-      ${mealPanelHTML(key,MC_SLOT)}
-    </div></div>`
+  const items=((mealsOf(key)||{})[MC_SLOT]||[]).filter(Boolean)
+  app().innerHTML=`<div class="screen no-nav fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">급식 달력</div><div style="width:34px"></div></div>
+    <div class="pcard">${calGrid(y,mo,{today,sel:MC_SEL,avail,nav:true,clickable:true})}</div>
+    <div class="pcard">
+      <div class="chd"><div class="sec" style="margin:0">${mo+1}월 ${MC_SEL}일</div><div class="pills" id="mc-seg">${MEAL_SLOTS.map(([k])=>`<button class="ppill${k===MC_SLOT?' on':''}" data-slot="${k}">${k}</button>`).join('')}</div></div>
+      <ul class="meal">${items.length?items.map(x=>`<li>${esc(x)}</li>`).join(''):`<div style="padding:8px 0;color:var(--sub);font-size:13.5px">급식 정보가 없어요</div>`}</ul>
+    </div>
+  </div>`
   document.getElementById('bk').onclick=pop
   document.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>mcPick(+b.dataset.day))
   document.querySelectorAll('[data-mcnav]').forEach(b=>b.onclick=()=>mcNav(+b.dataset.mcnav))
-  document.querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>mcSlot(b.dataset.slot))
+  document.querySelectorAll('#mc-seg [data-slot]').forEach(b=>b.onclick=()=>mcSlot(b.dataset.slot))
 }
 // meal.json / schedule.json 로드 (실패해도 앱은 기본값으로 정상 동작)
 async function loadSchoolData(){
@@ -879,7 +942,7 @@ async function fTransferAmt(mode,toUser){
   const upd=()=>{
     const n=parseInt(amtStr)||0
     const el=document.getElementById('kp-amt')
-    if(el)el.innerHTML=(n>0?`${fmt(n)}`:`<span class="cur">0</span>`)+`<small>옥</small>`
+    if(el){el.innerHTML=(n>0?`${fmt(n)}`:`<span class="cur">0</span>`)+`<small>옥</small>`;el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse')}
     const nb=document.getElementById('kp-next');if(nb)nb.disabled=!(n>0&&(!limited||n<=availBal))
     const bw=document.getElementById('kp-warn');if(bw)bw.style.display=(limited&&n>availBal)?'block':'none'
   }
@@ -922,21 +985,25 @@ async function fTransferAmt(mode,toUser){
 function fTransferConfirm(mode,toUser,amount,reason,myBal){
   // 단계 3: 확인 바텀시트 → 완료 화면
   const ov=document.createElement('div')
-  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end'
-  ov.innerHTML=`<div style="width:100%;background:#fff;border-radius:28px 28px 0 0;padding:32px 24px calc(28px + env(safe-area-inset-bottom))">
-    <div style="text-align:center;margin-bottom:28px">
-      <div style="width:64px;height:64px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;font-weight:800;color:var(--primary)">${esc(toUser.name.charAt(0))}</div>
-      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px">${mode==='발행'?'발행 확인':(mode==='회수'?'회수 확인':'송금 확인')}</div>
+  ov.className='p3sheet-ov'
+  ov.innerHTML=`<div class="p3sheet">
+    <div class="grab"></div>
+    <div style="text-align:center;margin-bottom:26px">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:25px;font-weight:800;color:#fff;box-shadow:var(--sh-blue)">${esc(toUser.name.charAt(0))}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.05em;margin-bottom:8px">${mode==='발행'?'발행 확인':(mode==='회수'?'회수 확인':'송금 확인')}</div>
       <div style="font-size:20px;font-weight:800;color:var(--ink);line-height:1.5">${esc(toUser.name)}님${mode==='회수'?'에게서':'에게'}<br><span style="color:var(--primary)">${fmt(amount)}옥</span> ${mode==='발행'?'발행':(mode==='회수'?'회수':'송금')}할까요?</div>
-      ${reason?`<div style="margin-top:10px;font-size:13px;color:var(--muted)">"${esc(reason)}"</div>`:''}
+      ${reason?`<div style="margin-top:10px;font-size:13px;color:var(--sub)">"${esc(reason)}"</div>`:''}
     </div>
     <div style="display:flex;gap:10px">
-      <button id="tf-cc" style="flex:1;padding:15px;border-radius:14px;background:var(--bg);border:none;font-size:15px;font-weight:700;color:var(--ink2);cursor:pointer">취소</button>
-      <button id="tf-ok" style="flex:2;padding:15px;border-radius:14px;background:var(--grad);border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer;box-shadow:var(--sh-blue)">${mode==='발행'?'발행하기':(mode==='회수'?'회수하기':'보내기')}</button>
+      <button id="tf-cc" style="flex:1;padding:16px;border-radius:14px;background:var(--soft);border:none;font-size:15px;font-weight:700;color:var(--ink2);cursor:pointer">취소</button>
+      <button id="tf-ok" style="flex:2;padding:16px;border-radius:14px;background:var(--grad);border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer;box-shadow:var(--sh-blue)">${mode==='발행'?'발행하기':(mode==='회수'?'회수하기':'보내기')}</button>
     </div>
   </div>`
   document.body.appendChild(ov)
-  ov.querySelector('#tf-cc').onclick=()=>ov.remove()
+  requestAnimationFrame(()=>ov.classList.add('show'))
+  const closeSheet=()=>{ov.classList.remove('show');setTimeout(()=>ov.remove(),300)}
+  ov.onclick=e=>{if(e.target===ov)closeSheet()}
+  ov.querySelector('#tf-cc').onclick=closeSheet
   ov.querySelector('#tf-ok').onclick=async()=>{
     const btn=ov.querySelector('#tf-ok')
     btn.disabled=true;btn.textContent='처리 중...'
@@ -951,7 +1018,7 @@ function fTransferConfirm(mode,toUser,amount,reason,myBal){
       const tm=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})
       app().innerHTML=`<div class="screen no-nav fade-in p3">
         <div class="succ">
-          <div class="ring"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></div>
+          <svg class="ring2" viewBox="0 0 100 100" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><circle class="bgc" cx="50" cy="50" r="42"/><circle class="arc" cx="50" cy="50" r="42" transform="rotate(-90 50 50)"/><path class="chk" d="M33 51l12 12 22-24"/></svg>
           <h2>${fmt(amount)}옥을<br>${esc(toUser.name)}님${verb}</h2>
           <p>${remain}${tm}${reason?` · "${esc(reason)}"`:''}</p>
           <div class="btns">
@@ -1166,16 +1233,16 @@ async function rRoom(){
 
 async function rPrint(){
   const COST=100,admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>옥야제본소</h2></div><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
+  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야제본소</div><div style="width:34px"></div></div><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
   document.getElementById('bk').onclick=pop
   let data=[]
   try{const r=await wt(sb.from('okya_prints').select('*').order('at',{ascending:false}));data=r.data||[]}catch{}
   const prs=admin?data:data.filter(p=>p.owner===SESSION.id)
-  const list=prs.length?prs.map(p=>`<div class="ldg-item"><div class="ldg-ic" style="background:var(--primary-tint);color:var(--primary);font-size:16px">📄</div><div class="ldg-body"><b>${esc(p.title)}</b><span>${admin?esc(p.owner_name):('내 신청')} · ${p.pages}장 · ${timeago(p.at)}</span></div>${admin?`<button class="btn out sm" data-done="${p.id}">완료</button>`:''}</div>`).join(''):'<div class="empty">신청 내역이 없어요.</div>'
-  app().innerHTML=`<div class="screen no-nav fade-in">
-    <div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>옥야제본소</h2></div>
-    ${!admin?`<div style="padding:20px 20px 0"><div class="card"><div style="font-size:15px;font-weight:700;margin-bottom:12px">제본 신청</div><div class="field"><label>제목</label><input id="pt" placeholder="예: 미적분 오답노트"></div><div class="field"><label>장수</label><input id="pp" type="number" inputmode="numeric" placeholder="예: 24"></div><button class="btn" id="preq">신청하기 · ${COST}옥</button><p class="note" style="margin-top:10px">신청 시 ${COST}옥이 사용됩니다.</p></div></div>`:''}
-    <div style="padding:16px 20px 0"><div class="sec-title">신청 목록</div><div class="card-list">${list}</div></div>
+  const list=prs.length?prs.map(p=>`<div class="lrow"><div class="chip ti-blue">${I.print}</div><div class="body"><div class="ti">${esc(p.title)}</div><div class="su">${admin?esc(p.owner_name):('내 신청')} · ${p.pages}장 · ${fmtDate(p.at)}</div></div>${admin?`<button class="minibtn soft" data-done="${p.id}">완료</button>`:''}</div>`).join(''):'<div class="empty">신청 내역이 없어요.</div>'
+  app().innerHTML=`<div class="screen no-nav fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야제본소</div><div style="width:34px"></div></div>
+    ${!admin?`<div class="pcard"><div class="sec">제본 신청</div><div class="field"><label>제목</label><input id="pt" placeholder="예: 미적분 오답노트"></div><div class="field" style="margin-bottom:0"><label>장수</label><input id="pp" type="number" inputmode="numeric" placeholder="예: 24"></div><button class="pbtn pri" id="preq" style="margin-top:12px">신청하기 · ${COST}옥</button><p style="font-size:12px;color:var(--sub);margin-top:10px">신청 시 ${COST}옥이 사용돼요.</p></div>`:''}
+    <div class="pcard"><div class="sec">신청 목록</div>${list}</div>
   </div>`
   document.getElementById('bk').onclick=pop
   const pr=document.getElementById('preq')
@@ -1192,7 +1259,7 @@ async function rPrint(){
 
 async function rMeeting(){
   const admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>회의록</h2></div><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
+  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">회의록</div><div style="width:34px"></div></div><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
   document.getElementById('bk').onclick=pop
   let ms=[]
   try{const r=await wt(sb.from('okya_meetings').select('*').order('at',{ascending:false}));ms=r.data||[]}catch{}
@@ -1244,11 +1311,11 @@ function rComm(){
 }
 
 async function rLost(){
-  app().innerHTML=`<div class="screen no-nav" style="display:flex;flex-direction:column;height:100dvh">
-    <div class="sub-hdr" style="flex:none">
-      <button class="back-btn" id="bk">${I.back}</button>
-      <h2>분실물</h2>
-      <button id="lost-map" style="background:none;border:none;font-size:12px;font-weight:700;color:var(--primary);cursor:pointer;display:flex;align-items:center;gap:3px;padding:0 4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>지도</button>
+  app().innerHTML=`<div class="screen no-nav p3" style="display:flex;flex-direction:column;height:100dvh">
+    <div class="phdr" style="flex:none">
+      <button class="bk" id="bk">${I.back}</button>
+      <div class="ttl">분실물</div>
+      <button id="lost-map" style="background:none;border:none;font-size:12px;font-weight:700;color:var(--primary);cursor:pointer;display:flex;align-items:center;gap:3px;padding:0 4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>지도</button>
     </div>
     <div id="lost-feed" style="flex:1;overflow-y:auto;padding:10px 0 4px;background:var(--bg)">
       <div class="loader" style="min-height:200px"><div class="spin"></div></div>
@@ -1448,14 +1515,14 @@ async function rDmChat(userId){
   const user=USERS.find(u=>u.id===userId)
   const name=user?.name||'알 수 없음'
   const myId=SESSION.id
-  app().innerHTML=`<div class="screen no-nav" style="display:flex;flex-direction:column;height:100dvh">
-    <div class="sub-hdr" style="flex:none">
-      <button class="back-btn" id="bk">${I.back}</button>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:28px;height:28px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--primary);overflow:hidden">${user?.photo?`<img src="${user.photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`:esc(name.charAt(0))}</div>
-        <h2>${esc(name)}</h2>
+  app().innerHTML=`<div class="screen no-nav p3" style="display:flex;flex-direction:column;height:100dvh">
+    <div class="phdr" style="flex:none">
+      <button class="bk" id="bk">${I.back}</button>
+      <div class="ttl" style="display:flex;align-items:center;gap:8px;font-size:16px">
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--primary);overflow:hidden;flex:none">${user?.photo?`<img src="${user.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`:esc(name.charAt(0))}</div>
+        ${esc(name)}
       </div>
-      <div></div>
+      <div style="width:34px"></div>
     </div>
     <div id="dm-feed" style="flex:1;overflow-y:auto;padding:10px 0 4px;background:var(--bg)">
       <div class="loader" style="min-height:200px"><div class="spin"></div></div>
@@ -1589,14 +1656,14 @@ async function rVerify(eid){
 }
 
 async function rGallery(eid){
-  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>인증 사진</h2></div><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
+  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">인증 사진</div><div style="width:34px"></div></div><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
   document.getElementById('bk').onclick=pop
   const admin=SESSION.role==='admin'
   let subs=[],ev=null
   try{const[r1,r2]=await Promise.allSettled([wt(sb.from('okya_event_subs').select('*').eq('event_id',eid).order('at',{ascending:false})),wt(sb.from('okya_events').select('title,reward').eq('id',eid).single())]);subs=r1.status==='fulfilled'?(r1.value.data||[]):[];ev=r2.status==='fulfilled'?r2.value.data:null}catch{}
   const title=ev?ev.title:'인증 사진'
-  const cards=subs.length?subs.map(s=>{const reacts=s.reactions||{};const hearts=Object.values(reacts).filter(v=>v==='heart').length;const tears=Object.values(reacts).filter(v=>v==='tear').length;const my=reacts[SESSION.id];return`<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-size:14px;font-weight:700">${esc(s.names||s.by_name)}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${timeago(s.at)}</div></div>${admin?`<button class="btn out sm" data-award="${s.id}">지급</button>`:''}</div>${s.photo?`<img class="thumb" src="${s.photo}">`:''}<div class="reacts" style="margin-top:10px"><button class="react-btn${my==='heart'?' on-r':''}" data-pr="${s.id}::heart">❤️ ${hearts}</button><button class="react-btn${my==='tear'?' on-b':''}" data-pr="${s.id}::tear">😢 ${tears}</button></div></div>`}).join(''):'<div class="empty">아직 인증 사진이 없어요.</div>'
-  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>📷 ${esc(title)}</h2></div><div style="padding:20px 20px 40px">${cards}</div></div>`
+  const cards=subs.length?subs.map(s=>{const reacts=s.reactions||{};const hearts=Object.values(reacts).filter(v=>v==='heart').length;const tears=Object.values(reacts).filter(v=>v==='tear').length;const my=reacts[SESSION.id];return`<div class="pcard"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div class="ti">${esc(s.names||s.by_name)}</div><div class="su">${fmtDate(s.at)}</div></div>${admin?`<button class="minibtn soft" data-award="${s.id}">지급</button>`:''}</div>${s.photo?`<img src="${s.photo}" style="width:100%;border-radius:14px;display:block">`:''}<div class="reacts" style="margin-top:10px"><button class="react-btn${my==='heart'?' on-r':''}" data-pr="${s.id}::heart">❤️ ${hearts}</button><button class="react-btn${my==='tear'?' on-b':''}" data-pr="${s.id}::tear">😢 ${tears}</button></div></div>`}).join(''):'<div class="empty">아직 인증 사진이 없어요.</div>'
+  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${esc(title)}</div><div style="width:34px"></div></div>${cards}<div style="height:12px"></div></div>`
   document.getElementById('bk').onclick=pop
   document.querySelectorAll('[data-pr]').forEach(b=>b.onclick=async()=>{
     const[id,t]=b.dataset.pr.split('::');let reacts={}
@@ -1614,7 +1681,7 @@ async function rAward(subId){
   if(!s){pop();return}
   ev=ev||{reward:0,title:''}
   const students=USERS.filter(u=>u.role!=='admin')
-  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>옥야머니 지급</h2></div><div style="padding:20px"><div class="card" style="background:var(--primary-tint);margin-bottom:14px"><div style="font-weight:700;margin-bottom:3px">${esc(ev.title)}</div><div style="font-size:13px;color:var(--primary)">보상 ${fmt(ev.reward)}옥</div><div style="font-size:13px;margin-top:5px">제출자: <b>${esc(s.names||'-')}</b></div></div>${s.photo?`<img class="thumb" src="${s.photo}" style="margin-bottom:14px">`:''}  <label style="margin-bottom:8px">지급할 학생 선택</label><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">${students.map(u=>`<label class="check-item"><input type="checkbox" value="${u.id}" ${u.id===s.by_id?'checked':''}>${esc(u.name)}</label>`).join('')}</div><button class="btn" id="pay">선택한 학생에게 ${fmt(ev.reward)}옥 지급</button></div></div>`
+  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야머니 지급</div><div style="width:34px"></div></div><div class="pcard"><div style="display:flex;gap:10px;align-items:center"><div class="chip ti-org">${I.star}</div><div style="flex:1"><div class="ti">${esc(ev.title)}</div><div class="su">보상 ${fmt(ev.reward)}옥 · 제출자 ${esc(s.names||'-')}</div></div></div>${s.photo?`<img src="${s.photo}" style="width:100%;border-radius:14px;display:block;margin-top:12px">`:''}</div><div class="pcard"><div class="sec">지급할 학생 선택</div><div style="display:flex;flex-direction:column;gap:8px">${students.map(u=>`<label class="check-item"><input type="checkbox" value="${u.id}" ${u.id===s.by_id?'checked':''}>${esc(u.name)}</label>`).join('')}</div><button class="pbtn pri" id="pay" style="margin-top:14px">${fmt(ev.reward)}옥 지급</button></div></div>`
   document.getElementById('bk').onclick=pop
   document.getElementById('pay').onclick=async()=>{
     const ids=[...document.querySelectorAll('.check-item input:checked')].map(i=>i.value)
@@ -1631,8 +1698,8 @@ async function iBook(){
   function bRow(b){
     const mine=b.owner===SESSION.id,applied=(b.applicants||[]).some(a=>a.id===SESSION.id)
     let act=''
-    if(b.status==='open'){if(mine)act=(b.applicants&&b.applicants.length)?`<button class="btn out sm" data-confirm="${b.id}">확정</button>`:`<span style="font-size:12px;color:var(--muted)">대기중</span>`;else act=applied?`<button class="btn gray sm" data-unapply="${b.id}">취소</button>`:`<button class="btn out sm" data-apply="${b.id}">${b.kind}</button>`}
-    else if(b.status==='matched'){if(b.recipient===SESSION.id)act=`<button class="btn green sm" data-complete="${b.id}">완료</button>`;else act=`<span class="pill green">${esc(b.recipient_name)}와 확정</span>`}
+    if(b.status==='open'){if(mine)act=(b.applicants&&b.applicants.length)?`<button class="minibtn soft" data-confirm="${b.id}">확정</button>`:`<span style="font-size:12px;color:var(--sub)">대기중</span>`;else act=applied?`<button class="minibtn out" data-unapply="${b.id}">취소</button>`:`<button class="minibtn soft" data-apply="${b.id}">${b.kind}</button>`}
+    else if(b.status==='matched'){if(b.recipient===SESSION.id)act=`<button class="minibtn soft" data-complete="${b.id}">완료</button>`;else act=`<span class="tag b" style="padding:4px 9px;font-size:11px">${esc(b.recipient_name)} 확정</span>`}
     const apps=(b.status==='open'&&b.applicants?.length)?`<div style="font-size:12px;color:var(--muted);margin-top:3px">신청: ${b.applicants.map(a=>esc(a.name)).join(', ')}</div>`:''
     const open=openBooks.has(b.id),cs=b.comments||[]
     const thumb=b.photo?`<img class="bthumb" src="${b.photo}">`:`<div class="bthumb"></div>`
@@ -1659,7 +1726,7 @@ async function iBook(){
 async function rConfirmBook(id){
   let b=null;try{const r=await wt(sb.from('okya_books').select('*').eq('id',id).single());b=r.data}catch{}
   if(!b){pop();return}
-  app().innerHTML=`<div class="screen no-nav fade-in"><div class="sub-hdr"><button class="back-btn" id="bk">${I.back}</button><h2>${b.kind} 확정</h2></div><div style="padding:20px"><div class="card" style="background:var(--primary-tint);margin-bottom:14px"><b>${esc(b.title)}</b></div><label style="margin-bottom:8px">누구와 ${b.kind}할까요?</label><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">${(b.applicants||[]).map(a=>`<label class="check-item"><input type="radio" name="rc" value="${a.id}" data-name="${esc(a.name)}">${esc(a.name)}</label>`).join('')||'<div class="empty">신청자가 없어요</div>'}</div><button class="btn" id="cf">확정하기</button></div></div>`
+  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${b.kind} 확정</div><div style="width:34px"></div></div><div class="pcard"><div class="sec" style="margin-bottom:4px">${esc(b.title)}</div><div style="font-size:12px;color:var(--sub);margin-bottom:14px">누구와 ${b.kind}할까요?</div><div style="display:flex;flex-direction:column;gap:8px">${(b.applicants||[]).map(a=>`<label class="check-item"><input type="radio" name="rc" value="${a.id}" data-name="${esc(a.name)}">${esc(a.name)}</label>`).join('')||'<div class="empty">신청자가 없어요</div>'}</div><button class="pbtn pri" id="cf" style="margin-top:14px">확정하기</button></div></div>`
   document.getElementById('bk').onclick=pop
   document.getElementById('cf').onclick=async()=>{const sel=document.querySelector('input[name="rc"]:checked');if(!sel){toast('상대를 선택해줘');return};try{await wt(sb.from('okya_books').update({status:'matched',recipient:sel.value,recipient_name:sel.dataset.name}).eq('id',id))}catch{};toast('확정했어요');pop()}
 }
@@ -1696,7 +1763,7 @@ async function rMy(){
   let curPri='#7B6CFF';try{const st=JSON.parse(localStorage.getItem('okya-theme')||'null');if(st&&st.primary)curPri=st.primary}catch{}
   const PRESETS=[['바이올렛','#7B6CFF'],['블루','#5B9BFF'],['인디고','#6C6BFF'],['스카이','#38BDF8'],['민트','#2DD4BF'],['그린','#34D399'],['라임','#A3E635'],['앰버','#FBBF24'],['코랄','#FB923C'],['로즈','#FB7185'],['핑크','#F472B6'],['라벤더','#C084FC']]
   const grad=p=>{const[a,b]=deriveGrad(p);return`linear-gradient(135deg,${a},${b})`}
-  const swatches=PRESETS.map(([n,p])=>{const on=p.toLowerCase()===curPri.toLowerCase();return`<div class="palitem${on?' on':''}" data-pri="${p}" data-name="${n}"><div class="c" style="background:${grad(p)}"></div><div class="l">${n}</div></div>`}).join('')
+  const pfis=PRESETS.map(([n,p])=>{const on=p.toLowerCase()===curPri.toLowerCase();return`<div class="pfi${on?' on':''}" data-pri="${p}" data-name="${n}" style="background:${grad(p)}"><div class="pl">${n}</div></div>`}).join('')
 
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="topbar"><div class="t">MY</div><button id="my-bell">${I.bell}</button></div>
@@ -1713,10 +1780,11 @@ async function rMy(){
     </div>
     <div class="pcard">
       <div class="sec" style="margin-bottom:2px">색상 테마</div>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:14px">앱 전체 색을 바꿔보세요</div>
-      <div class="palgrid">
-        ${swatches}
-        <label class="palitem" style="position:relative"><div class="c pick">${I.plus}</div><div class="l">직접</div><input type="color" id="my-color" value="${curPri}" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer"></label>
+      <div style="font-size:12px;color:var(--sub)">스펙트럼 버튼을 눌러 색을 펼쳐보세요</div>
+      <div class="palfan" id="palfan">
+        <button class="palfan-btn" id="palfan-btn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+        ${pfis}
+        <label class="pfi pick" data-custom="1"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><input type="color" id="my-color" value="${curPri}" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer"></label>
       </div>
     </div>
     <div class="menu">
@@ -1739,6 +1807,12 @@ async function rMy(){
     try{await wt(sb.from('okya_users').update({photo:url}).eq('id',SESSION.id))}catch{}
     rMy()
   }
+  // 스펙트럼 팔레트: 원형 배치
+  const fan=document.getElementById('palfan')
+  const items=[...fan.querySelectorAll('.pfi')]
+  const R=96,N=items.length
+  items.forEach((el,i)=>{const ang=(-90+i*(360/N))*Math.PI/180;el.style.setProperty('--tx',(Math.cos(ang)*R).toFixed(1)+'px');el.style.setProperty('--ty',(Math.sin(ang)*R).toFixed(1)+'px');el.style.transitionDelay=(i*20)+'ms'})
+  document.getElementById('palfan-btn').onclick=()=>fan.classList.toggle('open')
   document.querySelectorAll('[data-pri]').forEach(el=>el.onclick=()=>{applyTheme({name:el.dataset.name,primary:el.dataset.pri,v:2});rMy()})
   document.getElementById('my-color').onchange=e=>{applyTheme({name:'커스텀',primary:e.target.value,v:2});rMy()}
   document.getElementById('my-bell').onclick=()=>toast('알림은 준비 중이에요')
