@@ -793,8 +793,11 @@ async function fTransferAmt(mode,toUser){
   app().innerHTML=`<div class="screen no-nav fade-in p3" style="display:flex;flex-direction:column">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${title}</div><button id="tf-cancel" style="font-size:13px;font-weight:600;color:var(--sub);background:none">취소</button></div>
     <div class="kpwrap">
-      <div class="kpto"><div class="av">${esc(toUser.name.charAt(0))}</div><div><div class="n">${esc(toUser.name)}</div><div class="b">${mode==='발행'?'학생회 발행':(fmt(availBal)+'옥 보유')}</div></div></div>
-      <div class="kp-amt" id="kp-amt"><span class="cur">0</span><small>옥</small></div>
+      <div class="kpto"><div class="av">${esc(toUser.name.charAt(0))}</div><div><div class="n">${esc(toUser.name)}</div><div class="b">${mode==='발행'?'발행 대상':(isRecall?'회수 대상':'창녕옥야고등학교')}</div></div></div>
+      <div style="margin:auto 0;text-align:center">
+        <div class="kp-amt" id="kp-amt" style="margin:0"><span class="cur">0</span><small>옥</small></div>
+        <div id="kp-bal" style="font-size:12px;color:var(--sub);opacity:.8;font-weight:600;margin-top:10px">${mode==='발행'?'학생회에서 발행':(isRecall?esc(toUser.name)+'님 보유 '+fmt(availBal)+'옥':'보유 '+fmt(availBal)+'옥')}</div>
+      </div>
       <div id="kp-warn" style="display:none;text-align:center;color:var(--danger);font-size:12px;font-weight:700;margin-bottom:8px">${isRecall?'보유 잔액보다 많아요':'잔액이 부족해요'}</div>
       <div class="kpquick">${['+100','+500','+1,000','전액'].map(q=>`<span data-q="${q}">${q}</span>`).join('')}</div>
       <div style="display:flex;align-items:center;gap:8px;background:var(--soft);border:1px solid var(--line);border-radius:13px;padding:11px 14px;margin-bottom:10px"><span class="kpmsgic">${I.msg}</span><input id="tf-reason" placeholder="메시지 (선택)" style="flex:1;background:none;border:none;outline:none;font-size:13.5px;padding:0"></div>
