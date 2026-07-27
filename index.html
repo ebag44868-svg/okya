@@ -290,6 +290,62 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .p3 .lrow .ti{font-size:14px;font-weight:700;letter-spacing:-.2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .p3 .lrow .su{font-size:12px;color:var(--sub);margin-top:2px;}
 .p3 .ti-blue{background:var(--primary-tint);color:var(--primary);}
+.p3 .ti-green{background:#E7F8EF;color:#16A34A;}
+.p3 .ti-gray{background:#F1F3F8;color:#8A90A0;}
+.p3 .ti-org{background:#FFF3E4;color:#F59E0B;}
+.p3 .ti-pink{background:#FDECF5;color:#EC4899;}
+.p3 .lrow .tr{font-size:14.5px;font-weight:800;white-space:nowrap;text-align:right;}
+.p3 .lrow .tr.pos{color:#16A34A;}
+.p3 .lrow .tr.neg{color:var(--ink);}
+.p3 .lrow.on{background:#F5F3FF;border-radius:14px;}
+.p3 .lrow.on+.lrow{border-top-color:transparent;}
+
+/* pushed-screen header (뒤로가기) */
+.screen.no-nav.p3{padding-bottom:0;}
+.p3 .phdr{display:flex;align-items:center;gap:8px;padding:calc(12px + env(safe-area-inset-top)) 16px 10px;}
+.p3 .phdr .bk{width:34px;height:34px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;flex:none;color:#3a3f4b;}
+.p3 .phdr .bk svg{width:20px;height:20px;}
+.p3 .phdr .ttl{flex:1;font-size:17px;font-weight:800;color:var(--ink);}
+
+/* buttons (preview) */
+.p3 .pbtn{border:none;border-radius:15px;padding:14px 0;font-size:14.5px;font-weight:800;width:100%;cursor:pointer;font-family:inherit;}
+.p3 .pbtn.pri{background:var(--grad);color:#fff;box-shadow:var(--sh-blue);}
+.p3 .pbtn.out{background:#fff;color:var(--ink);border:1.5px solid var(--line);}
+.p3 .pbtn:disabled{cursor:default;}
+
+/* 내역 필터 태그 */
+.p3 .tag{display:inline-block;font-size:12px;font-weight:700;padding:7px 14px;border-radius:100px;cursor:pointer;white-space:nowrap;flex:none;}
+.p3 .tag.b{background:var(--primary-tint);color:var(--primary);}
+.p3 .tag.off{background:#F1F3F8;color:#8A90A0;}
+.p3 .datehd{padding:14px 18px 4px;font-size:12px;font-weight:800;color:var(--sub);}
+
+/* 송금 키패드 (preview 4) */
+.p3 .kpwrap{padding:0 22px;display:flex;flex-direction:column;flex:1;min-height:0;}
+.p3 .kpto{display:flex;align-items:center;gap:10px;background:var(--soft);border:1px solid var(--line);border-radius:15px;padding:10px 14px;margin-top:2px;}
+.p3 .kpto .av{width:36px;height:36px;border-radius:50%;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex:none;}
+.p3 .kpto .n{font-size:14px;font-weight:700;color:var(--ink);}
+.p3 .kpto .b{font-size:11.5px;color:var(--sub);margin-top:1px;}
+.p3 .kp-amt{text-align:center;margin:auto 0;font-size:46px;font-weight:800;letter-spacing:-2px;color:var(--ink);}
+.p3 .kp-amt small{font-size:24px;font-weight:700;color:var(--sub);margin-left:6px;letter-spacing:0;}
+.p3 .kp-amt .cur{color:#cfd4e0;}
+.p3 .kpquick{display:flex;gap:7px;justify-content:center;margin-bottom:10px;}
+.p3 .kpquick span{background:var(--soft);border:1px solid var(--line);color:#4b5563;border-radius:100px;padding:7px 14px;font-size:11.5px;font-weight:700;cursor:pointer;}
+.p3 .kpmsgic{width:16px;height:16px;color:var(--sub);display:flex;flex:none;}
+.p3 .kpmsgic svg{width:16px;height:16px;}
+.p3 .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:6px;}
+.p3 .key{text-align:center;font-size:24px;font-weight:600;padding:13px 0;color:var(--ink);border-radius:14px;cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:center;}
+.p3 .key:active{background:var(--soft);}
+.p3 .key svg{width:22px;height:22px;stroke-width:2;color:var(--sub);}
+.p3 .kpnext{background:var(--grad);color:#fff;border:none;border-radius:16px;padding:15px 0;font-size:15px;font-weight:800;margin-bottom:16px;cursor:pointer;box-shadow:var(--sh-blue);}
+.p3 .kpnext:disabled{opacity:.4;box-shadow:none;cursor:default;}
+
+/* 송금 완료 (preview 5) */
+.p3 .succ{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:0 26px;text-align:center;min-height:100dvh;}
+.p3 .succ .ring{width:88px;height:88px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:var(--sh-blue);}
+.p3 .succ .ring svg{width:42px;height:42px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.p3 .succ h2{font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1.45;color:var(--ink);}
+.p3 .succ p{color:var(--sub);font-size:13px;margin-top:10px;}
+.p3 .succ .btns{display:flex;gap:10px;width:100%;max-width:340px;margin-top:30px;}
 </style>
 </head>
 <body>
@@ -424,6 +480,7 @@ async function doAttendance(){
 }
 function attWeek(txs){const now=new Date(),day=(now.getDay()+6)%7,mon=new Date(now);mon.setDate(now.getDate()-day);const pad=n=>String(n).padStart(2,'0');const res=[];for(let i=0;i<5;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);res.push(txs.some(x=>x.type==='출석'&&x.to===SESSION.id&&(x.at||'').slice(0,10)===`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`))}return res}
 const ICO_CHECK_SM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+const ICO_DEL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>'
 // preview .att 스타일 (홈 전용). 기능(주간 출석/금요일 2배 보너스)은 doAttendance에서 유지
 function attendancePanelHTML(txs){
   const wk=attWeek(txs),L=['월','화','수','목','금'],done=attDoneToday(txs)
@@ -596,153 +653,177 @@ async function rHome(){
   const pb=document.getElementById('progbar');if(pb)requestAnimationFrame(()=>{pb.style.width=yearPct()+'%'})
 }
 
+// 거래 1건 → preview .lrow
+function txRow(t,admin){
+  const inc=admin?(t.type!=='회수'):(t.to===SESSION.id)
+  let tint='gray',icon=I.money
+  if(t.type==='출석'){tint='green';icon=ICO_CHECK_SM}
+  else if(t.type==='송금'){tint=inc?'green':'blue';icon=inc?I.recall:I.send}
+  else if(t.type==='발행'){tint='green';icon=I.recall}
+  else if(t.type==='회수'){tint='org';icon=I.send}
+  const title=admin?(t.type==='회수'?nameOf(t.from):nameOf(t.to)):(t.reason||t.type)
+  const sub=admin?(t.type+' · '+timeago(t.at)):((t.to===SESSION.id?nameOf(t.from):'→ '+nameOf(t.to))+' · '+timeago(t.at))
+  return`<div class="lrow"><div class="chip ti-${tint}">${icon}</div><div class="body"><div class="ti">${esc(title)}</div><div class="su">${esc(sub)}</div></div><div class="tr ${inc?'pos':'neg'}">${inc?'+':'−'}${fmt(t.amount)}옥</div></div>`
+}
+function fmtFull(iso){if(!iso)return'';const d=new Date(iso);const w=['일','월','화','수','목','금','토'][d.getDay()];return`${d.getMonth()+1}월 ${d.getDate()}일 ${w}요일`}
+
 async function rMoney(){
   TAB='money'
-  app().innerHTML=`<div class="screen fade-in"><div class="hdr"><h2>옥야머니</h2></div><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>${bnav()}`
+  app().innerHTML=`<div class="screen fade-in p3"><div class="topbar"><div class="t">옥야머니</div><div style="width:34px"></div></div><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>${bnav()}`
   bindNav()
   const admin=SESSION.role==='admin'
   const txs=await getAllTx()
   const bal=balOf(SESSION.id,txs)
   const issued=txs.filter(t=>t.type==='발행').reduce((s,t)=>s+t.amount,0)
-  const list=(admin?txs.filter(t=>t.type==='발행'||t.type==='회수'):txs.filter(t=>t.to===SESSION.id||t.from===SESSION.id))
-  const rows=list.length?list.map(t=>{
-    const isRe=t.type==='회수'
-    const inc=admin?!isRe:t.to===SESSION.id
-    const who=admin?(isRe?nameOf(t.from):nameOf(t.to)):null
-    const lbl=admin?who:(inc?nameOf(t.from)+' → 나':'나 → '+nameOf(t.to))
-    return`<div class="ldg-item"><div class="ldg-ic ${inc?'up':'dn'}">${inc?'+':'−'}</div><div class="ldg-body"><b>${esc(admin?who:t.reason||t.type)}</b><span>${admin?(esc(t.reason||t.type)+' · '):(lbl+' · ')}${timeago(t.at)}</span></div><div class="ldg-val ${inc?'p':'m'}">${inc?'+':'−'}${fmt(t.amount)}옥</div></div>`
-  }).join(''):'<div class="empty">내역이 없어요.</div>'
+  const ym=new Date().toISOString().slice(0,7)
+  const mine=txs.filter(t=>t.to===SESSION.id||t.from===SESSION.id)
+  const gotM=mine.filter(t=>t.to===SESSION.id&&(t.at||'').slice(0,7)===ym).reduce((s,t)=>s+t.amount,0)
+  const useM=mine.filter(t=>t.from===SESSION.id&&(t.at||'').slice(0,7)===ym).reduce((s,t)=>s+t.amount,0)
+  const list=(admin?txs.filter(t=>t.type==='발행'||t.type==='회수'):mine).slice(0,20)
+  const rows=list.length?list.map(t=>txRow(t,admin)).join(''):'<div class="empty">내역이 없어요.</div>'
 
-  app().innerHTML=`<div class="screen fade-in">
-    <div class="hdr"><h2>옥야머니</h2></div>
-    <div class="bal-card">
-      <div class="lbl">${admin?'학생회 총 발행량':'보유 잔액'}</div>
+  app().innerHTML=`<div class="screen fade-in p3">
+    <div class="topbar"><div class="t">옥야머니</div><div style="width:34px"></div></div>
+    <div class="balance">
+      <div class="lbl">${admin?'학생회 총 발행량':'총 잔액'}</div>
       <div class="amt">${fmt(admin?issued:bal)}<small>옥</small></div>
-      <div class="bal-acts">
-        <button class="bal-act" id="m-act">${I.send} ${admin?'발행':'송금'}</button>
-        ${admin?`<button class="bal-act" id="m-recall">${I.recall} 회수</button>`:''}
+      ${admin?'':`<div style="display:flex;gap:16px;font-size:12px;opacity:.92;margin-top:6px"><span>이번 달 <b style="font-weight:800">+${fmt(gotM)}</b> 받음</span><span><b style="font-weight:800">-${fmt(useM)}</b> 사용</span></div>`}
+      <div class="bbtns" style="margin-top:14px">
+        <button class="bbtn" id="m-act">${I.send}${admin?'발행':'송금'}</button>
+        ${admin?`<button class="bbtn" id="m-recall">${I.recall}회수</button>`:''}
+        <button class="bbtn" id="m-hist">${I.hist}내역</button>
       </div>
     </div>
-    <div style="padding:0 20px">
-      <div class="sec-title">${admin?'전체 발행 내역':'거래 내역'}</div>
-      <div class="card-list">${rows}</div>
+    <div class="pcard">
+      <div class="chd"><div class="sec" style="margin:0">${admin?'전체 발행 내역':'거래 내역'}</div><button id="m-all" style="font-size:12px;font-weight:700;color:var(--primary);background:none">전체보기</button></div>
+      ${rows}
     </div>
-    <div style="height:20px"></div>
+    <div style="height:6px"></div>
   </div>${bnav()}`
   bindNav()
   document.getElementById('m-act').onclick=()=>push(()=>fTransfer(admin?'발행':'송금'))
   if(admin)document.getElementById('m-recall').onclick=()=>push(()=>fTransfer('회수'))
+  document.getElementById('m-hist').onclick=()=>push(()=>rHistory())
+  document.getElementById('m-all').onclick=()=>push(()=>rHistory())
+}
+
+// 내역 화면 (preview 6): 필터 태그 + 날짜별 그룹
+async function rHistory(){
+  const admin=SESSION.role==='admin'
+  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">내역</div><div style="width:34px"></div></div><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>`
+  document.getElementById('bk').onclick=pop
+  const txs=await getAllTx()
+  const data=admin?txs.filter(t=>t.type==='발행'||t.type==='회수'):txs.filter(t=>t.to===SESSION.id||t.from===SESSION.id)
+  const filters=admin?['전체','발행','회수']:['전체','받기','송금','출석']
+  let cur='전체'
+  const match=t=>cur==='전체'?true:cur==='발행'?t.type==='발행':cur==='회수'?t.type==='회수':cur==='받기'?t.to===SESSION.id:cur==='송금'?(t.type==='송금'&&t.from===SESSION.id):cur==='출석'?t.type==='출석':true
+  app().innerHTML=`<div class="screen no-nav fade-in p3">
+    <div class="phdr"><button class="bk" id="bk2">${I.back}</button><div class="ttl">내역</div><div style="width:34px"></div></div>
+    <div style="display:flex;gap:7px;overflow:auto;padding:8px 18px 4px" id="hist-tags">${filters.map((f,i)=>`<span class="tag ${i===0?'b':'off'}" data-f="${f}">${f}</span>`).join('')}</div>
+    <div id="hist-body"></div>
+    <div style="height:12px"></div>
+  </div>`
+  document.getElementById('bk2').onclick=pop
+  const render=()=>{
+    const fl=data.filter(match),groups={}
+    fl.forEach(t=>{const d=(t.at||'').slice(0,10);(groups[d]=groups[d]||[]).push(t)})
+    const keys=Object.keys(groups).sort().reverse()
+    document.getElementById('hist-body').innerHTML=keys.length?keys.map(d=>`<div class="datehd">${fmtFull(d)}</div><div class="pcard" style="margin-top:2px">${groups[d].map(t=>txRow(t,admin)).join('')}</div>`).join(''):'<div class="empty">내역이 없어요.</div>'
+  }
+  document.querySelectorAll('#hist-tags [data-f]').forEach(el=>el.onclick=()=>{cur=el.dataset.f;document.querySelectorAll('#hist-tags [data-f]').forEach(x=>x.className='tag '+(x.dataset.f===cur?'b':'off'));render()})
+  render()
 }
 
 async function fTransfer(mode){
-  // 단계 1: 받는 사람 검색
+  // 단계 1: 받는 사람 검색 (preview 3)
   const isRecall=mode==='회수'
   const others=USERS.filter(u=>u.id!==SESSION.id&&!((mode==='송금'||isRecall)&&u.role==='admin'))
   let rtxs=null
   if(isRecall){
-    app().innerHTML=`<div class="screen no-nav"><div class="loader" style="min-height:300px"><div class="spin"></div></div></div>`
+    app().innerHTML=`<div class="screen no-nav p3"><div class="loader" style="min-height:300px"><div class="spin"></div></div></div>`
     rtxs=await getAllTx()
   }
+  let sel=null
+  const title=mode==='발행'?'옥야머니 발행':(isRecall?'옥야머니 회수':'송금')
   const buildList=(q='')=>{
     const fl=q?others.filter(u=>u.name.includes(q)):others
-    if(!fl.length)return`<div style="padding:60px 20px;text-align:center;color:var(--muted);font-size:14px">검색 결과가 없어요</div>`
-    return fl.map(u=>`<div class="row-item tf-user" data-uid="${u.id}" style="padding:14px 20px">
-      <div style="width:44px;height:44px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--primary);flex:none">${esc(u.name.charAt(0))}</div>
-      <div class="row-body"><div class="row-title">${esc(u.name)}</div><div class="row-desc">${isRecall?('잔액 '+fmt(balOf(u.id,rtxs))+'옥'):(u.role==='admin'?'학생회 임원':'학생')}</div></div>
-      <div class="row-right">${I.chev}</div>
-    </div>`).join('')
+    if(!fl.length)return`<div class="empty">검색 결과가 없어요</div>`
+    return fl.map(u=>{
+      const on=sel===u.id
+      const sub=isRecall?('잔액 '+fmt(balOf(u.id,rtxs))+'옥'):(u.role==='admin'?'학생회 임원':'학생')
+      return`<div class="lrow tf-user${on?' on':''}" data-uid="${u.id}"><div class="chip ti-blue" style="border-radius:50%;${on?'background:var(--grad);color:#fff':''}">${esc(u.name.charAt(0))}</div><div class="body"><div class="ti">${esc(u.name)}</div><div class="su">${sub}</div></div><span style="color:${on?'var(--primary)':'#c9cdd8'};display:flex">${on?ICO_CHECK_SM:I.chev}</span></div>`
+    }).join('')
   }
-  app().innerHTML=`<div class="screen no-nav fade-in">
-    <div style="padding:calc(16px + env(safe-area-inset-top)) 20px 12px;border-bottom:1px solid var(--line)">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <button class="back-btn" id="bk" style="flex:none">${I.back}</button>
-        <div style="flex:1;text-align:center;font-size:17px;font-weight:700">${mode==='발행'?'옥야머니 발행':(mode==='회수'?'옥야머니 회수':'송금')}</div>
-        <button id="tf-cancel" style="flex:none;font-size:14px;color:var(--muted);background:none;border:none;cursor:pointer;padding:0 4px">취소</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:14px;padding:11px 14px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input id="tf-q" placeholder="이름 검색" style="flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--ink)" autocomplete="off" autocorrect="off">
-      </div>
-    </div>
-    <div id="tf-list">${buildList()}</div>
+  app().innerHTML=`<div class="screen no-nav fade-in p3" style="display:flex;flex-direction:column">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${title}</div><button id="tf-cancel" style="font-size:13px;font-weight:600;color:var(--sub);background:none">취소</button></div>
+    <div style="padding:2px 18px 0"><div style="display:flex;align-items:center;gap:9px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:12px 15px"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--sub);fill:none;stroke-width:2;stroke-linecap:round;flex:none"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="tf-q" placeholder="이름으로 검색" style="flex:1;background:none;border:none;outline:none;font-size:14px;padding:0" autocomplete="off" autocorrect="off"></div></div>
+    <div class="pcard" id="tf-list" style="flex:1;overflow:auto;min-height:0">${buildList()}</div>
+    <div style="padding:8px 18px calc(14px + env(safe-area-inset-bottom))"><button class="pbtn pri" id="tf-next" disabled style="opacity:.4">다음</button></div>
   </div>`
-  const bind=()=>document.querySelectorAll('.tf-user').forEach(el=>{
-    el.onclick=()=>push(()=>fTransferAmt(mode,USERS.find(u=>u.id===el.dataset.uid)))
+  const syncNext=()=>{const b=document.getElementById('tf-next');b.disabled=!sel;b.style.opacity=sel?'1':'.4'}
+  const bind=()=>document.querySelectorAll('.tf-user').forEach(el=>el.onclick=()=>{
+    sel=el.dataset.uid
+    document.getElementById('tf-list').innerHTML=buildList(document.getElementById('tf-q').value)
+    bind();syncNext()
   })
-  bind()
+  bind();syncNext()
   document.getElementById('bk').onclick=pop
   document.getElementById('tf-cancel').onclick=()=>{STACK.length=0;routeTab()}
-  document.getElementById('tf-q').oninput=e=>{
-    document.getElementById('tf-list').innerHTML=buildList(e.target.value)
-    bind()
-  }
+  document.getElementById('tf-q').oninput=e=>{document.getElementById('tf-list').innerHTML=buildList(e.target.value);bind();syncNext()}
+  document.getElementById('tf-next').onclick=()=>{if(sel)push(()=>fTransferAmt(mode,USERS.find(u=>u.id===sel)))}
 }
 
 async function fTransferAmt(mode,toUser){
-  // 단계 2: 금액 입력 + 숫자 키패드 + 메시지
-  app().innerHTML=`<div class="screen no-nav"><div class="loader" style="min-height:300px"><div class="spin"></div></div></div>`
+  // 단계 2: 금액 입력 (preview 4) — 흰 배경, 숫자만 키패드
+  app().innerHTML=`<div class="screen no-nav p3"><div class="loader" style="min-height:300px"><div class="spin"></div></div></div>`
   const txs=await getAllTx()
   const myBal=balOf(SESSION.id,txs)
   const isRecall=mode==='회수'
   const availBal=isRecall?balOf(toUser.id,txs):myBal
   const limited=mode==='송금'||isRecall
-  const amtLbl=isRecall?'회수금액':'보낼금액'
+  const title=mode==='발행'?'발행':(isRecall?'회수':'송금')
   let amtStr='0'
   const upd=()=>{
     const n=parseInt(amtStr)||0
-    const el=document.getElementById('tf-disp')
-    if(el)el.innerHTML=n>0?`<span style="color:var(--ink)">${fmt(n)}<span style="font-size:22px;font-weight:600;margin-left:3px">옥</span></span>`:`<span style="color:var(--line)">${amtLbl}</span>`
-    const nb=document.getElementById('tf-next')
-    if(nb){const ok=n>0&&(!limited||n<=availBal);nb.disabled=!ok;nb.style.opacity=ok?'1':'.4'}
-    const bw=document.getElementById('tf-bwarn')
-    if(bw)bw.style.display=(limited&&n>0&&n>availBal)?'block':'none'
+    const el=document.getElementById('kp-amt')
+    if(el)el.innerHTML=(n>0?`${fmt(n)}`:`<span class="cur">0</span>`)+`<small>옥</small>`
+    const nb=document.getElementById('kp-next');if(nb)nb.disabled=!(n>0&&(!limited||n<=availBal))
+    const bw=document.getElementById('kp-warn');if(bw)bw.style.display=(limited&&n>availBal)?'block':'none'
   }
-  app().innerHTML=`<div class="screen no-nav fade-in" style="display:flex;flex-direction:column">
-    <div style="display:flex;align-items:center;padding:calc(16px + env(safe-area-inset-top)) 20px 14px;border-bottom:1px solid var(--line)">
-      <button class="back-btn" id="bk" style="flex:none">${I.back}</button>
-      <div style="flex:1;text-align:center">
-        <div style="font-size:16px;font-weight:700">${esc(toUser.name)}</div>
-        <div style="font-size:12px;color:var(--muted)">창녕옥야고등학교</div>
-      </div>
-      <button id="tf-cancel" style="flex:none;font-size:14px;color:var(--muted);background:none;border:none;cursor:pointer;width:36px;text-align:right">취소</button>
-    </div>
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:28px 20px 8px">
-      <div id="tf-disp" style="font-size:42px;font-weight:800;letter-spacing:-.03em"><span style="color:var(--line)">${amtLbl}</span></div>
-    </div>
-    <div style="padding:0 20px calc(16px + env(safe-area-inset-bottom))">
-      <div style="background:var(--bg);border-radius:14px;padding:13px 16px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:13px;color:var(--ink2)">${mode==='발행'?'발행 주체':(isRecall?esc(toUser.name)+' 보유 잔액':'내 잔액')}</span>
-        <span style="font-size:14px;font-weight:700;color:var(--ink)">${mode==='발행'?'학생회':fmt(availBal)+'옥'}</span>
-      </div>
-      <div id="tf-bwarn" style="display:none;color:var(--danger);font-size:12px;font-weight:600;text-align:center;margin-bottom:4px">${isRecall?'보유 잔액보다 많아요':'잔액이 부족해요'}</div>
-      <div style="background:var(--bg);border-radius:14px;padding:13px 16px;margin-bottom:14px;display:flex;align-items:center;gap:8px">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        <input id="tf-reason" placeholder="사유 또는 메시지 (선택)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--ink)">
-      </div>
-      <div id="tf-numpad" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">
-        ${['1','2','3','4','5','6','7','8','9','00','0','⌫'].map(k=>`<button data-k="${k}" style="height:52px;border-radius:14px;background:var(--bg);border:none;font-size:${k==='⌫'?'0':'20'}px;font-weight:600;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent">${k==='⌫'?`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>`:k}</button>`).join('')}
-      </div>
-      <button id="tf-next" disabled style="width:100%;padding:16px;border-radius:16px;background:var(--grad);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;opacity:.4;box-shadow:var(--sh-blue);transition:opacity .15s">다음</button>
+  app().innerHTML=`<div class="screen no-nav fade-in p3" style="display:flex;flex-direction:column">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${title}</div><button id="tf-cancel" style="font-size:13px;font-weight:600;color:var(--sub);background:none">취소</button></div>
+    <div class="kpwrap">
+      <div class="kpto"><div class="av">${esc(toUser.name.charAt(0))}</div><div><div class="n">${esc(toUser.name)}</div><div class="b">${mode==='발행'?'학생회 발행':(fmt(availBal)+'옥 보유')}</div></div></div>
+      <div class="kp-amt" id="kp-amt"><span class="cur">0</span><small>옥</small></div>
+      <div id="kp-warn" style="display:none;text-align:center;color:var(--danger);font-size:12px;font-weight:700;margin-bottom:8px">${isRecall?'보유 잔액보다 많아요':'잔액이 부족해요'}</div>
+      <div class="kpquick">${['+100','+500','+1,000','전액'].map(q=>`<span data-q="${q}">${q}</span>`).join('')}</div>
+      <div style="display:flex;align-items:center;gap:8px;background:var(--soft);border:1px solid var(--line);border-radius:13px;padding:11px 14px;margin-bottom:10px"><span class="kpmsgic">${I.msg}</span><input id="tf-reason" placeholder="메시지 (선택)" style="flex:1;background:none;border:none;outline:none;font-size:13.5px;padding:0"></div>
+      <div class="keypad">${['1','2','3','4','5','6','7','8','9','00','0','del'].map(k=>`<div class="key" data-k="${k}">${k==='del'?ICO_DEL:k}</div>`).join('')}</div>
+      <button class="kpnext" id="kp-next" disabled>다음</button>
     </div>
   </div>`
   document.getElementById('bk').onclick=pop
   document.getElementById('tf-cancel').onclick=()=>{STACK.length=0;routeTab()}
-  document.getElementById('tf-numpad').onclick=e=>{
-    const k=e.target.closest('[data-k]')?.dataset.k
-    if(!k)return
-    if(k==='⌫')amtStr=amtStr.length>1?amtStr.slice(0,-1):'0'
+  document.querySelectorAll('.kpquick [data-q]').forEach(el=>el.onclick=()=>{
+    const q=el.dataset.q;let n=parseInt(amtStr)||0
+    if(q==='전액'){n=limited?availBal:n}else{n+=parseInt(q.replace(/[+,]/g,''))}
+    if(limited)n=Math.min(n,availBal)
+    amtStr=String(n);upd()
+  })
+  document.querySelector('.keypad').onclick=e=>{
+    const k=e.target.closest('[data-k]')?.dataset.k;if(!k)return
+    if(k==='del')amtStr=amtStr.length>1?amtStr.slice(0,-1):'0'
     else if(k==='00'){if(amtStr!=='0'&&amtStr.length<7)amtStr+='00'}
     else{if(amtStr==='0')amtStr=k;else if(amtStr.length<7)amtStr+=k}
     upd()
   }
-  document.getElementById('tf-next').onclick=()=>{
-    const amount=parseInt(amtStr)||0
-    if(amount<=0)return
-    fTransferConfirm(mode,toUser,amount,document.getElementById('tf-reason').value.trim())
+  document.getElementById('kp-next').onclick=()=>{
+    const amount=parseInt(amtStr)||0;if(amount<=0)return
+    fTransferConfirm(mode,toUser,amount,document.getElementById('tf-reason').value.trim(),myBal)
   }
 }
 
-function fTransferConfirm(mode,toUser,amount,reason){
+function fTransferConfirm(mode,toUser,amount,reason,myBal){
   // 단계 3: 확인 바텀시트 → 완료 화면
   const ov=document.createElement('div')
   ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end'
@@ -769,19 +850,22 @@ function fTransferConfirm(mode,toUser,amount,reason){
     ov.remove()
     if(ok){
       STACK.length=0
-      app().innerHTML=`<div class="screen no-nav fade-in" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh">
-        <div style="text-align:center;padding:40px 24px">
-          <div style="width:72px;height:72px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;margin:0 auto 28px;box-shadow:var(--sh-blue)">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      const verb=mode==='발행'?'에게 발행했어요':(mode==='회수'?'에게서 회수했어요':'에게 보냈어요')
+      const remain=mode==='송금'?`남은 잔액 ${fmt(Math.max(0,(myBal||0)-amount))}옥 · `:''
+      const tm=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})
+      app().innerHTML=`<div class="screen no-nav fade-in p3">
+        <div class="succ">
+          <div class="ring"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></div>
+          <h2>${fmt(amount)}옥을<br>${esc(toUser.name)}님${verb}</h2>
+          <p>${remain}${tm}${reason?` · "${esc(reason)}"`:''}</p>
+          <div class="btns">
+            <button class="pbtn out" id="tf-home">홈으로</button>
+            <button class="pbtn pri" id="tf-hist">내역 보기</button>
           </div>
-          <div style="font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1.45">${esc(toUser.name)}님${mode==='회수'?'에게서':'에게'}<br><span style="color:var(--primary)">${fmt(amount)}옥</span> ${mode==='발행'?'발행했어요':(mode==='회수'?'회수했어요':'보냈어요')}</div>
-          ${reason?`<div style="margin-top:10px;font-size:14px;color:var(--muted)">"${esc(reason)}"</div>`:''}
-        </div>
-        <div style="position:fixed;bottom:0;left:0;right:0;padding:0 20px calc(24px + env(safe-area-inset-bottom))">
-          <button id="tf-done" style="width:100%;padding:16px;border-radius:16px;background:var(--grad);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;box-shadow:var(--sh-blue)">확인</button>
         </div>
       </div>`
-      document.getElementById('tf-done').onclick=()=>{TAB='money';rMoney()}
+      document.getElementById('tf-home').onclick=()=>{TAB='home';rHome()}
+      document.getElementById('tf-hist').onclick=()=>{TAB='money';STACK=[];push(()=>rHistory())}
     }else{
       toast('처리 중 오류가 발생했어요')
     }
