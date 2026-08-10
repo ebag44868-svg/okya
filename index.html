@@ -725,15 +725,15 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .pet-cat{display:inline-block;font-size:11.5px;font-weight:800;padding:4px 11px;border-radius:999px;background:var(--primary-tint);color:var(--primary);}
 .pet-cat.sm{font-size:10.5px;padding:3px 9px;}
 /* 메인 - 대표 청원(다른 카드와 같은 직사각형, 크게) */
-.pet-feat{margin:8px 18px 0;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);padding:24px 22px;cursor:pointer;animation:petrise .5s var(--ease) both;transition:transform .18s var(--ease),box-shadow .18s;}
+.pet-feat{margin:10px 18px 2px;min-height:190px;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--sh);padding:28px 26px;cursor:pointer;animation:petrise .5s var(--ease) both;transition:transform .18s var(--ease),box-shadow .18s;}
 .pet-feat:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(20,26,40,.15);}
 .pet-feat:active{transform:scale(.995);}
-.pet-feat-tag{font-size:12px;font-weight:800;color:var(--primary);margin-bottom:11px;}
-.pet-feat-title{font-size:22px;font-weight:900;line-height:1.4;letter-spacing:-.5px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.pet-feat-sub{font-size:13.5px;color:var(--sub);line-height:1.55;margin-top:9px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
-.pet-feat-meta{display:flex;align-items:center;gap:11px;margin-top:17px;}
-.pet-feat-n{font-size:14px;font-weight:700;color:var(--sub);}
-.pet-feat-n b{color:var(--primary);font-weight:900;font-size:16px;}
+.pet-feat-tag{font-size:13px;font-weight:800;color:var(--primary);margin-bottom:13px;}
+.pet-feat-title{font-size:25px;font-weight:900;line-height:1.4;letter-spacing:-.6px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.pet-feat-sub{font-size:14px;color:var(--sub);line-height:1.6;margin-top:11px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+.pet-feat-meta{display:flex;align-items:center;gap:11px;margin-top:auto;padding-top:18px;}
+.pet-feat-n{font-size:14.5px;font-weight:700;color:var(--sub);}
+.pet-feat-n b{color:var(--primary);font-weight:900;font-size:17px;}
 /* 메인 - 그리드(제목 메인, 나머지 아래로) */
 .pet-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:2px 18px 10px;}
 .pet-card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:16px;cursor:pointer;display:flex;flex-direction:column;animation:petrise .45s var(--ease) both;transition:transform .18s var(--ease),box-shadow .18s;}
@@ -776,8 +776,8 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .pet-prog i{display:block;height:100%;border-radius:99px;background:var(--grad);transition:width .6s var(--ease);}
 .pet-body{font-size:14px;line-height:1.85;color:var(--ink2);font-weight:500;white-space:pre-wrap;}
 .pet-phasebtns{display:flex;flex-wrap:wrap;gap:8px;}
-.pet-cta{padding:18px 18px 6px;}
-.pet-agree-btn{font-size:16px;padding:16px 0;}
+.pet-cta{padding:18px 18px 6px;text-align:center;}
+.pet-agree-btn{width:auto;min-width:180px;font-size:14.5px;padding:12px 40px;}
 .pet-agree-btn.agreed{background:var(--primary-tint);color:var(--primary);box-shadow:none;}
 
 @media (min-width:820px) and (min-aspect-ratio:1/1){
@@ -2216,7 +2216,7 @@ async function rPetitionDetail(pid){
       <div class="pet-row"><div class="k">청원분야</div><div class="v"><span class="pet-cat">${esc(p.category||'기타')}</span></div></div>
       <div class="pet-row"><div class="k">진행단계</div><div class="v" style="font-weight:800;color:var(--primary)">${esc(phase)}</div></div>
       <div class="pet-row"><div class="k">동의기간</div><div class="v">${fmtDate(start)} ~ ${fmtDate(dl)}<div class="pet-note">청원 공개 이후 30일 이내 · ${left>=0?left+'일 남음':'마감됨'}</div></div></div>
-      <div class="pet-row"><div class="k">동의수</div><div class="v"><div class="pet-agree-line"><span class="pet-agree-big">👍 ${fmt(agrees)}명</span><span class="pet-pct">${pct}%</span></div><div class="pet-prog"><i style="width:${pct}%"></i></div><div class="pet-note">목표 ${fmt(PET_GOAL)}명</div></div></div>
+      <div class="pet-row"><div class="k">동의수</div><div class="v"><div class="pet-agree-line"><span class="pet-agree-big">${fmt(agrees)}명</span><span class="pet-pct">${pct}%</span></div><div class="pet-prog"><i style="width:${pct}%"></i></div><div class="pet-note">목표 ${fmt(PET_GOAL)}명</div></div></div>
       <div class="pet-row"><div class="k">청원인</div><div class="v" style="display:flex;align-items:center;gap:9px"><span id="pet-author">익명</span>${admin?`<button class="minibtn out" id="pd-reveal" style="padding:4px 10px;font-size:11.5px">🔒 확인</button>`:''}</div></div>
       <div class="pet-row col"><div class="k">청원의 취지</div><div class="v pet-body">${esc(p.purpose||'-')}</div></div>
       <div class="pet-row col"><div class="k">청원의 내용</div><div class="v pet-body">${esc(p.content||p.txt||'-')}</div></div>
@@ -2430,7 +2430,7 @@ async function iPetition(){
   const grid=pub.length?`<div class="pet-grid">${pub.map(p=>`<div class="pet-card" data-open="${p.id}">
     <span class="pet-cat sm">${esc(p.category||'기타')}</span>
     <div class="pet-c-title">${ptitle(p)}</div>
-    <div class="pet-c-foot"><b>👍 ${fmt(petAgrees(p))}</b><span>${timeago(petStart(p))}</span></div>
+    <div class="pet-c-foot"><span class="pet-c-n">동의 <b>${fmt(petAgrees(p))}</b></span><span>${timeago(petStart(p))}</span></div>
   </div>`).join('')}</div>`:'<div class="empty">아직 공개된 청원이 없습니다.<br><br>우측 상단 <b style="color:var(--primary)">＋ 청원</b>으로 첫 청원을 올려보세요.</div>'
   const pendSec=admin&&pend.length?`<div class="pcard"><div class="sec">검토 대기 (${pend.length})</div>${pend.map(p=>`<div class="post"><div class="pbody" style="font-weight:800">${ptitle(p)}</div><div class="pmeta" style="margin:4px 0 8px">${esc(p.category||'기타')} · 접수 ${timeago(p.at)}</div><div style="display:flex;gap:8px"><button class="minibtn soft" data-ap="${p.id}">공개</button><button class="minibtn danger" data-rj="${p.id}">반려</button></div></div>`).join('')}</div>`:''
   cb.innerHTML=`${banner}${pendSec}<div class="sec" style="margin:18px 20px 10px">공개된 청원 <span style="color:var(--primary)">${pub.length}</span></div>${grid}<div style="height:16px"></div>`
