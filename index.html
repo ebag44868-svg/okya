@@ -608,6 +608,20 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
   .p3 .home-top .topbar{padding-left:4px;padding-right:4px;}
   .p3 .home-top .greet{padding-left:4px;padding-right:4px;}
 }
+
+/* 가로 — 송금/내역 등 푸시 화면을 중앙 모달 카드로 */
+@media (min-width:820px) and (min-aspect-ratio:1/1){
+  .screen.no-nav.p3{flex:none;width:min(470px,94vw);max-height:88vh;margin:auto;align-self:center;background:var(--card);border-radius:26px;box-shadow:0 30px 80px rgba(20,26,40,.34);overflow-y:auto;padding-bottom:0;}
+  .screen.no-nav.p3>.phdr{position:sticky;top:0;background:var(--card);z-index:5;padding-top:16px;}
+  .screen.no-nav.p3 .succ{min-height:auto;padding:30px 28px 30px;}
+  .screen.no-nav.p3 .succ .btns{margin-top:26px;}
+  .screen.no-nav.p3 .kpwrap{min-height:auto;padding-bottom:16px;}
+  .screen.no-nav.p3 .kp-amt{font-size:40px;}
+  .screen.no-nav.p3 #tf-list{max-height:44vh;}
+  /* 확인 바텀시트 → 중앙 다이얼로그 */
+  .p3sheet-ov{align-items:center;}
+  .p3sheet{max-width:430px;border-radius:26px;}
+}
 </style>
 </head>
 <body>
@@ -1026,21 +1040,27 @@ async function rMoney(){
   const list=(admin?txs.filter(t=>t.type==='발행'||t.type==='회수'):mine).slice(0,20)
   const rows=list.length?list.map(t=>txRow(t,admin,rbal[t.id])).join(''):'<div class="empty">내역이 없어요.</div>'
 
-  app().innerHTML=`<div class="screen fade-in p3">
-    <div class="topbar"><div class="t">옥야머니</div><div style="width:34px"></div></div>
-    <div class="balance">
-      <div class="lbl">${admin?'학생회 총 발행량':'총 잔액'}</div>
-      <div class="amt">${fmt(admin?issued:bal)}<small>옥</small></div>
-      ${admin?'':`<div style="display:flex;gap:16px;font-size:12px;opacity:.92;margin-top:6px"><span>이번 달 <b style="font-weight:800">+${fmt(gotM)}</b> 받음</span><span><b style="font-weight:800">-${fmt(useM)}</b> 사용</span></div>`}
-      <div class="bbtns" style="margin-top:14px">
-        <button class="bbtn" id="m-act">${I.send}${admin?'발행':'송금'}</button>
-        ${admin?`<button class="bbtn" id="m-recall">${I.recall}회수</button>`:''}
-        <button class="bbtn" id="m-hist">${I.hist}내역</button>
+  app().innerHTML=`<div class="screen fade-in p3 home-scope">
+    <div class="home-top"><div class="topbar"><div class="t">옥야머니</div><div style="width:34px"></div></div></div>
+    <div class="home-cols">
+     <div class="home-col">
+      <div class="balance">
+        <div class="lbl">${admin?'학생회 총 발행량':'총 잔액'}</div>
+        <div class="amt">${fmt(admin?issued:bal)}<small>옥</small></div>
+        ${admin?'':`<div style="display:flex;gap:16px;font-size:12px;opacity:.92;margin-top:6px"><span>이번 달 <b style="font-weight:800">+${fmt(gotM)}</b> 받음</span><span><b style="font-weight:800">-${fmt(useM)}</b> 사용</span></div>`}
+        <div class="bbtns" style="margin-top:14px">
+          <button class="bbtn" id="m-act">${I.send}${admin?'발행':'송금'}</button>
+          ${admin?`<button class="bbtn" id="m-recall">${I.recall}회수</button>`:''}
+          <button class="bbtn" id="m-hist">${I.hist}내역</button>
+        </div>
       </div>
-    </div>
-    <div class="pcard">
-      <div class="chd"><div class="sec" style="margin:0">${admin?'전체 발행 내역':'거래 내역'}</div><button id="m-all" style="font-size:12px;font-weight:700;color:var(--primary);background:none">전체보기</button></div>
-      ${rows}
+     </div>
+     <div class="home-col">
+      <div class="pcard">
+        <div class="chd"><div class="sec" style="margin:0">${admin?'전체 발행 내역':'거래 내역'}</div><button id="m-all" style="font-size:12px;font-weight:700;color:var(--primary);background:none;white-space:nowrap">전체보기</button></div>
+        ${rows}
+      </div>
+     </div>
     </div>
     <div style="height:6px"></div>
   </div>${bnav()}`
