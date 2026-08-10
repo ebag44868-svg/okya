@@ -789,6 +789,9 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .pr-pill.s0{background:var(--soft);color:var(--sub);}
 .pr-pill.s1{background:rgba(245,166,35,.16);color:#E0930F;}
 .pr-pill.s2{background:rgba(47,180,166,.16);color:#2FB4A6;}
+.pr-card{cursor:pointer;transition:transform .15s var(--ease),box-shadow .15s var(--ease);}
+.pr-card:active{transform:scale(.985);}
+.pr-detail-hero{display:flex;flex-direction:column;}
 
 /* 책 교환 (굿노트 책장) */
 .book-help{margin:10px 18px 2px;padding:13px 15px;background:var(--primary-tint);border-radius:14px;font-size:12.5px;line-height:1.65;color:var(--ink2);}
@@ -898,11 +901,17 @@ async function notify(userId,type,title,body,link){
   if(!userId||userId===(SESSION&&SESSION.id))return   // 자기 자신에겐 알림 안 만듦
   try{await wt(sb.from('okya_notifications').insert({id:uid('nt'),user_id:userId,type,title,body:body||'',link:link||'',read:false,at:nowISO()}),5000)}catch{}
 }
-async function loadNotifs(){try{const{data}=await wt(sb.from('okya_notifications').select('*').eq('user_id',SESSION.id).order('at',{ascending:false}).limit(50),5000);NOTIFS=data||[]}catch{NOTIFS=[]}return NOTIFS}
+// 여러 명에게 한 번에 알림. opts.includeAdmin=true면 학생회 임원도 포함
+async function notifyMany(ids,type,title,body,link){for(const id of new Set(ids))await notify(id,type,title,body,link)}
+async function notifyStudents(type,title,body,link){await notifyMany(USERS.filter(u=>u.role!=='admin').map(u=>u.id),type,title,body,link)}
+async function notifyAdmins(type,title,body,link){await notifyMany(USERS.filter(u=>u.role==='admin').map(u=>u.id),type,title,body,link)}
+async function loadNotifs(){try{const{data}=await wt(sb.from('okya_notifications').select('*').eq('user_id',SESSION.id).order('at',{ascending:false}).limit(50),5000);NOTIFS=data||[]}catch{NOTIFS=[]}updateAppBadge();return NOTIFS}
 function unreadCount(){return NOTIFS.filter(n=>!n.read).length}
-async function markNotifsRead(){const uns=NOTIFS.filter(n=>!n.read);if(!uns.length)return;uns.forEach(n=>n.read=true);try{await wt(sb.from('okya_notifications').update({read:true}).eq('user_id',SESSION.id).eq('read',false),5000)}catch{}}
+// 앱 아이콘 배지(패드 홈화면 우측 상단). 미지원 브라우저는 조용히 무시
+function updateAppBadge(){try{const c=unreadCount();if('setAppBadge'in navigator){c>0?navigator.setAppBadge(c):navigator.clearAppBadge()}}catch{}}
+async function markNotifsRead(){const uns=NOTIFS.filter(n=>!n.read);if(!uns.length){updateAppBadge();return}uns.forEach(n=>n.read=true);updateAppBadge();try{await wt(sb.from('okya_notifications').update({read:true}).eq('user_id',SESSION.id).eq('read',false),5000)}catch{}}
 // 벨 버튼([data-bell])에 클릭·배지 반영
-function wireBell(){document.querySelectorAll('[data-bell]').forEach(b=>{
+function wireBell(){updateAppBadge();document.querySelectorAll('[data-bell]').forEach(b=>{
   b.onclick=()=>push(()=>rNotifications())
   const old=b.querySelector('.nbadge');if(old)old.remove()
   const c=unreadCount();if(c>0){const s=document.createElement('span');s.className='nbadge';s.textContent=c>9?'9+':c;b.appendChild(s)}
@@ -1334,7 +1343,7 @@ async function rHistory(){
 }
 
 // 알림 센터
-const NT_META={money:{ic:'money',tint:'green'},dm:{ic:'send',tint:'blue'},petition:{ic:'notice',tint:'org'},notice:{ic:'notice',tint:'blue'}}
+const NT_META={money:{ic:'money',tint:'green'},dm:{ic:'send',tint:'blue'},petition:{ic:'notice',tint:'org'},notice:{ic:'notice',tint:'blue'},book:{ic:'book',tint:'blue'},print:{ic:'print',tint:'org'},challenge:{ic:'star',tint:'green'}}
 async function rNotifications(){
   app().innerHTML=`<div class="screen no-nav fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">알림</div><button id="nt-clear" style="font-size:12.5px;font-weight:700;color:var(--primary);background:none">모두 읽음</button></div>
@@ -1722,14 +1731,46 @@ async function iPrint(){
     const si=Math.max(0,PR_STATUS.indexOf(p.status||'접수'))
     const pill=`<span class="pr-pill s${si}">${PR_STATUS[si]}</span>`
     const meta=`${p.pages?p.pages+'장 · ':''}${p.copies||1}부 · ${bindLabel(p.bind)}`
-    const adminAct=admin?`<div style="display:flex;gap:8px;margin-top:12px">${si<2?`<button class="minibtn soft" data-next="${p.id}">${PR_STATUS[si+1]}(으)로</button>`:''}<button class="minibtn danger" data-del="${p.id}">삭제</button></div>`:''
-    return`<div class="pcard"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div style="min-width:0"><div class="ti" style="font-size:15px;white-space:normal">${esc(p.title)}</div><div class="su" style="margin-top:3px">${admin?esc(p.owner_name)+' · ':''}${meta}</div></div>${pill}</div>${p.file?`<img src="${esc(p.file)}" style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;margin-top:10px">`:''}${prSteps(si)}<div class="su" style="margin-top:8px">신청 ${fmtDate(p.at)} · <b style="color:var(--primary)">${fmt(p.cost||0)}옥</b></div>${adminAct}</div>`
+    return`<div class="pcard pr-card" data-open="${p.id}"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div style="min-width:0"><div class="ti" style="font-size:15px;white-space:normal">${esc(p.title)}</div><div class="su" style="margin-top:3px">${admin?esc(p.owner_name)+' · ':''}${meta}</div></div>${pill}</div>${prSteps(si)}<div class="su" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">신청 ${fmtDate(p.at)} · <b style="color:var(--primary)">${fmt(p.cost||0)}옥</b><span style="color:var(--primary);font-weight:700;font-size:12.5px">진행현황 ›</span></div></div>`
   }
   const list=prs.length?prs.map(card).join(''):'<div class="empty">신청 내역이 없어요.</div>'
   cb.innerHTML=`${help}<div class="sec" style="margin:16px 20px 10px">${admin?'전체 신청':'내 신청'} <span style="color:var(--primary)">${prs.length}</span></div>${list}<div style="height:12px"></div>`
+  cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rPrintDetail(el.dataset.open)))
+}
+async function rPrintDetail(id){
+  const admin=SESSION.role==='admin'
+  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">제본 진행현황</div><div style="width:34px"></div></div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
+  bindNav();document.getElementById('bk').onclick=pop
+  let p=null
+  try{const r=await wt(sb.from('okya_prints').select('*').eq('id',id).single());p=r.data}catch{}
+  const cb=document.getElementById('cb');if(!cb)return
+  if(!p){cb.innerHTML='<div class="empty">신청을 찾을 수 없어요.</div>';return}
+  const si=Math.max(0,PR_STATUS.indexOf(p.status||'접수'))
+  const msg=['접수됐어요. 학생회가 곧 제본을 시작해요.','학생회가 제본을 만들고 있어요.','제본이 완료됐어요! 학생회에서 받아가세요.'][si]
+  const row=(k,v)=>`<div class="pet-row"><div class="pet-k">${k}</div><div class="pet-v">${v}</div></div>`
+  const adminAct=admin?`<div style="display:flex;gap:8px;margin-top:14px">${si<2?`<button class="pbtn pri" id="pd-next" style="flex:1">${PR_STATUS[si+1]}(으)로 변경</button>`:'<div class="empty" style="flex:1;padding:12px">완료된 신청이에요</div>'}<button class="minibtn danger" id="pd-del">삭제</button></div>`:''
+  cb.innerHTML=`<div class="chal-detail">
+    <div class="pcard pr-detail-hero">
+      <div class="pr-pill s${si}" style="align-self:flex-start">${PR_STATUS[si]}</div>
+      <div class="ti" style="font-size:20px;white-space:normal;margin-top:10px">${esc(p.title)}</div>
+      <div class="su" style="margin-top:4px">${msg}</div>
+      ${prSteps(si)}
+    </div>
+    ${p.file?`<div class="pcard" style="padding:10px"><img src="${esc(p.file)}" style="width:100%;max-height:260px;object-fit:cover;border-radius:12px"></div>`:''}
+    <div class="pcard pet-sheet">
+      ${row('제본 방식',esc(bindLabel(p.bind)))}
+      ${row('부수',`${p.copies||1}부`)}
+      ${p.pages?row('장수',`${p.pages}장`):''}
+      ${admin?row('신청인',esc(p.owner_name||'')):''}
+      ${row('신청일',fmtDate(p.at))}
+      ${row('사용 옥야머니',`<b style="color:var(--primary)">${fmt(p.cost||0)}옥</b>`)}
+      ${adminAct}
+    </div>
+    <div style="height:12px"></div>
+  </div>`
   if(admin){
-    document.querySelectorAll('[data-next]').forEach(b=>b.onclick=async()=>{const id=b.dataset.next;try{const r=await wt(sb.from('okya_prints').select('status').eq('id',id).single());const cur=Math.max(0,PR_STATUS.indexOf(r.data?.status||'접수'));await wt(sb.from('okya_prints').update({status:PR_STATUS[Math.min(2,cur+1)]}).eq('id',id))}catch{};iPrint()})
-    document.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_prints').delete().eq('id',b.dataset.del))}catch{};toast('삭제');iPrint()})
+    const nx=document.getElementById('pd-next');if(nx)nx.onclick=async()=>{const ns=PR_STATUS[Math.min(2,si+1)];try{await wt(sb.from('okya_prints').update({status:ns}).eq('id',id))}catch{};if(ns==='제작중')notify(p.owner,'print','제본 제작중',`'${p.title}' 제본을 만들고 있어요`);if(ns==='완료')notify(p.owner,'print','제본 완료 🎉',`'${p.title}' 제본이 완료됐어요. 받아가세요!`);toast(ns+'(으)로 변경');rPrintDetail(id)}
+    const dl=document.getElementById('pd-del');if(dl)dl.onclick=async()=>{try{await wt(sb.from('okya_prints').delete().eq('id',id))}catch{};toast('삭제');pop()}
   }
 }
 function rPrintNew(){
@@ -1763,7 +1804,10 @@ function rPrintNew(){
     let fileUrl=null
     if(file){toast('파일 업로드 중...');fileUrl=await uploadImg(file,'print');if(!fileUrl){btn.disabled=false;btn.textContent='＋ 제본 신청하기';return}}
     await addTx({from:SESSION.id,to:'u_council',amount:cost,type:'사용',reason:'제본소: '+title})
-    try{await wt(sb.from('okya_prints').insert({id:uid('pr'),title,pages,copies,bind,cost,file:fileUrl,status:'접수',owner:SESSION.id,owner_name:SESSION.name,at:nowISO()}))}catch{toast('신청 실패 · okya_prints에 copies/bind/cost/file/status 컬럼이 필요해요');btn.disabled=false;btn.textContent='＋ 제본 신청하기';return}
+    let insErr=null
+    try{const{error}=await wt(sb.from('okya_prints').insert({id:uid('pr'),title,pages,copies,bind,cost,file:fileUrl,status:'접수',owner:SESSION.id,owner_name:SESSION.name,at:nowISO()}));insErr=error}catch(e){insErr=e}
+    if(insErr){toast('신청 실패: '+(insErr.message||'okya_prints 테이블/컬럼을 확인해줘'));btn.disabled=false;btn.textContent='＋ 제본 신청하기';return}
+    notifyAdmins('print','새 제본 신청',`${SESSION.name}님이 '${title}' 제본을 신청했어요`)
     toast('신청 완료 · '+fmt(cost)+'옥 사용');pop()
   }
 }
@@ -2181,7 +2225,9 @@ function rChallengeNew(){
     let poster=null
     if(posterFile){toast('포스터 업로드 중...');poster=await uploadImg(posterFile,'challenge_poster',900,0.72);if(!poster){btn.disabled=false;btn.textContent='등록';return}}
     const dd=document.getElementById('cndd').value
-    try{await wt(sb.from('okya_events').insert({id:uid('e'),title,poster,reward:parseInt(document.getElementById('cnr').value,10)||0,descr:document.getElementById('cndesc').value.trim(),deadline:dd?new Date(dd+'T23:59:59').toISOString():null,at:nowISO()}))}catch{toast('등록 실패 · okya_events에 poster 열이 필요해요');btn.disabled=false;btn.textContent='등록';return}
+    const rw=parseInt(document.getElementById('cnr').value,10)||0
+    try{await wt(sb.from('okya_events').insert({id:uid('e'),title,poster,reward:rw,descr:document.getElementById('cndesc').value.trim(),deadline:dd?new Date(dd+'T23:59:59').toISOString():null,at:nowISO()}))}catch{toast('등록 실패 · okya_events에 poster 열이 필요해요');btn.disabled=false;btn.textContent='등록';return}
+    notifyStudents('challenge','새 챌린지 🔥',`'${title}' — 인증하면 ${fmt(rw)}옥`)
     toast('챌린지 등록 완료');pop()
   }
 }
@@ -2276,7 +2322,9 @@ function rBookNew(){
     const btn=document.getElementById('badd');btn.disabled=true;btn.textContent='등록 중...'
     let photo=null
     if(photoFile){toast('사진 업로드 중...');photo=await uploadImg(photoFile,'book');if(!photo){btn.disabled=false;btn.textContent='등록하기';return}}
-    try{await wt(sb.from('okya_books').insert({id:uid('b'),title,grade:document.getElementById('bg').value,kind:document.getElementById('bk2').value,photo,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}))}catch{toast('등록 실패 · okya_books에 photo 컬럼이 필요해요');btn.disabled=false;btn.textContent='등록하기';return}
+    const kind=document.getElementById('bk2').value
+    try{await wt(sb.from('okya_books').insert({id:uid('b'),title,grade:document.getElementById('bg').value,kind,photo,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}))}catch{toast('등록 실패 · okya_books에 photo 컬럼이 필요해요');btn.disabled=false;btn.textContent='등록하기';return}
+    notifyStudents('book',`새 ${kind} 책`,`'${title}' 책이 올라왔어요`)
     toast('책 등록 완료');pop()
   }
 }
@@ -2321,6 +2369,7 @@ function rPetitionNew(){
     const content=document.getElementById('pn-content').value.trim()
     const btn=document.getElementById('pn-sub');btn.disabled=true;btn.textContent='제출 중...'
     try{await wt(sb.from('okya_petitions').insert({id:uid('p'),title,category:cat,purpose,content,txt:title,status:'pending',phase:'청원진행',by_id:SESSION.id,at:nowISO(),reacts:{}}))}catch{toast('제출 실패 · okya_petitions에 title/category/purpose/content/phase 열이 필요해요');btn.disabled=false;btn.textContent='청원 제출';return}
+    notifyAdmins('petition','새 청원 검토 요청',`익명 청원 '${title}'이 접수됐어요`)
     toast('청원 제출 완료 · 검토 후 공개돼요');pop()
   }
 }
@@ -2556,7 +2605,7 @@ async function rBookDetail(id){
     <div class="pcard"><div class="sec">댓글 <span style="color:var(--primary)">${visCs.length}</span></div><div class="pet-note" style="margin:-4px 0 8px">🔒 책 주인과 작성자만 볼 수 있는 비공개 댓글이에요.</div>${comments}<div style="display:flex;gap:8px;margin-top:10px"><input id="bd-cinput" placeholder="댓글 입력" style="flex:1;padding:11px 13px;font-size:14px"><button class="minibtn soft" id="bd-csend">등록</button></div></div>
     <div style="height:10px"></div>
   </div>`
-  const ap=document.getElementById('bd-apply');if(ap)ap.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',id).single());const apps=[...(r.data?.applicants||[])];if(apps.length&&!apps.some(a=>a.id===SESSION.id)){toast('이미 다른 학생이 신청했어요');rBookDetail(id);return}if(!apps.some(a=>a.id===SESSION.id))apps.push({id:SESSION.id,name:SESSION.name,at:nowISO()});await wt(sb.from('okya_books').update({applicants:apps}).eq('id',id))}catch{toast('오류');return};toast('신청했어요');rBookDetail(id)}
+  const ap=document.getElementById('bd-apply');if(ap)ap.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',id).single());const apps=[...(r.data?.applicants||[])];if(apps.length&&!apps.some(a=>a.id===SESSION.id)){toast('이미 다른 학생이 신청했어요');rBookDetail(id);return}if(!apps.some(a=>a.id===SESSION.id))apps.push({id:SESSION.id,name:SESSION.name,at:nowISO()});await wt(sb.from('okya_books').update({applicants:apps}).eq('id',id))}catch{toast('오류');return};notify(b.owner,'book',`새 ${b.kind||'교환'} 신청`,`${SESSION.name}님이 '${b.title}' 책을 신청했어요`);toast('신청했어요');rBookDetail(id)}
   const un=document.getElementById('bd-unapply');if(un)un.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',id).single());await wt(sb.from('okya_books').update({applicants:(r.data?.applicants||[]).filter(a=>a.id!==SESSION.id)}).eq('id',id))}catch{};rBookDetail(id)}
   const cf=document.getElementById('bd-confirm');if(cf)cf.onclick=()=>push(()=>rConfirmBook(id))
   const cp=document.getElementById('bd-complete');if(cp)cp.onclick=async()=>{try{await wt(sb.from('okya_books').delete().eq('id',id))}catch{};toast('교환 완료 🎉');pop()}
@@ -2568,7 +2617,7 @@ async function rConfirmBook(id){
   if(!b){pop();return}
   app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${b.kind} 확정</div><div style="width:34px"></div></div><div class="pcard"><div class="sec" style="margin-bottom:4px">${esc(b.title)}</div><div style="font-size:12px;color:var(--sub);margin-bottom:14px">누구와 ${b.kind}할까요?</div><div style="display:flex;flex-direction:column;gap:8px">${(b.applicants||[]).map(a=>`<label class="check-item"><input type="radio" name="rc" value="${a.id}" data-name="${esc(a.name)}">${esc(a.name)}</label>`).join('')||'<div class="empty">신청자가 없어요</div>'}</div><button class="pbtn pri" id="cf" style="margin-top:14px">확정하기</button></div></div>`
   document.getElementById('bk').onclick=pop
-  document.getElementById('cf').onclick=async()=>{const sel=document.querySelector('input[name="rc"]:checked');if(!sel){toast('상대를 선택해줘');return};try{await wt(sb.from('okya_books').update({status:'matched',recipient:sel.value,recipient_name:sel.dataset.name}).eq('id',id))}catch{};toast('확정했어요');pop()}
+  document.getElementById('cf').onclick=async()=>{const sel=document.querySelector('input[name="rc"]:checked');if(!sel){toast('상대를 선택해줘');return};try{await wt(sb.from('okya_books').update({status:'matched',recipient:sel.value,recipient_name:sel.dataset.name}).eq('id',id))}catch{};notify(sel.value,'book',`${b.kind} 확정 🎉`,`'${b.title}' — ${SESSION.name}님과 ${b.kind}이 확정됐어요`);toast('확정했어요');pop()}
 }
 
 async function iPetition(){
@@ -2593,7 +2642,7 @@ async function iPetition(){
   const pendSec=admin&&pend.length?`<div class="pcard"><div class="sec">검토 대기 (${pend.length})</div>${pend.map(p=>`<div class="post"><div class="pbody" style="font-weight:800">${ptitle(p)}</div><div class="pmeta" style="margin:4px 0 8px">${esc(p.category||'기타')} · 접수 ${timeago(p.at)}</div><div style="display:flex;gap:8px"><button class="minibtn soft" data-ap="${p.id}">공개</button><button class="minibtn danger" data-rj="${p.id}">반려</button></div></div>`).join('')}</div>`:''
   cb.innerHTML=`${banner}${pendSec}<div class="sec" style="margin:18px 20px 10px">공개된 청원 <span style="color:var(--primary)">${pub.length}</span></div>${grid}<div style="height:16px"></div>`
   cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rPetitionDetail(el.dataset.open)))
-  document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_petitions').update({status:'approved',approved_at:nowISO()}).eq('id',b.dataset.ap))}catch{};iPetition()})
+  document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=async()=>{const pt=pend.find(x=>x.id===b.dataset.ap);try{await wt(sb.from('okya_petitions').update({status:'approved',approved_at:nowISO()}).eq('id',b.dataset.ap))}catch{};if(pt)notifyStudents('petition','새 청원 공개',`'${ptitle(pt)}' 청원에 동의해보세요`);iPetition()})
   document.querySelectorAll('[data-rj]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_petitions').delete().eq('id',b.dataset.rj))}catch{};iPetition()})
 }
 
