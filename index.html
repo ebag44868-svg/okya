@@ -724,35 +724,34 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 /* 청원 (국민청원 스타일) */
 .pet-cat{display:inline-block;font-size:11.5px;font-weight:800;padding:4px 11px;border-radius:999px;background:var(--primary-tint);color:var(--primary);}
 .pet-cat.sm{font-size:10.5px;padding:3px 9px;}
-/* 메인 - 대표 청원(컬러 없는 큰 흰 카드) */
-.pet-feat{margin:8px 18px 0;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--sh);padding:20px;cursor:pointer;animation:chalpop .5s var(--ease) both;transition:transform .18s var(--ease),box-shadow .18s;}
-.pet-feat:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(20,26,40,.14);}
+/* 메인 - 대표 청원(다른 카드와 같은 직사각형, 크게) */
+.pet-feat{margin:8px 18px 0;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);padding:24px 22px;cursor:pointer;animation:petrise .5s var(--ease) both;transition:transform .18s var(--ease),box-shadow .18s;}
+.pet-feat:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(20,26,40,.15);}
 .pet-feat:active{transform:scale(.995);}
-.pet-feat-tag{font-size:12px;font-weight:800;color:var(--primary);margin-bottom:9px;}
-.pet-feat-title{font-size:20px;font-weight:900;line-height:1.38;letter-spacing:-.4px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.pet-feat-sub{font-size:13.5px;color:var(--sub);line-height:1.55;margin-top:8px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
-.pet-feat-meta{display:flex;align-items:center;gap:11px;margin-top:15px;}
+.pet-feat-tag{font-size:12px;font-weight:800;color:var(--primary);margin-bottom:11px;}
+.pet-feat-title{font-size:22px;font-weight:900;line-height:1.4;letter-spacing:-.5px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.pet-feat-sub{font-size:13.5px;color:var(--sub);line-height:1.55;margin-top:9px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+.pet-feat-meta{display:flex;align-items:center;gap:11px;margin-top:17px;}
 .pet-feat-n{font-size:14px;font-weight:700;color:var(--sub);}
 .pet-feat-n b{color:var(--primary);font-weight:900;font-size:16px;}
-/* 메인 - 그리드(유튜브 홈 느낌) */
-.pet-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px 12px;padding:2px 18px 10px;}
-.pet-card{cursor:pointer;animation:chalpop .45s var(--ease) both;}
+/* 메인 - 그리드(제목 메인, 나머지 아래로) */
+.pet-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:2px 18px 10px;}
+.pet-card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:16px;cursor:pointer;display:flex;flex-direction:column;animation:petrise .45s var(--ease) both;transition:transform .18s var(--ease),box-shadow .18s;}
+.pet-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(20,26,40,.14);}
 .pet-card:active{transform:scale(.98);}
-.pet-thumb{aspect-ratio:16/10;border-radius:14px;background:var(--soft);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;overflow:hidden;transition:transform .18s var(--ease),box-shadow .18s;}
-.pet-card:hover .pet-thumb{transform:translateY(-3px);box-shadow:0 14px 30px rgba(20,26,40,.14);}
-.pet-thumb-n{font-size:30px;font-weight:900;color:var(--primary);letter-spacing:-1px;line-height:1;}
-.pet-thumb-u{font-size:11px;font-weight:700;color:var(--sub);}
-.pet-ct{padding:10px 2px 0;}
-.pet-ct .pet-cat{margin-bottom:6px;}
-.pet-c-title{font-size:14.5px;font-weight:800;line-height:1.35;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.pet-c-meta{font-size:12px;color:var(--sub);margin-top:5px;}
+.pet-card .pet-cat{align-self:flex-start;margin-bottom:10px;}
+.pet-c-title{font-size:16px;font-weight:900;line-height:1.4;letter-spacing:-.3px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;flex:1;}
+.pet-c-foot{display:flex;align-items:center;justify-content:space-between;margin-top:15px;font-size:12.5px;color:var(--sub);}
+.pet-c-foot b{color:var(--primary);font-weight:900;font-size:14px;}
+.pet-card:nth-child(2){animation-delay:.04s}.pet-card:nth-child(3){animation-delay:.08s}.pet-card:nth-child(4){animation-delay:.12s}.pet-card:nth-child(5){animation-delay:.16s}.pet-card:nth-child(6){animation-delay:.2s}.pet-card:nth-child(n+7){animation-delay:.24s}
+@keyframes petrise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 /* 작성 폼 분야 선택 */
 .pet-catsel{display:flex;flex-wrap:wrap;gap:8px;}
 .pet-chip{font-size:13px;font-weight:700;padding:8px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;transition:all .15s;}
 .pet-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;}
 /* 상세 - 하나의 시트(표 형식) */
-.pet-eyebrow{font-size:13px;font-weight:900;color:var(--ink);margin:6px 20px 0;padding-left:10px;border-left:3px solid var(--primary);line-height:1.3;}
-.pet-sheet{padding:20px 18px 6px;}
+.pet-eyebrow{font-size:13px;font-weight:900;color:var(--ink);margin:6px 20px 0;padding-left:10px;border-left:3px solid var(--primary);line-height:1.3;animation:petrise .4s var(--ease) both;}
+.pet-sheet{padding:20px 18px 6px;animation:petrise .5s var(--ease) both;animation-delay:.05s;}
 .pet-title-row{display:flex;gap:9px;align-items:flex-start;}
 .pet-doc{flex-shrink:0;margin-top:2px;}
 .pet-doc svg{width:20px;height:20px;stroke:var(--primary);}
@@ -2429,8 +2428,9 @@ async function iPetition(){
     <div class="pet-feat-meta"><span class="pet-cat">${esc(top.category||'기타')}</span><span class="pet-feat-n"><b>${fmt(petAgrees(top))}</b>명 동의</span></div>
   </div>`:''
   const grid=pub.length?`<div class="pet-grid">${pub.map(p=>`<div class="pet-card" data-open="${p.id}">
-    <div class="pet-thumb"><span class="pet-thumb-n">${fmt(petAgrees(p))}</span><span class="pet-thumb-u">명 동의</span></div>
-    <div class="pet-ct"><span class="pet-cat sm">${esc(p.category||'기타')}</span><div class="pet-c-title">${ptitle(p)}</div><div class="pet-c-meta">${timeago(petStart(p))}</div></div>
+    <span class="pet-cat sm">${esc(p.category||'기타')}</span>
+    <div class="pet-c-title">${ptitle(p)}</div>
+    <div class="pet-c-foot"><b>👍 ${fmt(petAgrees(p))}</b><span>${timeago(petStart(p))}</span></div>
   </div>`).join('')}</div>`:'<div class="empty">아직 공개된 청원이 없습니다.<br><br>우측 상단 <b style="color:var(--primary)">＋ 청원</b>으로 첫 청원을 올려보세요.</div>'
   const pendSec=admin&&pend.length?`<div class="pcard"><div class="sec">검토 대기 (${pend.length})</div>${pend.map(p=>`<div class="post"><div class="pbody" style="font-weight:800">${ptitle(p)}</div><div class="pmeta" style="margin:4px 0 8px">${esc(p.category||'기타')} · 접수 ${timeago(p.at)}</div><div style="display:flex;gap:8px"><button class="minibtn soft" data-ap="${p.id}">공개</button><button class="minibtn danger" data-rj="${p.id}">반려</button></div></div>`).join('')}</div>`:''
   cb.innerHTML=`${banner}${pendSec}<div class="sec" style="margin:18px 20px 10px">공개된 청원 <span style="color:var(--primary)">${pub.length}</span></div>${grid}<div style="height:16px"></div>`
