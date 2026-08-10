@@ -722,28 +722,42 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .sub-card .sc-note{font-size:13px;color:var(--ink2);line-height:1.5;margin-top:8px;}
 
 /* 청원 (국민청원 스타일) */
-.pet-banner{margin:8px 18px 0;border-radius:20px;padding:22px 20px;background:linear-gradient(135deg,#6D5EF0,#9B7BFF);color:#fff;box-shadow:var(--sh-blue);cursor:pointer;overflow:hidden;animation:chalpop .5s var(--ease) both;}
-.pet-banner:active{transform:scale(.99);}
-.pet-bn-tag{font-size:12px;font-weight:800;opacity:.92;margin-bottom:9px;}
-.pet-bn-title{font-size:20px;font-weight:900;line-height:1.35;letter-spacing:-.4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.pet-bn-meta{display:flex;align-items:center;gap:10px;margin-top:15px;}
-.pet-bn-meta .pet-cat{background:rgba(255,255,255,.22);color:#fff;}
-.pet-bn-meta .pet-agree{font-size:14px;font-weight:800;}
 .pet-cat{display:inline-block;font-size:11.5px;font-weight:800;padding:4px 11px;border-radius:999px;background:var(--primary-tint);color:var(--primary);}
-.pet-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px 12px;padding:2px 18px 10px;}
+.pet-cat.sm{font-size:10.5px;padding:3px 9px;}
+/* 메인 - 대표 청원(컬러 없는 큰 흰 카드) */
+.pet-feat{margin:8px 18px 0;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--sh);padding:20px;cursor:pointer;animation:chalpop .5s var(--ease) both;transition:transform .18s var(--ease),box-shadow .18s;}
+.pet-feat:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(20,26,40,.14);}
+.pet-feat:active{transform:scale(.995);}
+.pet-feat-tag{font-size:12px;font-weight:800;color:var(--primary);margin-bottom:9px;}
+.pet-feat-title{font-size:20px;font-weight:900;line-height:1.38;letter-spacing:-.4px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.pet-feat-sub{font-size:13.5px;color:var(--sub);line-height:1.55;margin-top:8px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+.pet-feat-meta{display:flex;align-items:center;gap:11px;margin-top:15px;}
+.pet-feat-n{font-size:14px;font-weight:700;color:var(--sub);}
+.pet-feat-n b{color:var(--primary);font-weight:900;font-size:16px;}
+/* 메인 - 그리드(유튜브 홈 느낌) */
+.pet-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px 12px;padding:2px 18px 10px;}
 .pet-card{cursor:pointer;animation:chalpop .45s var(--ease) both;}
 .pet-card:active{transform:scale(.98);}
-.pet-thumb{position:relative;aspect-ratio:16/10;border-radius:14px;background:linear-gradient(135deg,#EEF0FF,#E2E7FF);border:1px solid var(--line);display:flex;align-items:flex-end;justify-content:space-between;padding:11px;overflow:hidden;transition:transform .18s var(--ease),box-shadow .18s;}
-.pet-card:hover .pet-thumb{transform:translateY(-3px);box-shadow:0 14px 30px rgba(20,26,40,.16);}
-.pet-thumb-cat{font-size:11px;font-weight:800;color:var(--primary);background:#fff;padding:3px 9px;border-radius:999px;}
-.pet-thumb-n{font-size:23px;font-weight:900;color:var(--primary);letter-spacing:-.5px;line-height:1;}
+.pet-thumb{aspect-ratio:16/10;border-radius:14px;background:var(--soft);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;overflow:hidden;transition:transform .18s var(--ease),box-shadow .18s;}
+.pet-card:hover .pet-thumb{transform:translateY(-3px);box-shadow:0 14px 30px rgba(20,26,40,.14);}
+.pet-thumb-n{font-size:30px;font-weight:900;color:var(--primary);letter-spacing:-1px;line-height:1;}
+.pet-thumb-u{font-size:11px;font-weight:700;color:var(--sub);}
 .pet-ct{padding:10px 2px 0;}
+.pet-ct .pet-cat{margin-bottom:6px;}
 .pet-c-title{font-size:14.5px;font-weight:800;line-height:1.35;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .pet-c-meta{font-size:12px;color:var(--sub);margin-top:5px;}
+/* 작성 폼 분야 선택 */
 .pet-catsel{display:flex;flex-wrap:wrap;gap:8px;}
 .pet-chip{font-size:13px;font-weight:700;padding:8px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;transition:all .15s;}
 .pet-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;}
-.pet-steps{display:flex;align-items:flex-start;margin-top:18px;}
+/* 상세 - 하나의 시트(표 형식) */
+.pet-eyebrow{font-size:13px;font-weight:900;color:var(--ink);margin:6px 20px 0;padding-left:10px;border-left:3px solid var(--primary);line-height:1.3;}
+.pet-sheet{padding:20px 18px 6px;}
+.pet-title-row{display:flex;gap:9px;align-items:flex-start;}
+.pet-doc{flex-shrink:0;margin-top:2px;}
+.pet-doc svg{width:20px;height:20px;stroke:var(--primary);}
+.pet-d-title{font-size:19px;font-weight:900;line-height:1.42;letter-spacing:-.4px;color:var(--ink);}
+.pet-steps{display:flex;align-items:flex-start;margin:20px 0 6px;}
 .pet-step{display:flex;flex-direction:column;align-items:center;gap:7px;width:56px;flex-shrink:0;}
 .pet-step-dot{width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;border:2px solid var(--line);transition:all .3s var(--ease);}
 .pet-step.done .pet-step-dot{background:var(--primary);border-color:var(--primary);color:#fff;}
@@ -751,12 +765,17 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .pet-step-l{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;}
 .pet-step.done .pet-step-l{color:var(--primary);}
 .pet-step-line{flex:1;height:2px;background:var(--line);margin:16px 4px 0;border-radius:2px;}
-.pet-d-title{font-size:21px;font-weight:900;line-height:1.42;letter-spacing:-.5px;color:var(--ink);margin-top:10px;}
-.pet-stat-row{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:var(--sub);padding:7px 0;}
-.pet-stat-row b{color:var(--ink);font-weight:700;}
-.pet-stat-row.big{border-top:1px solid var(--line);margin-top:4px;padding-top:12px;}
+.pet-row{display:flex;gap:12px;padding:13px 0;border-top:1px solid var(--line);}
+.pet-row .k{width:76px;flex-shrink:0;font-size:13px;font-weight:800;color:var(--sub);}
+.pet-row .v{flex:1;min-width:0;font-size:13.5px;color:var(--ink);font-weight:600;line-height:1.55;}
+.pet-row.col{flex-direction:column;gap:8px;}
+.pet-note{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:4px;}
+.pet-agree-line{display:flex;align-items:baseline;justify-content:space-between;}
 .pet-agree-big{font-size:22px;font-weight:900;color:var(--primary);letter-spacing:-.5px;}
-.pet-body{font-size:14px;line-height:1.85;color:var(--ink2);white-space:pre-wrap;}
+.pet-pct{font-size:14px;font-weight:900;color:var(--primary);}
+.pet-prog{height:8px;border-radius:99px;background:var(--soft);overflow:hidden;margin-top:8px;}
+.pet-prog i{display:block;height:100%;border-radius:99px;background:var(--grad);transition:width .6s var(--ease);}
+.pet-body{font-size:14px;line-height:1.85;color:var(--ink2);font-weight:500;white-space:pre-wrap;}
 .pet-phasebtns{display:flex;flex-wrap:wrap;gap:8px;}
 .pet-cta{padding:18px 18px 6px;}
 .pet-agree-btn{font-size:16px;padding:16px 0;}
@@ -764,8 +783,9 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 
 @media (min-width:820px) and (min-aspect-ratio:1/1){
   .pet-grid{grid-template-columns:repeat(4,1fr);max-width:1000px;margin:0 auto;}
-  .pet-banner{max-width:1000px;margin:8px auto 0;}
-  .pet-bn-title{font-size:24px;}
+  .pet-feat{max-width:1000px;margin:8px auto 0;}
+  .pet-feat-title{font-size:23px;}
+  .pet-eyebrow{max-width:860px;margin:6px auto 0;}
   /* 챌린지 화면은 모달 대신 전체화면 */
   .screen.no-nav.p3.fs{flex:1;width:auto;max-width:none;height:auto;min-height:100dvh;max-height:none;margin:0;border-radius:0;box-shadow:none;background:var(--bg);display:block;overflow-y:auto;}
   .screen.no-nav.p3.fs>.phdr{position:sticky;top:0;z-index:5;background:var(--bg);padding:18px 26px 12px;max-width:none;}
@@ -2132,6 +2152,7 @@ async function rChallengeDetail(eid){
 async function rBookPage(){_cbPage('책 교환');await iBook()}
 const PET_CATS=['교실','기숙사','급식','체육관','학교 시스템','기타']
 const PET_PHASES=['청원진행','회의 회부','심사중']
+const PET_GOAL=100
 function petAgrees(p){return Object.keys(p.reacts||{}).length}
 function petStart(p){return p.approved_at||p.at}
 function petDeadline(p){const d=new Date(petStart(p));d.setDate(d.getDate()+30);return d}
@@ -2185,27 +2206,22 @@ async function rPetitionDetail(pid){
   const agrees=petAgrees(p),mine=(p.reacts||{})[SESSION.id]
   const start=petStart(p),dl=petDeadline(p),left=petDaysLeft(p)
   const phase=p.phase||'청원진행',curIdx=PET_PHASES.indexOf(phase)
+  const pct=Math.min(100,Math.round(agrees/PET_GOAL*100))
   const stepper=`<div class="pet-steps">${PET_PHASES.map((s,i)=>`<div class="pet-step${i<=curIdx?' done':''}${i===curIdx?' cur':''}"><div class="pet-step-dot">${i<curIdx?'✓':i+1}</div><div class="pet-step-l">${s}</div></div>`).join('<div class="pet-step-line"></div>')}</div>`
-  const adminPanel=admin?`<div class="pcard"><div class="sec">학생회 관리</div>
-    <div style="font-size:12px;color:var(--sub);margin-bottom:8px">진행 현황 변경</div>
-    <div class="pet-phasebtns">${PET_PHASES.map(ph=>`<button class="pet-chip${ph===phase?' on':''}" data-phase="${ph}">${ph}</button>`).join('')}</div>
-    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
-      <button class="minibtn out" id="pd-reveal">🔒 청원인 확인 · 이중잠금</button>
-      <div id="pd-reveal-box"></div>
-    </div></div>`:''
+  const adminPanel=admin?`<div class="pcard"><div class="sec">학생회 · 진행단계 변경</div><div class="pet-phasebtns">${PET_PHASES.map(ph=>`<button class="pet-chip${ph===phase?' on':''}" data-phase="${ph}">${ph}</button>`).join('')}</div></div>`:''
   cb.innerHTML=`<div class="chal-detail">
-    <div class="pcard">
-      <div class="pet-cat">${esc(p.category||'기타')}</div>
-      <div class="pet-d-title">${esc(p.title||p.txt||'제목 없음')}</div>
+    <div class="pet-eyebrow">동의진행 청원</div>
+    <div class="pcard pet-sheet">
+      <div class="pet-title-row"><span class="pet-doc">${I.petition}</span><div class="pet-d-title">${esc(p.title||p.txt||'제목 없음')}</div></div>
       ${stepper}
+      <div class="pet-row"><div class="k">청원분야</div><div class="v"><span class="pet-cat">${esc(p.category||'기타')}</span></div></div>
+      <div class="pet-row"><div class="k">진행단계</div><div class="v" style="font-weight:800;color:var(--primary)">${esc(phase)}</div></div>
+      <div class="pet-row"><div class="k">동의기간</div><div class="v">${fmtDate(start)} ~ ${fmtDate(dl)}<div class="pet-note">청원 공개 이후 30일 이내 · ${left>=0?left+'일 남음':'마감됨'}</div></div></div>
+      <div class="pet-row"><div class="k">동의수</div><div class="v"><div class="pet-agree-line"><span class="pet-agree-big">👍 ${fmt(agrees)}명</span><span class="pet-pct">${pct}%</span></div><div class="pet-prog"><i style="width:${pct}%"></i></div><div class="pet-note">목표 ${fmt(PET_GOAL)}명</div></div></div>
+      <div class="pet-row"><div class="k">청원인</div><div class="v" style="display:flex;align-items:center;gap:9px"><span id="pet-author">익명</span>${admin?`<button class="minibtn out" id="pd-reveal" style="padding:4px 10px;font-size:11.5px">🔒 확인</button>`:''}</div></div>
+      <div class="pet-row col"><div class="k">청원의 취지</div><div class="v pet-body">${esc(p.purpose||'-')}</div></div>
+      <div class="pet-row col"><div class="k">청원의 내용</div><div class="v pet-body">${esc(p.content||p.txt||'-')}</div></div>
     </div>
-    <div class="pcard">
-      <div class="pet-stat-row"><span>청원 시작</span><b>${fmtDate(start)}</b></div>
-      <div class="pet-stat-row"><span>동의 기간</span><b>~${fmtDate(dl)} · ${left>=0?`${left}일 남음`:'마감'}</b></div>
-      <div class="pet-stat-row big"><span>동의 인원</span><b class="pet-agree-big">${fmt(agrees)}명</b></div>
-    </div>
-    <div class="pcard"><div class="sec">청원의 취지</div><div class="pet-body">${esc(p.purpose||'-')}</div></div>
-    <div class="pcard"><div class="sec">청원의 내용</div><div class="pet-body">${esc(p.content||p.txt||'-')}</div></div>
     ${adminPanel}
     <div class="pet-cta"><button class="pbtn pri pet-agree-btn${mine?' agreed':''}" id="pd-agree">${mine?'✓ 동의 완료':left<0?'동의 기간 마감':'동의하기'}</button></div>
     <div style="height:10px"></div>
@@ -2224,9 +2240,9 @@ async function rPetitionDetail(pid){
     let rstep=0
     const rb=document.getElementById('pd-reveal')
     rb.onclick=()=>{
-      if(rstep===0){rstep=1;rb.textContent='🔓 한 번 더 눌러 확인';rb.classList.remove('out');rb.classList.add('danger');return}
+      if(rstep===0){rstep=1;rb.textContent='🔓 한 번 더';rb.classList.remove('out');rb.classList.add('danger');return}
       const u=USERS.find(x=>x.id===p.by_id)
-      document.getElementById('pd-reveal-box').innerHTML=`<div style="margin-top:10px;font-size:14px;font-weight:800;color:var(--ink)">청원인: ${esc(u?u.name:(p.by_id||'알 수 없음'))}</div>`
+      const au=document.getElementById('pet-author');if(au){au.textContent=(u?u.name:(p.by_id||'알 수 없음'));au.style.fontWeight='800';au.style.color='var(--ink)'}
       rb.style.display='none'
     }
   }
@@ -2406,14 +2422,15 @@ async function iPetition(){
   const cb=document.getElementById('cb');if(!cb)return
   const ptitle=p=>esc(p.title||p.txt||'제목 없음')
   const top=[...pub].sort((a,b)=>petAgrees(b)-petAgrees(a))[0]
-  const banner=top?`<div class="pet-banner" data-open="${top.id}">
-    <div class="pet-bn-tag">🔥 가장 많은 동의를 받은 청원</div>
-    <div class="pet-bn-title">${ptitle(top)}</div>
-    <div class="pet-bn-meta"><span class="pet-cat">${esc(top.category||'기타')}</span><span class="pet-agree">${fmt(petAgrees(top))}명 동의</span></div>
+  const banner=top?`<div class="pet-feat" data-open="${top.id}">
+    <div class="pet-feat-tag">🔥 지금 가장 주목받는 청원</div>
+    <div class="pet-feat-title">${ptitle(top)}</div>
+    ${top.purpose?`<div class="pet-feat-sub">${esc(top.purpose)}</div>`:''}
+    <div class="pet-feat-meta"><span class="pet-cat">${esc(top.category||'기타')}</span><span class="pet-feat-n"><b>${fmt(petAgrees(top))}</b>명 동의</span></div>
   </div>`:''
   const grid=pub.length?`<div class="pet-grid">${pub.map(p=>`<div class="pet-card" data-open="${p.id}">
-    <div class="pet-thumb"><span class="pet-thumb-cat">${esc(p.category||'기타')}</span><span class="pet-thumb-n">${fmt(petAgrees(p))}</span></div>
-    <div class="pet-ct"><div class="pet-c-title">${ptitle(p)}</div><div class="pet-c-meta">${esc(p.category||'기타')} · ${timeago(petStart(p))}</div></div>
+    <div class="pet-thumb"><span class="pet-thumb-n">${fmt(petAgrees(p))}</span><span class="pet-thumb-u">명 동의</span></div>
+    <div class="pet-ct"><span class="pet-cat sm">${esc(p.category||'기타')}</span><div class="pet-c-title">${ptitle(p)}</div><div class="pet-c-meta">${timeago(petStart(p))}</div></div>
   </div>`).join('')}</div>`:'<div class="empty">아직 공개된 청원이 없습니다.<br><br>우측 상단 <b style="color:var(--primary)">＋ 청원</b>으로 첫 청원을 올려보세요.</div>'
   const pendSec=admin&&pend.length?`<div class="pcard"><div class="sec">검토 대기 (${pend.length})</div>${pend.map(p=>`<div class="post"><div class="pbody" style="font-weight:800">${ptitle(p)}</div><div class="pmeta" style="margin:4px 0 8px">${esc(p.category||'기타')} · 접수 ${timeago(p.at)}</div><div style="display:flex;gap:8px"><button class="minibtn soft" data-ap="${p.id}">공개</button><button class="minibtn danger" data-rj="${p.id}">반려</button></div></div>`).join('')}</div>`:''
   cb.innerHTML=`${banner}${pendSec}<div class="sec" style="margin:18px 20px 10px">공개된 청원 <span style="color:var(--primary)">${pub.length}</span></div>${grid}<div style="height:16px"></div>`
