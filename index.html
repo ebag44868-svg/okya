@@ -648,11 +648,21 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .bnav-group>.bnav-row{flex:1;display:flex;}
 .bnav-group>.bnav-row>.bnav-item{flex:1;}
 .bnav-subitem{font-family:inherit;border:none;cursor:pointer;}
+.subarr{width:15px;height:15px;color:var(--muted);flex:none;}
 
-.cbtrack{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:2px 18px 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.cbtrack{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 11% 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .cbtrack::-webkit-scrollbar{display:none;}
-.cbcard{scroll-snap-align:start;flex:0 0 86%;min-height:236px;border-radius:22px;box-shadow:var(--sh);background:var(--card);padding:20px;position:relative;overflow:hidden;display:flex;flex-direction:column;}
-.cbcard:active{transform:scale(.985);}
+.cbcard{scroll-snap-align:center;flex:0 0 78%;min-height:360px;border-radius:24px;box-shadow:var(--sh);background:var(--card);padding:24px;position:relative;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s var(--ease),box-shadow .3s var(--ease);}
+.cbcard:active{transform:scale(.99);}
+/* 바로가기: 작은 직사각형 패널 세로 일렬 */
+.qcol{display:flex;flex-direction:column;gap:8px;padding:0 18px;}
+.qbtn{display:flex;align-items:center;gap:11px;background:var(--card);border-radius:13px;box-shadow:var(--sh);padding:11px 14px;cursor:pointer;transition:transform .13s var(--ease);}
+.qbtn:active{transform:scale(.985);}
+.qic{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;}
+.qic svg{width:17px;height:17px;}
+.qt{flex:1;font-size:14px;font-weight:700;color:var(--ink);}
+.qchev{color:#c9cdd8;display:flex;}
+.qchev svg{width:16px;height:16px;}
 .cbtag{align-self:flex-start;font-size:11px;font-weight:800;padding:5px 11px;border-radius:100px;background:var(--primary-tint);color:var(--primary);letter-spacing:.02em;position:relative;z-index:1;}
 .cb-peti{align-items:center;justify-content:center;text-align:center;background:radial-gradient(120% 130% at 50% -10%,var(--primary-tint),var(--card) 62%);}
 .cb-peti .cbtag{position:absolute;top:18px;left:50%;transform:translateX(-50%);}
@@ -676,10 +686,15 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
   .bnav-group.open>.bnav-row .bnav-exp svg{transform:rotate(90deg);}
   .bnav-sub{display:block;overflow:hidden;max-height:0;transition:max-height .32s var(--ease);}
   .bnav-group.open>.bnav-sub{max-height:360px;}
-  .bnav-subitem{display:block;width:100%;text-align:left;padding:9px 12px 9px 48px;font-size:13.5px;font-weight:600;color:var(--ink2);border-radius:11px;background:none;}
+  .bnav-subitem{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:9px 12px 9px 30px;font-size:13.5px;font-weight:600;color:var(--ink2);border-radius:11px;background:none;}
   .bnav-subitem:hover{background:var(--soft);color:var(--ink);}
-  .cbcard{flex-basis:min(600px,66%);min-height:300px;}
-  .cb-petitle{font-size:27px;}
+  .bnav-subitem:hover .subarr{color:var(--primary);}
+  /* 배너: 중앙에 한 장 크게(세로로 긴 직사각형), 양옆 살짝 보임 */
+  .cbtrack{padding-left:calc(50% - 240px);padding-right:calc(50% - 240px);gap:22px;}
+  .cbcard{flex:0 0 480px;min-height:470px;padding:28px;}
+  .cb-petitle{font-size:28px;}
+  /* 바로가기 세로 패널: 배너 아래 중앙 좁게 */
+  .qcol{max-width:480px;margin:0 auto;}
 }
 </style>
 </head>
@@ -976,7 +991,8 @@ function bnav(){
   return`<nav class="bnav">${tabs.map(t=>{
     const item=`<button class="bnav-item${TAB===t.k?' active':''}" data-tab="${t.k}">${t.ic}<span>${t.l}</span></button>`
     if(!t.subs)return item
-    return`<div class="bnav-group${TAB===t.k?' open':''}"><div class="bnav-row">${item}<button class="bnav-exp" data-exp="${t.k}">${I.chev}</button></div><div class="bnav-sub">${t.subs.map(([id,l])=>`<button class="bnav-subitem" data-nav="${t.k}:${id}">${l}</button>`).join('')}</div></div>`
+    const arr='<svg class="subarr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5v7a3 3 0 003 3h7"/><path d="M14 12l4 3-4 3"/></svg>'
+    return`<div class="bnav-group${TAB===t.k?' open':''}"><div class="bnav-row">${item}<button class="bnav-exp" data-exp="${t.k}">${I.chev}</button></div><div class="bnav-sub">${t.subs.map(([id,l])=>`<button class="bnav-subitem" data-nav="${t.k}:${id}">${arr}<span>${l}</span></button>`).join('')}</div></div>`
   }).join('')}</nav>`
 }
 const SUBROUTES={
@@ -1615,10 +1631,10 @@ function rComm(){
       <div class="cbtrack" id="cbtrack">${BANNER.map(bcard).join('')}</div>
       <div class="cbdots" id="cbdots">${BANNER.map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join('')}</div>
     </div>
-    <div class="sec" style="margin:18px 18px 10px">바로가기</div>
-    <div style="padding:0 18px 0"><div class="grid2">
-      ${CARDS.map(c=>`<div class="gcard" data-cid="${c.id}"><div class="gic ti-${c.tint}">${I[c.ic]}</div><div class="gt">${c.title}</div><div class="gs">${c.desc}</div></div>`).join('')}
-    </div></div>
+    <div class="sec" style="margin:22px 18px 10px">바로가기</div>
+    <div class="qcol">
+      ${CARDS.map(c=>`<div class="qbtn" data-cid="${c.id}"><div class="qic ti-${c.tint}">${I[c.ic]}</div><div class="qt">${c.title}</div><span class="qchev">${I.chev}</span></div>`).join('')}
+    </div>
     <div style="height:8px"></div>
   </div>${bnav()}`
   bindNav()
@@ -1633,23 +1649,25 @@ function rComm(){
   })
   initCarousel()
 }
-// 배너 캐러셀: 스크롤 스냅 + 점 동기화 + 자동 넘김(사용자 조작 시 정지)
+// 배너 캐러셀: 중앙 스냅(한 장씩 강조, 양옆 살짝 보임) + 점 동기화 + 느린 자동 넘김
 function initCarousel(){
   const track=document.getElementById('cbtrack');if(!track)return
   const dots=[...document.querySelectorAll('#cbdots i')]
   const cards=[...track.querySelectorAll('.cbcard')];if(!cards.length)return
-  const step=()=>cards[0].offsetWidth+14
-  const idxOf=()=>Math.min(cards.length-1,Math.max(0,Math.round(track.scrollLeft/step())))
+  const centerTarget=i=>cards[i].offsetLeft-(track.clientWidth-cards[i].offsetWidth)/2
+  const idxOf=()=>{const c=track.scrollLeft+track.clientWidth/2;let best=0,bd=1e9;cards.forEach((el,i)=>{const cc=el.offsetLeft+el.offsetWidth/2,d=Math.abs(cc-c);if(d<bd){bd=d;best=i}});return best}
   const sync=()=>{const i=idxOf();dots.forEach((d,j)=>d.classList.toggle('on',j===i))}
+  const glide=(to,dur=1100)=>{const s=track.scrollLeft,diff=to-s,t0=performance.now();(function st(n){const p=Math.min(1,(n-t0)/dur),e=1-Math.pow(1-p,3);track.scrollLeft=s+diff*e;if(p<1)requestAnimationFrame(st);else sync()})(performance.now())}
   track.addEventListener('scroll',()=>{clearTimeout(track._t);track._t=setTimeout(sync,60)})
-  dots.forEach((d,i)=>d.onclick=()=>track.scrollTo({left:step()*i,behavior:'smooth'}))
+  dots.forEach((d,i)=>d.onclick=()=>glide(centerTarget(i)))
   clearInterval(track._auto)
   track._auto=setInterval(()=>{
     if(!document.body.contains(track)){clearInterval(track._auto);return}
     const n=(idxOf()+1)%cards.length
-    track.scrollTo({left:step()*n,behavior:'smooth'})
-  },4500)
+    glide(centerTarget(n))
+  },7000)
   track.addEventListener('pointerdown',()=>clearInterval(track._auto),{once:true})
+  requestAnimationFrame(()=>{track.scrollLeft=Math.max(0,centerTarget(0));sync()})
 }
 
 async function rLost(){
