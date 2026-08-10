@@ -641,6 +641,46 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
   .p3sheet-ov{align-items:center;}
   .p3sheet{max-width:430px;border-radius:26px;}
 }
+
+/* ===== 레일 아코디언 (세로에선 숨김) + 커뮤 배너 캐러셀 ===== */
+.bnav-exp,.bnav-sub{display:none;}
+.bnav>.bnav-group{flex:1;display:flex;}
+.bnav-group>.bnav-row{flex:1;display:flex;}
+.bnav-group>.bnav-row>.bnav-item{flex:1;}
+.bnav-subitem{font-family:inherit;border:none;cursor:pointer;}
+
+.cbtrack{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:2px 18px 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.cbtrack::-webkit-scrollbar{display:none;}
+.cbcard{scroll-snap-align:start;flex:0 0 86%;min-height:236px;border-radius:22px;box-shadow:var(--sh);background:var(--card);padding:20px;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.cbcard:active{transform:scale(.985);}
+.cbtag{align-self:flex-start;font-size:11px;font-weight:800;padding:5px 11px;border-radius:100px;background:var(--primary-tint);color:var(--primary);letter-spacing:.02em;position:relative;z-index:1;}
+.cb-peti{align-items:center;justify-content:center;text-align:center;background:radial-gradient(120% 130% at 50% -10%,var(--primary-tint),var(--card) 62%);}
+.cb-peti .cbtag{position:absolute;top:18px;left:50%;transform:translateX(-50%);}
+.cb-petitle{font-size:23px;font-weight:800;line-height:1.42;letter-spacing:-.4px;color:var(--ink);margin:auto 6px 12px;}
+.cbmeta{font-size:12.5px;color:var(--sub);font-weight:600;}
+.cbimg{flex:1;margin:12px 0;border-radius:16px;background:var(--soft);border:1.6px dashed #cfd4e0;display:flex;align-items:center;justify-content:center;min-height:110px;}
+.cbimg-ph{color:#aeb4c2;font-size:12px;font-weight:700;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.cbimg-ph svg{width:30px;height:30px;stroke:#c2c8d4;}
+.cbcap-t{font-size:16px;font-weight:800;color:var(--ink);}
+.cbcap-s{font-size:12.5px;color:var(--sub);margin-top:3px;}
+.cbdots{display:flex;gap:6px;justify-content:center;margin-top:8px;}
+.cbdots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:width .25s var(--ease),background .25s;}
+.cbdots i.on{width:20px;border-radius:4px;background:var(--primary);}
+
+@media (min-width:820px) and (min-aspect-ratio:1/1){
+  .bnav>.bnav-group{flex:none;display:block;}
+  .bnav-group>.bnav-row{display:flex;align-items:center;gap:2px;}
+  .bnav-group>.bnav-row>.bnav-item{flex:1;}
+  .bnav-exp{display:flex;align-items:center;justify-content:center;width:36px;height:44px;flex:none;color:var(--muted);border-radius:12px;background:none;}
+  .bnav-exp svg{width:18px;height:18px;transition:transform .25s var(--ease);}
+  .bnav-group.open>.bnav-row .bnav-exp svg{transform:rotate(90deg);}
+  .bnav-sub{display:block;overflow:hidden;max-height:0;transition:max-height .32s var(--ease);}
+  .bnav-group.open>.bnav-sub{max-height:360px;}
+  .bnav-subitem{display:block;width:100%;text-align:left;padding:9px 12px 9px 48px;font-size:13.5px;font-weight:600;color:var(--ink2);border-radius:11px;background:none;}
+  .bnav-subitem:hover{background:var(--soft);color:var(--ink);}
+  .cbcard{flex-basis:min(600px,66%);min-height:300px;}
+  .cb-petitle{font-size:27px;}
+}
 </style>
 </head>
 <body>
@@ -925,10 +965,29 @@ const I={
 }
 
 function bnav(){
-  const tabs=[{k:'home',l:'홈',ic:I.home},{k:'money',l:'머니',ic:I.money},{k:'school',l:'학교',ic:I.school},{k:'comm',l:'커뮤',ic:I.comm},{k:'search',l:'검색',ic:I.search},{k:'my',l:'MY',ic:I.my}]
-  return`<nav class="bnav">${tabs.map(t=>`<button class="bnav-item${TAB===t.k?' active':''}" data-tab="${t.k}">${t.ic}<span>${t.l}</span></button>`).join('')}</nav>`
+  const tabs=[
+    {k:'home',l:'홈',ic:I.home},
+    {k:'money',l:'머니',ic:I.money},
+    {k:'school',l:'학교',ic:I.school,subs:[['food','급식'],['cal','학사일정'],['tt','시간표'],['study','시험대비'],['room','교실예약'],['mt','회의록']]},
+    {k:'comm',l:'커뮤',ic:I.comm,subs:[['challenge','챌린지'],['petition','청원'],['book','책 교환'],['binding','제본소'],['board','게시판'],['lost','분실물']]},
+    {k:'search',l:'검색',ic:I.search},
+    {k:'my',l:'MY',ic:I.my}
+  ]
+  return`<nav class="bnav">${tabs.map(t=>{
+    const item=`<button class="bnav-item${TAB===t.k?' active':''}" data-tab="${t.k}">${t.ic}<span>${t.l}</span></button>`
+    if(!t.subs)return item
+    return`<div class="bnav-group${TAB===t.k?' open':''}"><div class="bnav-row">${item}<button class="bnav-exp" data-exp="${t.k}">${I.chev}</button></div><div class="bnav-sub">${t.subs.map(([id,l])=>`<button class="bnav-subitem" data-nav="${t.k}:${id}">${l}</button>`).join('')}</div></div>`
+  }).join('')}</nav>`
 }
-function bindNav(){document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;STACK=[];routeTab()})}
+const SUBROUTES={
+  school:{food:()=>rSchoolFood(),cal:()=>rSchoolCal(),tt:()=>rSchoolTT(),study:()=>rStudy(),room:()=>rRoom(),mt:()=>rMeeting()},
+  comm:{challenge:()=>rChallengePage(),petition:()=>rPetitionPage(),book:()=>rBookPage(),binding:()=>rPrint(),board:()=>rBoardPage(),lost:()=>rLost()}
+}
+function bindNav(){
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;STACK=[];routeTab()})
+  document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=e=>{e.stopPropagation();const g=b.closest('.bnav-group');if(g)g.classList.toggle('open')})
+  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{const[tab,id]=b.dataset.nav.split(':');TAB=tab;STACK=[];routeTab();const fn=SUBROUTES[tab]&&SUBROUTES[tab][id];if(fn)push(fn)})
+}
 function routeTab(){({home:rHome,money:rMoney,school:rSchool,comm:rComm,search:rSearch,my:rMy})[TAB]?.()}
 function push(fn){STACK.push(fn);fn()}
 function pop(){STACK.pop();if(STACK.length)STACK[STACK.length-1]();else routeTab();const s=app().querySelector('.fade-in');if(s){s.classList.remove('fade-in');s.classList.add('slide-back')}}
@@ -1538,9 +1597,26 @@ function rComm(){
     {id:'binding',  ic:'binding', tint:'sky', title:'옥야제본소',desc:'제본 신청 · 100옥'},
     {id:'lost',     ic:'lost',    tint:'org', title:'분실물',   desc:'분실물 신고·찾기'},
   ]
+  // 최신 소식 배너 (임시 플레이스홀더 — 사진/실데이터는 이후 연결)
+  const BANNER=[
+    {type:'petition',tag:'청원',title:'급식에 디저트를 더 자주 넣어주세요',meta:'익명 · 8월 10일 · 👍 42'},
+    {type:'challenge',tag:'챌린지',title:'이번 주 아침 운동 챌린지',sub:'참여하고 옥야머니 받기'},
+    {type:'book',tag:'책 교환',title:'수학의 정석(상) 교환해요',sub:'2학년 · 상태 좋음'},
+    {type:'share',tag:'책 나눔',title:'문학 자습서 나눔합니다',sub:'선착순 · 무료'},
+    {type:'challenge',tag:'챌린지',title:'독서 인증 챌린지',sub:'하루 30분 인증하기'}
+  ]
+  const bcard=b=>b.type==='petition'
+    ? `<div class="cbcard cb-peti"><span class="cbtag">${b.tag}</span><div class="cb-petitle">${esc(b.title)}</div><div class="cbmeta">${esc(b.meta||'')}</div></div>`
+    : `<div class="cbcard cb-img"><span class="cbtag">${b.tag}</span><div class="cbimg"><span class="cbimg-ph">${I.image}이미지 준비 중</span></div><div class="cbcap"><div class="cbcap-t">${esc(b.title)}</div><div class="cbcap-s">${esc(b.sub||'')}</div></div></div>`
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="topbar"><div class="t">소통</div><div style="width:34px"></div></div>
-    <div style="padding:12px 18px 0"><div class="grid2">
+    <div class="sec" style="margin:2px 18px 10px">최근 소식</div>
+    <div class="cbanner">
+      <div class="cbtrack" id="cbtrack">${BANNER.map(bcard).join('')}</div>
+      <div class="cbdots" id="cbdots">${BANNER.map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join('')}</div>
+    </div>
+    <div class="sec" style="margin:18px 18px 10px">바로가기</div>
+    <div style="padding:0 18px 0"><div class="grid2">
       ${CARDS.map(c=>`<div class="gcard" data-cid="${c.id}"><div class="gic ti-${c.tint}">${I[c.ic]}</div><div class="gt">${c.title}</div><div class="gs">${c.desc}</div></div>`).join('')}
     </div></div>
     <div style="height:8px"></div>
@@ -1555,6 +1631,25 @@ function rComm(){
     else if(id==='binding')push(rPrint)
     else if(id==='lost')push(rLost)
   })
+  initCarousel()
+}
+// 배너 캐러셀: 스크롤 스냅 + 점 동기화 + 자동 넘김(사용자 조작 시 정지)
+function initCarousel(){
+  const track=document.getElementById('cbtrack');if(!track)return
+  const dots=[...document.querySelectorAll('#cbdots i')]
+  const cards=[...track.querySelectorAll('.cbcard')];if(!cards.length)return
+  const step=()=>cards[0].offsetWidth+14
+  const idxOf=()=>Math.min(cards.length-1,Math.max(0,Math.round(track.scrollLeft/step())))
+  const sync=()=>{const i=idxOf();dots.forEach((d,j)=>d.classList.toggle('on',j===i))}
+  track.addEventListener('scroll',()=>{clearTimeout(track._t);track._t=setTimeout(sync,60)})
+  dots.forEach((d,i)=>d.onclick=()=>track.scrollTo({left:step()*i,behavior:'smooth'}))
+  clearInterval(track._auto)
+  track._auto=setInterval(()=>{
+    if(!document.body.contains(track)){clearInterval(track._auto);return}
+    const n=(idxOf()+1)%cards.length
+    track.scrollTo({left:step()*n,behavior:'smooth'})
+  },4500)
+  track.addEventListener('pointerdown',()=>clearInterval(track._auto),{once:true})
 }
 
 async function rLost(){
