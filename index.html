@@ -549,16 +549,21 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 /* ===================================================================
    홈 2열 래퍼 (세로에선 투명, 가로에서 그리드) + 진입 애니메이션 강화
    =================================================================== */
-.home-top,.home-cols,.home-col{display:contents;}
+.home-top,.home-cols,.home-col,.money-top,.money-stack{display:contents;}
 /* 홈 카드 진입: 크게 떠오르며 살짝 오버슈트 (세로/가로 공통) */
 .screen.p3.home-scope>*{animation:none;}
 @keyframes p3rise2{from{opacity:0;transform:translateY(28px) scale(.965);}60%{opacity:1;}to{opacity:1;transform:none;}}
 .screen.p3.home-scope .home-top>*,
+.screen.p3.home-scope .money-top>*,
+.screen.p3.home-scope .money-stack>*,
 .screen.p3.home-scope .home-col>*{animation:p3rise2 .62s var(--ease) both;}
-.screen.p3.home-scope .home-top>*:nth-child(1){animation-delay:.02s;}
+.screen.p3.home-scope .home-top>*:nth-child(1),
+.screen.p3.home-scope .money-top>*:nth-child(1){animation-delay:.02s;}
 .screen.p3.home-scope .home-top>*:nth-child(2){animation-delay:.07s;}
-.screen.p3.home-scope .home-col>*:nth-child(1){animation-delay:.13s;}
-.screen.p3.home-scope .home-col>*:nth-child(2){animation-delay:.20s;}
+.screen.p3.home-scope .home-col>*:nth-child(1),
+.screen.p3.home-scope .money-stack>*:nth-child(1){animation-delay:.13s;}
+.screen.p3.home-scope .home-col>*:nth-child(2),
+.screen.p3.home-scope .money-stack>*:nth-child(2){animation-delay:.20s;}
 .screen.p3.home-scope .home-col>*:nth-child(3){animation-delay:.27s;}
 .screen.p3.home-scope .home-col>*:nth-child(4){animation-delay:.34s;}
 
@@ -607,22 +612,27 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
   .p3 .home-col>*{margin:0!important;}
   .p3 .home-top .topbar{padding-left:4px;padding-right:4px;}
   .p3 .home-top .greet{padding-left:4px;padding-right:4px;}
+  /* 머니 — 잔액 카드 위 / 거래내역 아래로 길게 (단일 컬럼) */
+  .p3 .money-top{display:block;width:100%;max-width:720px;margin:0 auto;}
+  .p3 .money-top .topbar{padding-left:4px;padding-right:4px;}
+  .p3 .money-stack{display:flex;flex-direction:column;gap:16px;width:100%;max-width:720px;margin:6px auto 0;}
+  .p3 .money-stack>*{margin:0!important;}
 }
 
 /* 가로 — 송금/내역 등 푸시 화면을 중앙 모달 카드로 */
 @media (min-width:820px) and (min-aspect-ratio:1/1){
-  .screen.no-nav.p3{flex:none;width:min(680px,92vw);height:min(94vh,940px);max-height:94vh;margin:auto;align-self:center;background:var(--card);border-radius:28px;box-shadow:0 34px 90px rgba(20,26,40,.36);overflow-y:auto;padding-bottom:0;display:flex;flex-direction:column;}
+  .screen.no-nav.p3{flex:none;width:min(900px,95vw);height:min(94vh,960px);max-height:94vh;margin:auto;align-self:center;background:var(--card);border-radius:28px;box-shadow:0 34px 90px rgba(20,26,40,.36);overflow-y:auto;padding-bottom:0;display:flex;flex-direction:column;}
   .screen.no-nav.p3>.phdr{position:sticky;top:0;background:var(--card);z-index:5;padding:20px 26px 14px;}
   .screen.no-nav.p3>.phdr .ttl{font-size:19px;}
   /* 내부 콘텐츠도 함께 확대 (빈 공간만 커지지 않게) */
-  .screen.no-nav.p3 .kpwrap{flex:1;min-height:0;width:100%;max-width:600px;margin:0 auto;padding:10px 26px 24px;}
-  .screen.no-nav.p3 .kp-amt{font-size:56px;}
-  .screen.no-nav.p3 .keypad{max-width:600px;margin:0 auto;gap:14px 48px;}
+  .screen.no-nav.p3 .kpwrap{flex:1;min-height:0;width:100%;max-width:760px;margin:0 auto;padding:10px 30px 26px;}
+  .screen.no-nav.p3 .kp-amt{font-size:58px;}
+  .screen.no-nav.p3 .keypad{max-width:720px;margin:0 auto;gap:20px 96px;}
   .screen.no-nav.p3 .key{font-size:30px;padding:18px 0;}
   .screen.no-nav.p3 .kpto{padding:14px 18px;}
-  .screen.no-nav.p3 #tf-list{flex:1;width:100%;max-width:600px;margin:0 auto;}
-  .screen.no-nav.p3 .phdr+div{width:100%;max-width:600px;margin:0 auto;}
-  .screen.no-nav.p3 .phdr~div:last-child{width:100%;max-width:600px;margin:0 auto;}
+  .screen.no-nav.p3 #tf-list{flex:1;width:100%;max-width:720px;margin:0 auto;}
+  .screen.no-nav.p3 .phdr+div{width:100%;max-width:720px;margin:0 auto;}
+  .screen.no-nav.p3 .phdr~div:last-child{width:100%;max-width:720px;margin:0 auto;}
   .screen.no-nav.p3 .succ{flex:1;min-height:auto;width:100%;max-width:520px;margin:0 auto;padding:48px 32px;}
   .screen.no-nav.p3 .succ .ring2{width:104px;height:104px;}
   .screen.no-nav.p3 .succ h2{font-size:23px;}
@@ -1050,9 +1060,8 @@ async function rMoney(){
   const rows=list.length?list.map(t=>txRow(t,admin,rbal[t.id])).join(''):'<div class="empty">내역이 없어요.</div>'
 
   app().innerHTML=`<div class="screen fade-in p3 home-scope">
-    <div class="home-top"><div class="topbar"><div class="t">옥야머니</div><div style="width:34px"></div></div></div>
-    <div class="home-cols">
-     <div class="home-col">
+    <div class="money-top"><div class="topbar"><div class="t">옥야머니</div><div style="width:34px"></div></div></div>
+    <div class="money-stack">
       <div class="balance">
         <div class="lbl">${admin?'학생회 총 발행량':'총 잔액'}</div>
         <div class="amt">${fmt(admin?issued:bal)}<small>옥</small></div>
@@ -1063,13 +1072,10 @@ async function rMoney(){
           <button class="bbtn" id="m-hist">${I.hist}내역</button>
         </div>
       </div>
-     </div>
-     <div class="home-col">
       <div class="pcard">
         <div class="chd"><div class="sec" style="margin:0">${admin?'전체 발행 내역':'거래 내역'}</div><button id="m-all" style="font-size:12px;font-weight:700;color:var(--primary);background:none;white-space:nowrap">전체보기</button></div>
         ${rows}
       </div>
-     </div>
     </div>
     <div style="height:6px"></div>
   </div>${bnav()}`
