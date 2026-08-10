@@ -780,7 +780,42 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .pet-agree-btn{width:auto;min-width:180px;font-size:14.5px;padding:12px 40px;}
 .pet-agree-btn.agreed{background:var(--primary-tint);color:var(--primary);box-shadow:none;}
 
+/* 책 교환 (굿노트 책장) */
+.book-shelf{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 16px;padding:10px 18px 10px;}
+.book-item{cursor:pointer;animation:petrise .45s var(--ease) both;}
+.book-item:active{transform:scale(.97);}
+.book-cover{position:relative;aspect-ratio:3/4.1;border-radius:3px 9px 9px 3px;overflow:hidden;background:var(--soft);box-shadow:0 6px 16px rgba(20,26,40,.18),0 1px 3px rgba(0,0,0,.1);border:1px solid rgba(0,0,0,.05);transition:transform .22s var(--ease),box-shadow .22s;}
+.book-cover::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;background:linear-gradient(90deg,rgba(0,0,0,.24),rgba(0,0,0,.02));z-index:2;}
+.book-cover::after{content:"";position:absolute;left:7px;top:0;bottom:0;width:2px;background:rgba(255,255,255,.22);z-index:2;}
+.book-item:hover .book-cover{transform:translateY(-6px) rotate(-1.2deg);box-shadow:0 18px 34px rgba(20,26,40,.26);}
+.book-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+.book-cover .bc-title{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px 14px 16px 20px;font-size:14px;font-weight:800;color:#fff;line-height:1.45;letter-spacing:-.3px;text-shadow:0 1px 5px rgba(0,0,0,.2);overflow:hidden;}
+.book-badge{position:absolute;top:8px;right:8px;z-index:3;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--ink);}
+.book-badge.give{color:#2FB4A6;}
+.book-badge.swap{color:var(--primary);}
+.book-badge.done{background:rgba(20,26,40,.72);color:#fff;}
+.book-label{padding:9px 2px 0;}
+.bl-title{font-size:13.5px;font-weight:800;line-height:1.35;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.bl-meta{font-size:11.5px;color:var(--sub);margin-top:3px;}
+.book-add .book-addcover{display:flex;align-items:center;justify-content:center;background:var(--soft);border:2px dashed var(--line);box-shadow:none;}
+.book-add .book-addcover span{font-size:42px;font-weight:200;color:var(--muted);line-height:1;}
+.book-add .book-addcover::before,.book-add .book-addcover::after{display:none;}
+.book-add:hover .book-addcover{transform:translateY(-4px);border-color:var(--primary);}
+.book-add:hover .book-addcover span{color:var(--primary);}
+.book-hero{max-width:210px;margin:6px auto 0;}
+.book-hero .book-cover:hover{transform:none;}
+.book-kind{display:inline-block;font-size:11.5px;font-weight:800;padding:4px 11px;border-radius:999px;background:var(--primary-tint);color:var(--primary);}
+.book-kind.give{background:rgba(47,180,166,.14);color:#2FB4A6;}
+.book-kind.grade{background:var(--soft);color:var(--sub);}
+.bc-item{padding:11px 0;border-bottom:1px solid var(--line);}
+.bc-head{display:flex;gap:7px;align-items:center;margin-bottom:4px;}
+.bc-by{font-size:13px;font-weight:700;color:var(--ink);}
+.bc-at{font-size:11px;color:var(--sub);}
+.bc-txt{font-size:13.5px;line-height:1.5;color:var(--ink2);}
+.book-item:nth-child(2){animation-delay:.04s}.book-item:nth-child(3){animation-delay:.08s}.book-item:nth-child(4){animation-delay:.12s}.book-item:nth-child(5){animation-delay:.16s}.book-item:nth-child(6){animation-delay:.2s}.book-item:nth-child(n+7){animation-delay:.24s}
+
 @media (min-width:820px) and (min-aspect-ratio:1/1){
+  .book-shelf{grid-template-columns:repeat(5,1fr);max-width:1000px;margin:0 auto;}
   .pet-grid{grid-template-columns:repeat(4,1fr);max-width:1000px;margin:0 auto;}
   .pet-feat{max-width:1000px;margin:8px auto 0;}
   .pet-feat-title{font-size:23px;}
@@ -2148,7 +2183,44 @@ async function rChallengeDetail(eid){
     document.getElementById('ch-verify').onclick=()=>push(()=>rVerify(eid))
   }
 }
-async function rBookPage(){_cbPage('책 교환');await iBook()}
+const BOOK_COVERS=['linear-gradient(150deg,#7B6CFF,#9C8BFF)','linear-gradient(150deg,#FF7A8A,#FFA37E)','linear-gradient(150deg,#2FB4A6,#6FE0C6)','linear-gradient(150deg,#4E7BFF,#84AAFF)','linear-gradient(150deg,#F5A623,#FFCF6B)','linear-gradient(150deg,#B06CFF,#E08BFF)','linear-gradient(150deg,#EC5F8B,#FF9AB0)','linear-gradient(150deg,#3AA0FF,#7FD0FF)']
+function bookCover(b){const s=(b.title||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0);return BOOK_COVERS[s%BOOK_COVERS.length]}
+function bookCoverEl(b,big){const badge=b.status==='matched'?'<span class="book-badge done">교환완료</span>':`<span class="book-badge ${b.kind==='나눔'?'give':'swap'}">${esc(b.kind||'교환')}</span>`;return`<div class="book-cover${big?' big':''}" style="${b.photo?'':`background:${bookCover(b)}`}">${b.photo?`<img src="${esc(b.photo)}">`:`<div class="bc-title">${esc(b.title||'')}</div>`}${badge}</div>`}
+async function rBookPage(){
+  app().innerHTML=`<div class="screen fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">책 교환</div><button id="bk-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 등록</button></div>
+    <div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
+  </div>${bnav()}`
+  bindNav()
+  document.getElementById('bk').onclick=pop
+  document.getElementById('bk-new').onclick=()=>push(rBookNew)
+  await iBook()
+}
+function rBookNew(){
+  let photoFile=null
+  app().innerHTML=`<div class="screen fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">책 등록</div><div style="width:34px"></div></div>
+    <div class="chal-detail">
+      <div class="pcard">
+        <div class="field"><label>교재명</label><input id="bt" placeholder="예: 통합사회1 (비상)"></div>
+        <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>학년</label><select id="bg"><option>1학년</option><option>2학년</option><option>3학년</option></select></div><div class="field" style="flex:1"><label>구분</label><select id="bk2"><option>나눔</option><option>교환</option></select></div></div>
+        <div class="field" style="margin-bottom:0"><label>책 표지 사진 (선택)</label><label for="bf" class="upload" id="bfl">${I.image}<span>사진 추가하기</span></label><input id="bf" type="file" accept="image/*" style="display:none"></div>
+      </div>
+      <div style="padding:0 18px"><button class="pbtn pri" id="badd" style="margin-top:4px">등록하기</button><p style="font-size:12px;color:var(--sub);margin:12px 2px 0;text-align:center">사진이 없으면 표지가 자동 생성돼요.</p></div>
+    </div>
+  </div>${bnav()}`
+  bindNav()
+  document.getElementById('bk').onclick=pop
+  document.getElementById('bf').onchange=e2=>{const f=e2.target.files[0];if(f){photoFile=f;const l=document.getElementById('bfl');l.classList.add('has');l.innerHTML=`<img src="${URL.createObjectURL(f)}">`}}
+  document.getElementById('badd').onclick=async()=>{
+    const title=document.getElementById('bt').value.trim();if(!title){toast('교재명을 입력해줘');return}
+    const btn=document.getElementById('badd');btn.disabled=true;btn.textContent='등록 중...'
+    let photo=null
+    if(photoFile){toast('사진 업로드 중...');photo=await uploadImg(photoFile,'book');if(!photo){btn.disabled=false;btn.textContent='등록하기';return}}
+    try{await wt(sb.from('okya_books').insert({id:uid('b'),title,grade:document.getElementById('bg').value,kind:document.getElementById('bk2').value,photo,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}))}catch{toast('등록 실패 · okya_books에 photo 컬럼이 필요해요');btn.disabled=false;btn.textContent='등록하기';return}
+    toast('책 등록 완료');pop()
+  }
+}
 const PET_CATS=['교실','기숙사','급식','체육관','학교 시스템','기타']
 const PET_PHASES=['청원진행','회의 회부','심사중']
 const PET_GOAL=100
@@ -2377,32 +2449,49 @@ async function rAward(subId){
 async function iBook(){
   let books=[]
   try{const r=await wt(sb.from('okya_books').select('*').order('at',{ascending:false}));books=r.data||[]}catch{}
-  function bRow(b){
-    const mine=b.owner===SESSION.id,applied=(b.applicants||[]).some(a=>a.id===SESSION.id)
-    let act=''
-    if(b.status==='open'){if(mine)act=(b.applicants&&b.applicants.length)?`<button class="minibtn soft" data-confirm="${b.id}">확정</button>`:`<span style="font-size:12px;color:var(--sub)">대기중</span>`;else act=applied?`<button class="minibtn out" data-unapply="${b.id}">취소</button>`:`<button class="minibtn soft" data-apply="${b.id}">${b.kind}</button>`}
-    else if(b.status==='matched'){if(b.recipient===SESSION.id)act=`<button class="minibtn soft" data-complete="${b.id}">완료</button>`;else act=`<span class="tag b" style="padding:4px 9px;font-size:11px">${esc(b.recipient_name)} 확정</span>`}
-    const apps=(b.status==='open'&&b.applicants?.length)?`<div style="font-size:12px;color:var(--muted);margin-top:3px">신청: ${b.applicants.map(a=>esc(a.name)).join(', ')}</div>`:''
-    const open=openBooks.has(b.id),cs=b.comments||[]
-    const thumb=b.photo?`<img class="bthumb" src="${b.photo}">`:`<div class="bthumb"></div>`
-    return`<div class="pcard" style="padding:14px 16px"><div style="display:flex;align-items:flex-start;gap:12px">${thumb}<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${b.kind==='나눔'?'b':'off'}" style="padding:3px 9px;font-size:11px">${b.kind}</span><span class="tag off" style="padding:3px 9px;font-size:11px">${esc(b.grade)}</span></div><div class="ti" style="font-size:15px;white-space:normal">${esc(b.title)}</div><div class="su">${esc(b.owner_name)} · ${timeago(b.at)}</div>${apps}</div><div style="flex:none">${act}</div></div><div style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px"><button style="font-size:13px;font-weight:700;color:var(--primary)" data-ctoggle="${b.id}">💬 댓글 ${cs.length} · ${open?'접기':'열기'}</button>${open?`<div style="margin-top:8px">${cs.length?cs.map(c=>`<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div style="display:flex;gap:7px;align-items:center;margin-bottom:3px"><span style="font-size:13px;font-weight:700">${esc(c.byName)}</span><span style="font-size:11px;color:var(--sub)">${timeago(c.at)}</span></div><div style="font-size:13.5px;line-height:1.5;color:var(--ink2)">${esc(c.text)}</div></div>`).join(''):'<div style="font-size:13px;color:var(--sub);padding:8px 0">첫 댓글을 남겨보세요.</div>'}<div style="display:flex;gap:8px;margin-top:8px"><input data-cbook="${b.id}" placeholder="댓글 입력" style="flex:1;padding:9px 12px;font-size:14px"><button class="minibtn soft" data-csend="${b.id}">등록</button></div></div>`:''}</div></div>`
+  const cb=document.getElementById('cb');if(!cb)return
+  const addTile=`<div class="book-item book-add" id="book-add"><div class="book-cover book-addcover"><span>＋</span></div><div class="book-label"><div class="bl-title">새 책 등록</div></div></div>`
+  const items=books.map(b=>`<div class="book-item" data-open="${b.id}">${bookCoverEl(b)}<div class="book-label"><div class="bl-title">${esc(b.title)}</div><div class="bl-meta">${esc(b.grade||'')} · ${esc(b.owner_name||'')}</div></div></div>`).join('')
+  cb.innerHTML=`<div class="book-shelf">${addTile}${items}</div><div style="height:16px"></div>`
+  document.getElementById('book-add').onclick=()=>push(rBookNew)
+  cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rBookDetail(el.dataset.open)))
+}
+async function rBookDetail(id){
+  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">책 교환</div><div style="width:34px"></div></div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
+  bindNav()
+  document.getElementById('bk').onclick=pop
+  let b=null
+  try{const r=await wt(sb.from('okya_books').select('*').eq('id',id).single());b=r.data}catch{}
+  const cb=document.getElementById('cb');if(!cb)return
+  if(!b){cb.innerHTML='<div class="empty">책을 찾을 수 없어요.</div>';return}
+  const mine=b.owner===SESSION.id,applied=(b.applicants||[]).some(a=>a.id===SESSION.id),cs=b.comments||[]
+  let act=''
+  if(b.status==='open'){
+    if(mine)act=(b.applicants&&b.applicants.length)?`<button class="pbtn pri" id="bd-confirm">신청자 확정하기 (${b.applicants.length})</button>`:`<button class="pbtn" id="bd-wait" disabled style="background:var(--soft);color:var(--sub)">신청 대기중</button>`
+    else act=applied?`<button class="pbtn" id="bd-unapply" style="background:var(--primary-tint);color:var(--primary)">신청 취소</button>`:`<button class="pbtn pri" id="bd-apply">${b.kind==='나눔'?'나눔 신청하기':'교환 신청하기'}</button>`
+  }else if(b.status==='matched'){
+    if(b.recipient===SESSION.id)act=`<button class="pbtn pri" id="bd-complete">교환 완료</button>`
+    else act=`<div class="empty" style="padding:14px">${esc(b.recipient_name)}님과 교환 확정됨</div>`
   }
-  const rows=books.length?books.map(bRow).join(''):'<div class="empty">등록된 책이 없어요.</div>'
-  document.getElementById('cb').innerHTML=`<div class="pcard"><div class="sec">책 올리기</div><div class="field"><label>교재명</label><input id="bt" placeholder="예: 통합사회1 (비상)"></div><div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>학년</label><select id="bg"><option>1학년</option><option>2학년</option><option>3학년</option></select></div><div class="field" style="flex:1"><label>구분</label><select id="bk2"><option>나눔</option><option>교환</option></select></div></div><div class="field" style="margin-bottom:0"><label>책 사진 (선택)</label><label for="bf" class="upload" id="bfl">${I.image}<span>사진 추가하기</span></label><input id="bf" type="file" accept="image/*" style="display:none"></div><button class="pbtn pri" id="badd" style="margin-top:12px">등록하기</button></div>${rows}<div style="height:8px"></div>`
-  document.getElementById('bf').onchange=e2=>{const f=e2.target.files[0];if(f){const l=document.getElementById('bfl');l.classList.add('has');l.innerHTML=`<img src="${URL.createObjectURL(f)}">`}}
-  document.getElementById('badd').onclick=async()=>{
-    const title=document.getElementById('bt').value.trim();if(!title){toast('교재명을 입력해줘');return}
-    let photo=null;const f=document.getElementById('bf').files[0]
-    if(f){toast('사진 업로드 중...');photo=await uploadImg(f,'book');if(!photo)return}
-    try{await wt(sb.from('okya_books').insert({id:uid('b'),title,grade:document.getElementById('bg').value,kind:document.getElementById('bk2').value,photo,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}))}catch{toast('등록 실패 · okya_books에 photo 컬럼이 필요해요');return}
-    toast('등록 완료');iBook()
-  }
-  document.querySelectorAll('[data-apply]').forEach(b=>b.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',b.dataset.apply).single());const apps=[...(r.data?.applicants||[])];if(!apps.some(a=>a.id===SESSION.id))apps.push({id:SESSION.id,name:SESSION.name,at:nowISO()});await wt(sb.from('okya_books').update({applicants:apps}).eq('id',b.dataset.apply))}catch{toast('오류');return};toast('신청했어요');iBook()})
-  document.querySelectorAll('[data-unapply]').forEach(b=>b.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',b.dataset.unapply).single());await wt(sb.from('okya_books').update({applicants:(r.data?.applicants||[]).filter(a=>a.id!==SESSION.id)}).eq('id',b.dataset.unapply))}catch{};iBook()})
-  document.querySelectorAll('[data-complete]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_books').delete().eq('id',b.dataset.complete))}catch{};toast('완료');iBook()})
-  document.querySelectorAll('[data-confirm]').forEach(b=>b.onclick=()=>push(()=>rConfirmBook(b.dataset.confirm)))
-  document.querySelectorAll('[data-ctoggle]').forEach(b=>b.onclick=()=>{const id=b.dataset.ctoggle;if(openBooks.has(id))openBooks.delete(id);else openBooks.add(id);iBook()})
-  document.querySelectorAll('[data-csend]').forEach(b=>b.onclick=async()=>{const id=b.dataset.csend,inp=document.querySelector('[data-cbook="'+id+'"]'),text=inp?.value.trim();if(!text)return;try{const r=await wt(sb.from('okya_books').select('comments').eq('id',id).single());const comments=[...(r.data?.comments||[]),{by:SESSION.id,byName:SESSION.name,text,at:nowISO()}];await wt(sb.from('okya_books').update({comments}).eq('id',id))}catch{};openBooks.add(id);iBook()})
+  const apps=(mine&&b.status==='open'&&b.applicants?.length)?`<div class="pet-note" style="margin-top:8px">신청: ${b.applicants.map(a=>esc(a.name)).join(', ')}</div>`:''
+  const comments=cs.length?cs.map(c=>`<div class="bc-item"><div class="bc-head"><span class="bc-by">${esc(c.byName)}</span><span class="bc-at">${timeago(c.at)}</span></div><div class="bc-txt">${esc(c.text)}</div></div>`).join(''):'<div style="font-size:13px;color:var(--sub);padding:10px 0">첫 댓글을 남겨보세요.</div>'
+  cb.innerHTML=`<div class="chal-detail">
+    <div class="book-hero">${bookCoverEl(b,true)}</div>
+    <div class="pcard" style="margin-top:16px">
+      <div style="display:flex;gap:7px;margin-bottom:9px"><span class="book-kind ${b.kind==='나눔'?'give':'swap'}">${esc(b.kind||'교환')}</span><span class="book-kind grade">${esc(b.grade||'')}</span></div>
+      <div class="ti" style="font-size:19px;white-space:normal">${esc(b.title)}</div>
+      <div class="su" style="margin-top:4px">${esc(b.owner_name)} · ${timeago(b.at)}</div>
+      ${apps}
+      <div style="margin-top:14px">${act}</div>
+    </div>
+    <div class="pcard"><div class="sec">댓글 <span style="color:var(--primary)">${cs.length}</span></div>${comments}<div style="display:flex;gap:8px;margin-top:10px"><input id="bd-cinput" placeholder="댓글 입력" style="flex:1;padding:11px 13px;font-size:14px"><button class="minibtn soft" id="bd-csend">등록</button></div></div>
+    <div style="height:10px"></div>
+  </div>`
+  const ap=document.getElementById('bd-apply');if(ap)ap.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',id).single());const apps=[...(r.data?.applicants||[])];if(!apps.some(a=>a.id===SESSION.id))apps.push({id:SESSION.id,name:SESSION.name,at:nowISO()});await wt(sb.from('okya_books').update({applicants:apps}).eq('id',id))}catch{toast('오류');return};toast('신청했어요');rBookDetail(id)}
+  const un=document.getElementById('bd-unapply');if(un)un.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',id).single());await wt(sb.from('okya_books').update({applicants:(r.data?.applicants||[]).filter(a=>a.id!==SESSION.id)}).eq('id',id))}catch{};rBookDetail(id)}
+  const cf=document.getElementById('bd-confirm');if(cf)cf.onclick=()=>push(()=>rConfirmBook(id))
+  const cp=document.getElementById('bd-complete');if(cp)cp.onclick=async()=>{try{await wt(sb.from('okya_books').delete().eq('id',id))}catch{};toast('교환 완료 🎉');pop()}
+  document.getElementById('bd-csend').onclick=async()=>{const inp=document.getElementById('bd-cinput'),text=inp?.value.trim();if(!text)return;try{const r=await wt(sb.from('okya_books').select('comments').eq('id',id).single());const comments=[...(r.data?.comments||[]),{by:SESSION.id,byName:SESSION.name,text,at:nowISO()}];await wt(sb.from('okya_books').update({comments}).eq('id',id))}catch{};rBookDetail(id)}
 }
 
 async function rConfirmBook(id){
