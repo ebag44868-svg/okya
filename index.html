@@ -711,7 +711,7 @@ function attendancePanelHTML(txs){
   const btn=done?`<button class="get" disabled>완료</button>`:`<button class="get" id="att-btn">받기</button>`
   return`<span class="t">매일 출석</span><div class="dots">${dots}</div>${btn}`
 }
-function countUp(el,to,dur=900){if(!el)return;(function tk(now){const p=Math.min(1,(now-tk.s)/dur),e=1-Math.pow(1-p,3);el.textContent=fmt(Math.round(to*e));if(p<1)requestAnimationFrame(tk)})(tk.s=performance.now())}
+function countUp(el,to,dur=900){if(!el)return;const t0=performance.now();(function tk(now){const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,3);el.textContent=fmt(Math.round(to*e));if(p<1)requestAnimationFrame(tk)})(t0)}
 function yearPct(){const n=new Date(),y=n.getFullYear(),s=new Date(y,0,1),e=new Date(y+1,0,1);return Math.round((n-s)/(e-s)*100)}
 // 게이지바+퍼센트를 JS로 직접 이징 애니메이션(CSS transition 배칭 이슈 회피). 무조건 재생됨.
 function animateGauge(bar,pctEl,target,dur=1400,delay=280){
