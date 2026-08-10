@@ -718,10 +718,54 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .sub-card .sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px;}
 .sub-card .sc-name{font-size:14px;font-weight:800;color:var(--ink);}
 .sub-card .sc-meta{font-size:12px;color:var(--sub);margin-top:2px;}
-.sub-card img.sc-photo{width:100%;border-radius:12px;display:block;}
+.sub-card img.sc-photo{max-width:200px;width:100%;max-height:240px;object-fit:cover;border-radius:12px;display:block;}
 .sub-card .sc-note{font-size:13px;color:var(--ink2);line-height:1.5;margin-top:8px;}
 
+/* 청원 (국민청원 스타일) */
+.pet-banner{margin:8px 18px 0;border-radius:20px;padding:22px 20px;background:linear-gradient(135deg,#6D5EF0,#9B7BFF);color:#fff;box-shadow:var(--sh-blue);cursor:pointer;overflow:hidden;animation:chalpop .5s var(--ease) both;}
+.pet-banner:active{transform:scale(.99);}
+.pet-bn-tag{font-size:12px;font-weight:800;opacity:.92;margin-bottom:9px;}
+.pet-bn-title{font-size:20px;font-weight:900;line-height:1.35;letter-spacing:-.4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.pet-bn-meta{display:flex;align-items:center;gap:10px;margin-top:15px;}
+.pet-bn-meta .pet-cat{background:rgba(255,255,255,.22);color:#fff;}
+.pet-bn-meta .pet-agree{font-size:14px;font-weight:800;}
+.pet-cat{display:inline-block;font-size:11.5px;font-weight:800;padding:4px 11px;border-radius:999px;background:var(--primary-tint);color:var(--primary);}
+.pet-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px 12px;padding:2px 18px 10px;}
+.pet-card{cursor:pointer;animation:chalpop .45s var(--ease) both;}
+.pet-card:active{transform:scale(.98);}
+.pet-thumb{position:relative;aspect-ratio:16/10;border-radius:14px;background:linear-gradient(135deg,#EEF0FF,#E2E7FF);border:1px solid var(--line);display:flex;align-items:flex-end;justify-content:space-between;padding:11px;overflow:hidden;transition:transform .18s var(--ease),box-shadow .18s;}
+.pet-card:hover .pet-thumb{transform:translateY(-3px);box-shadow:0 14px 30px rgba(20,26,40,.16);}
+.pet-thumb-cat{font-size:11px;font-weight:800;color:var(--primary);background:#fff;padding:3px 9px;border-radius:999px;}
+.pet-thumb-n{font-size:23px;font-weight:900;color:var(--primary);letter-spacing:-.5px;line-height:1;}
+.pet-ct{padding:10px 2px 0;}
+.pet-c-title{font-size:14.5px;font-weight:800;line-height:1.35;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.pet-c-meta{font-size:12px;color:var(--sub);margin-top:5px;}
+.pet-catsel{display:flex;flex-wrap:wrap;gap:8px;}
+.pet-chip{font-size:13px;font-weight:700;padding:8px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;transition:all .15s;}
+.pet-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+.pet-steps{display:flex;align-items:flex-start;margin-top:18px;}
+.pet-step{display:flex;flex-direction:column;align-items:center;gap:7px;width:56px;flex-shrink:0;}
+.pet-step-dot{width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;border:2px solid var(--line);transition:all .3s var(--ease);}
+.pet-step.done .pet-step-dot{background:var(--primary);border-color:var(--primary);color:#fff;}
+.pet-step.cur .pet-step-dot{box-shadow:0 0 0 5px var(--primary-tint);}
+.pet-step-l{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;}
+.pet-step.done .pet-step-l{color:var(--primary);}
+.pet-step-line{flex:1;height:2px;background:var(--line);margin:16px 4px 0;border-radius:2px;}
+.pet-d-title{font-size:21px;font-weight:900;line-height:1.42;letter-spacing:-.5px;color:var(--ink);margin-top:10px;}
+.pet-stat-row{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:var(--sub);padding:7px 0;}
+.pet-stat-row b{color:var(--ink);font-weight:700;}
+.pet-stat-row.big{border-top:1px solid var(--line);margin-top:4px;padding-top:12px;}
+.pet-agree-big{font-size:22px;font-weight:900;color:var(--primary);letter-spacing:-.5px;}
+.pet-body{font-size:14px;line-height:1.85;color:var(--ink2);white-space:pre-wrap;}
+.pet-phasebtns{display:flex;flex-wrap:wrap;gap:8px;}
+.pet-cta{padding:18px 18px 6px;}
+.pet-agree-btn{font-size:16px;padding:16px 0;}
+.pet-agree-btn.agreed{background:var(--primary-tint);color:var(--primary);box-shadow:none;}
+
 @media (min-width:820px) and (min-aspect-ratio:1/1){
+  .pet-grid{grid-template-columns:repeat(4,1fr);max-width:1000px;margin:0 auto;}
+  .pet-banner{max-width:1000px;margin:8px auto 0;}
+  .pet-bn-title{font-size:24px;}
   /* 챌린지 화면은 모달 대신 전체화면 */
   .screen.no-nav.p3.fs{flex:1;width:auto;max-width:none;height:auto;min-height:100dvh;max-height:none;margin:0;border-radius:0;box-shadow:none;background:var(--bg);display:block;overflow-y:auto;}
   .screen.no-nav.p3.fs>.phdr{position:sticky;top:0;z-index:5;background:var(--bg);padding:18px 26px 12px;max-width:none;}
@@ -2086,7 +2130,107 @@ async function rChallengeDetail(eid){
   }
 }
 async function rBookPage(){_cbPage('책 교환');await iBook()}
-async function rPetitionPage(){_cbPage('청원');await iPetition()}
+const PET_CATS=['교실','기숙사','급식','체육관','학교 시스템','기타']
+const PET_PHASES=['청원진행','회의 회부','심사중']
+function petAgrees(p){return Object.keys(p.reacts||{}).length}
+function petStart(p){return p.approved_at||p.at}
+function petDeadline(p){const d=new Date(petStart(p));d.setDate(d.getDate()+30);return d}
+function petDaysLeft(p){return Math.ceil((petDeadline(p)-new Date())/86400000)}
+async function rPetitionPage(){
+  app().innerHTML=`<div class="screen fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">청원</div><button id="pt-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 청원</button></div>
+    <div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
+  </div>${bnav()}`
+  bindNav()
+  document.getElementById('bk').onclick=pop
+  document.getElementById('pt-new').onclick=()=>push(rPetitionNew)
+  await iPetition()
+}
+function rPetitionNew(){
+  let cat=PET_CATS[0]
+  app().innerHTML=`<div class="screen fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">청원 올리기</div><div style="width:34px"></div></div>
+    <div class="chal-detail">
+      <div class="pcard">
+        <div class="field"><label>청원 제목</label><input id="pn-title" placeholder="예: 급식에 디저트를 늘려주세요"></div>
+        <div class="field"><label>청원 분야</label><div class="pet-catsel" id="pn-cats">${PET_CATS.map((c,i)=>`<button type="button" class="pet-chip${i===0?' on':''}" data-cat="${c}">${c}</button>`).join('')}</div></div>
+        <div class="field"><label>청원의 취지</label><textarea id="pn-purpose" rows="3" placeholder="이 청원을 올리는 이유를 간단히 적어주세요" style="resize:none"></textarea></div>
+        <div class="field" style="margin-bottom:0"><label>청원의 내용</label><textarea id="pn-content" rows="6" placeholder="구체적인 내용을 자유롭게 작성해주세요" style="resize:none"></textarea></div>
+      </div>
+      <div style="padding:0 18px"><button class="pbtn pri" id="pn-sub" style="margin-top:4px">청원 제출</button>
+      <p style="font-size:12px;color:var(--sub);margin:12px 2px 0;text-align:center">익명으로 접수되며, 학생회 검토 후 공개됩니다.</p></div>
+    </div>
+  </div>${bnav()}`
+  bindNav()
+  document.getElementById('bk').onclick=pop
+  document.querySelectorAll('#pn-cats .pet-chip').forEach(b=>b.onclick=()=>{cat=b.dataset.cat;document.querySelectorAll('#pn-cats .pet-chip').forEach(x=>x.classList.toggle('on',x===b))})
+  document.getElementById('pn-sub').onclick=async()=>{
+    const title=document.getElementById('pn-title').value.trim();if(!title){toast('제목을 입력해줘');return}
+    const purpose=document.getElementById('pn-purpose').value.trim()
+    const content=document.getElementById('pn-content').value.trim()
+    const btn=document.getElementById('pn-sub');btn.disabled=true;btn.textContent='제출 중...'
+    try{await wt(sb.from('okya_petitions').insert({id:uid('p'),title,category:cat,purpose,content,txt:title,status:'pending',phase:'청원진행',by_id:SESSION.id,at:nowISO(),reacts:{}}))}catch{toast('제출 실패 · okya_petitions에 title/category/purpose/content/phase 열이 필요해요');btn.disabled=false;btn.textContent='청원 제출';return}
+    toast('청원 제출 완료 · 검토 후 공개돼요');pop()
+  }
+}
+async function rPetitionDetail(pid){
+  const admin=SESSION.role==='admin'
+  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">청원</div>${admin?`<button id="pd-del" style="font-size:12px;font-weight:700;color:var(--danger);background:none">삭제</button>`:'<div style="width:34px"></div>'}</div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
+  bindNav()
+  document.getElementById('bk').onclick=pop
+  let p=null
+  try{const r=await wt(sb.from('okya_petitions').select('*').eq('id',pid).single());p=r.data}catch{}
+  const cb=document.getElementById('cb');if(!cb)return
+  if(!p){cb.innerHTML='<div class="empty">청원을 찾을 수 없어요.</div>';return}
+  const agrees=petAgrees(p),mine=(p.reacts||{})[SESSION.id]
+  const start=petStart(p),dl=petDeadline(p),left=petDaysLeft(p)
+  const phase=p.phase||'청원진행',curIdx=PET_PHASES.indexOf(phase)
+  const stepper=`<div class="pet-steps">${PET_PHASES.map((s,i)=>`<div class="pet-step${i<=curIdx?' done':''}${i===curIdx?' cur':''}"><div class="pet-step-dot">${i<curIdx?'✓':i+1}</div><div class="pet-step-l">${s}</div></div>`).join('<div class="pet-step-line"></div>')}</div>`
+  const adminPanel=admin?`<div class="pcard"><div class="sec">학생회 관리</div>
+    <div style="font-size:12px;color:var(--sub);margin-bottom:8px">진행 현황 변경</div>
+    <div class="pet-phasebtns">${PET_PHASES.map(ph=>`<button class="pet-chip${ph===phase?' on':''}" data-phase="${ph}">${ph}</button>`).join('')}</div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+      <button class="minibtn out" id="pd-reveal">🔒 청원인 확인 · 이중잠금</button>
+      <div id="pd-reveal-box"></div>
+    </div></div>`:''
+  cb.innerHTML=`<div class="chal-detail">
+    <div class="pcard">
+      <div class="pet-cat">${esc(p.category||'기타')}</div>
+      <div class="pet-d-title">${esc(p.title||p.txt||'제목 없음')}</div>
+      ${stepper}
+    </div>
+    <div class="pcard">
+      <div class="pet-stat-row"><span>청원 시작</span><b>${fmtDate(start)}</b></div>
+      <div class="pet-stat-row"><span>동의 기간</span><b>~${fmtDate(dl)} · ${left>=0?`${left}일 남음`:'마감'}</b></div>
+      <div class="pet-stat-row big"><span>동의 인원</span><b class="pet-agree-big">${fmt(agrees)}명</b></div>
+    </div>
+    <div class="pcard"><div class="sec">청원의 취지</div><div class="pet-body">${esc(p.purpose||'-')}</div></div>
+    <div class="pcard"><div class="sec">청원의 내용</div><div class="pet-body">${esc(p.content||p.txt||'-')}</div></div>
+    ${adminPanel}
+    <div class="pet-cta"><button class="pbtn pri pet-agree-btn${mine?' agreed':''}" id="pd-agree">${mine?'✓ 동의 완료':left<0?'동의 기간 마감':'동의하기'}</button></div>
+    <div style="height:10px"></div>
+  </div>`
+  document.getElementById('pd-agree').onclick=async()=>{
+    if(left<0){toast('동의 기간이 마감되었어요');return}
+    let reacts={}
+    try{const r=await wt(sb.from('okya_petitions').select('reacts').eq('id',pid).single());reacts={...(r.data?.reacts||{})}}catch{}
+    if(reacts[SESSION.id])delete reacts[SESSION.id];else reacts[SESSION.id]=1
+    try{await wt(sb.from('okya_petitions').update({reacts}).eq('id',pid))}catch{}
+    rPetitionDetail(pid)
+  }
+  if(admin){
+    document.getElementById('pd-del').onclick=async()=>{try{await wt(sb.from('okya_petitions').delete().eq('id',pid))}catch{};toast('청원 삭제');pop()}
+    document.querySelectorAll('[data-phase]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_petitions').update({phase:b.dataset.phase}).eq('id',pid))}catch{};rPetitionDetail(pid)})
+    let rstep=0
+    const rb=document.getElementById('pd-reveal')
+    rb.onclick=()=>{
+      if(rstep===0){rstep=1;rb.textContent='🔓 한 번 더 눌러 확인';rb.classList.remove('out');rb.classList.add('danger');return}
+      const u=USERS.find(x=>x.id===p.by_id)
+      document.getElementById('pd-reveal-box').innerHTML=`<div style="margin-top:10px;font-size:14px;font-weight:800;color:var(--ink)">청원인: ${esc(u?u.name:(p.by_id||'알 수 없음'))}</div>`
+      rb.style.display='none'
+    }
+  }
+}
 async function rBoardPage(){_cbPage('게시판');await rBoard()}
 
 // 익명 자유게시판 (DC 느낌)
@@ -2259,15 +2403,23 @@ async function iPetition(){
   let ps=[]
   try{const r=await wt(sb.from('okya_petitions').select('*').order('at',{ascending:false}));ps=r.data||[]}catch{}
   const pub=ps.filter(p=>p.status==='approved'),pend=ps.filter(p=>p.status==='pending')
-  const rv=(p,t)=>Object.values(p.reacts||{}).filter(v=>v===t).length
-  const pubList=pub.length?pub.map(p=>{const mine=(p.reacts||{})[SESSION.id];return`<div class="post"><div class="pbody">${esc(p.txt)}</div><div class="pmeta" style="margin:6px 0 0">공개됨 · ${timeago(p.approved_at||p.at)}</div><div class="reacts" style="margin-top:9px"><button class="react-btn${mine==='up'?' on-r':''}" data-react="${p.id}::up">👍 ${rv(p,'up')}</button><button class="react-btn${mine==='down'?' on-b':''}" data-react="${p.id}::down">👎 ${rv(p,'down')}</button><button class="react-btn${mine==='meh'?' on-g':''}" data-react="${p.id}::meh">⋯ ${rv(p,'meh')}</button></div></div>`}).join(''):'<div class="empty">아직 공개된 청원이 없어요.</div>'
-  const pendList=admin&&pend.length?pend.map(p=>`<div class="post"><div class="pbody">${esc(p.txt)}</div><div class="pmeta" style="margin:6px 0 8px">검토 대기 · ${timeago(p.at)}</div><div style="display:flex;gap:8px"><button class="minibtn soft" data-ap="${p.id}">공개</button><button class="minibtn danger" data-rj="${p.id}">반려</button></div></div>`).join(''):''
-  document.getElementById('cb').innerHTML=`${!admin?`<div class="pcard"><div class="sec">청원 올리기 · 익명</div><div class="field" style="margin-bottom:0"><textarea id="pt" rows="3" placeholder="건의하고 싶은 내용을 적어줘" style="resize:none"></textarea></div><button class="pbtn pri" id="psub" style="margin-top:12px">제출하기</button><p style="font-size:12px;color:var(--sub);margin-top:10px">제출한 청원은 학생회 검토 후 공개돼요.</p></div>`:''}${admin&&pend.length?`<div class="pcard"><div class="sec">검토 대기 (${pend.length})</div>${pendList}</div>`:''}<div class="pcard"><div class="sec">공개된 청원</div>${pubList}</div><div style="height:8px"></div>`
-  const psub=document.getElementById('psub')
-  if(psub)psub.onclick=async()=>{const txt=document.getElementById('pt').value.trim();if(!txt){toast('내용을 입력해줘');return};try{await wt(sb.from('okya_petitions').insert({id:uid('p'),txt,status:'pending',by_id:SESSION.id,at:nowISO(),reacts:{}}))}catch{toast('제출 실패');return};toast('제출 완료 · 검토 후 공개돼요');iPetition()}
+  const cb=document.getElementById('cb');if(!cb)return
+  const ptitle=p=>esc(p.title||p.txt||'제목 없음')
+  const top=[...pub].sort((a,b)=>petAgrees(b)-petAgrees(a))[0]
+  const banner=top?`<div class="pet-banner" data-open="${top.id}">
+    <div class="pet-bn-tag">🔥 가장 많은 동의를 받은 청원</div>
+    <div class="pet-bn-title">${ptitle(top)}</div>
+    <div class="pet-bn-meta"><span class="pet-cat">${esc(top.category||'기타')}</span><span class="pet-agree">${fmt(petAgrees(top))}명 동의</span></div>
+  </div>`:''
+  const grid=pub.length?`<div class="pet-grid">${pub.map(p=>`<div class="pet-card" data-open="${p.id}">
+    <div class="pet-thumb"><span class="pet-thumb-cat">${esc(p.category||'기타')}</span><span class="pet-thumb-n">${fmt(petAgrees(p))}</span></div>
+    <div class="pet-ct"><div class="pet-c-title">${ptitle(p)}</div><div class="pet-c-meta">${esc(p.category||'기타')} · ${timeago(petStart(p))}</div></div>
+  </div>`).join('')}</div>`:'<div class="empty">아직 공개된 청원이 없습니다.<br><br>우측 상단 <b style="color:var(--primary)">＋ 청원</b>으로 첫 청원을 올려보세요.</div>'
+  const pendSec=admin&&pend.length?`<div class="pcard"><div class="sec">검토 대기 (${pend.length})</div>${pend.map(p=>`<div class="post"><div class="pbody" style="font-weight:800">${ptitle(p)}</div><div class="pmeta" style="margin:4px 0 8px">${esc(p.category||'기타')} · 접수 ${timeago(p.at)}</div><div style="display:flex;gap:8px"><button class="minibtn soft" data-ap="${p.id}">공개</button><button class="minibtn danger" data-rj="${p.id}">반려</button></div></div>`).join('')}</div>`:''
+  cb.innerHTML=`${banner}${pendSec}<div class="sec" style="margin:18px 20px 10px">공개된 청원 <span style="color:var(--primary)">${pub.length}</span></div>${grid}<div style="height:16px"></div>`
+  cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rPetitionDetail(el.dataset.open)))
   document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_petitions').update({status:'approved',approved_at:nowISO()}).eq('id',b.dataset.ap))}catch{};iPetition()})
   document.querySelectorAll('[data-rj]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_petitions').delete().eq('id',b.dataset.rj))}catch{};iPetition()})
-  document.querySelectorAll('[data-react]').forEach(b=>b.onclick=async()=>{const[id,t]=b.dataset.react.split('::');try{const r=await wt(sb.from('okya_petitions').select('reacts').eq('id',id).single());const reacts={...(r.data?.reacts||{})};if(reacts[SESSION.id]===t)delete reacts[SESSION.id];else reacts[SESSION.id]=t;await wt(sb.from('okya_petitions').update({reacts}).eq('id',id))}catch{};iPetition()})
 }
 
 async function rMy(){
