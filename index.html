@@ -862,6 +862,34 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
   .chal-grid{grid-template-columns:repeat(3,1fr);max-width:1000px;margin:0 auto;}
   .chal-detail{max-width:860px;margin:0 auto;}
 }
+/* ===== 학교 탭 슬라이드 덱 ===== */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.school-screen{height:100dvh;overflow:hidden;}
+.school-tabs{display:flex;gap:6px;padding:4px 18px 10px;flex:none;}
+.school-tab{flex:1;padding:9px 0;border:none;border-radius:12px;background:var(--soft);color:var(--sub);font-weight:800;font-size:13px;font-family:inherit;cursor:pointer;transition:background .25s var(--ease),color .25s,box-shadow .25s;}
+.school-tab.on{background:var(--grad);color:#fff;box-shadow:var(--sh-blue);}
+.school-deck{display:flex;flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.school-deck::-webkit-scrollbar{display:none;}
+.school-slide{flex:0 0 100%;width:100%;scroll-snap-align:start;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sc-inner{padding:2px 0 26px;max-width:760px;margin:0 auto;animation:fadeUp .4s var(--ease) both;}
+.bk.mini{width:30px;height:30px;background:none;}
+.cal-dows{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;}
+.cal-dow{text-align:center;font-size:10.5px;font-weight:700;padding:4px 0;color:var(--sub);}
+.cal-dow.sun{color:var(--danger);}.cal-dow.sat{color:var(--primary);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:3px;}
+.cal-cell{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 0;background:none;border:none;cursor:pointer;font-family:inherit;}
+.cal-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--ink);transition:background .18s,color .18s;}
+.cal-num.sun{color:var(--danger);}.cal-num.sat{color:var(--primary);}
+.cal-cell.today .cal-num{border:1.6px solid var(--primary);font-weight:800;}
+.cal-cell.sel .cal-num{background:var(--grad);color:#fff!important;font-weight:800;box-shadow:var(--sh-blue);}
+.cal-dot{width:5px;height:5px;border-radius:50%;}
+.cal-legend{display:flex;gap:14px;justify-content:center;margin-top:14px;font-size:11.5px;color:var(--sub);font-weight:600;}
+.cal-legend span{display:flex;align-items:center;gap:5px;}
+.cal-legend i{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.sc-evdot{width:8px;height:8px;border-radius:50%;flex:none;margin-right:2px;}
+.sc-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:76px 30px;text-align:center;font-size:40px;}
+.sc-empty-t{font-size:17px;font-weight:800;color:var(--ink);}
+.sc-empty-s{font-size:13.5px;color:var(--sub);line-height:1.65;}
 </style>
 </head>
 <body>
@@ -1070,7 +1098,8 @@ function calGrid(y,mo,o){o=o||{}
   let cells=wd.map((w,i)=>`<div style="text-align:center;font-size:11px;font-weight:600;color:${i===0?'#F0616B':'var(--muted)'};padding-bottom:6px">${w}</div>`).join('')
   for(let i=0;i<first;i++)cells+='<div></div>'
   for(let d=1;d<=days;d++){const dow=(first+d-1)%7,isT=o.today===d,isS=o.sel===d,mk=(o.events&&o.events[d])||(o.avail&&o.avail[d]);const bg=isT?'var(--primary)':isS?'var(--primary-tint)':'transparent';const col=isT?'#fff':isS?'var(--primary)':dow===0?'#F0616B':'var(--ink)';const dc=o.clickable?`data-day="${d}"`:''
-    cells+=`<div ${dc} style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;font-size:13px;font-weight:${(isT||isS)?'700':'500'};border-radius:10px;background:${bg};color:${col};cursor:${o.clickable?'pointer':'default'}">${d}${mk?`<span style="position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:${isT?'#fff':'var(--primary)'}"></span>`:''}</div>`}
+    const dotc=isT?'#fff':((o.dotColors&&o.dotColors[d])||'var(--primary)')
+    cells+=`<div ${dc} style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;font-size:13px;font-weight:${(isT||isS)?'700':'500'};border-radius:10px;background:${bg};color:${col};cursor:${o.clickable?'pointer':'default'}">${d}${mk?`<span style="position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:${dotc}"></span>`:''}</div>`}
   const nav=o.nav?`<div style="display:flex;gap:4px"><button data-mcnav="-1" style="width:30px;height:30px;border:none;border-radius:9px;background:var(--bg);color:var(--ink2);cursor:pointer;font-size:16px">‹</button><button data-mcnav="1" style="width:30px;height:30px;border:none;border-radius:9px;background:var(--bg);color:var(--ink2);cursor:pointer;font-size:16px">›</button></div>`:''
   return`<div style="background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:15px 13px"><div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px 12px"><div style="font-size:14px;font-weight:700">${y}년 ${mo+1}월</div>${nav}</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">${cells}</div></div>`
 }
@@ -1157,7 +1186,7 @@ function bnav(){
   const tabs=[
     {k:'home',l:'홈',ic:I.home},
     {k:'money',l:'머니',ic:I.money},
-    {k:'school',l:'학교',ic:I.school,subs:[['food','급식'],['cal','학사일정'],['tt','시간표'],['mt','회의록']]},
+    {k:'school',l:'학교',ic:I.school,subs:[['food','급식'],['cal','학사일정'],['jado','자습감독표'],['mt','회의록']]},
     {k:'comm',l:'커뮤',ic:I.comm,subs:[['challenge','챌린지'],['petition','청원'],['book','책 교환'],['binding','제본소']]},
     {k:'search',l:'메시지',ic:I.msg},
     {k:'my',l:'MY',ic:I.my}
@@ -1170,7 +1199,7 @@ function bnav(){
   }).join('')}</nav>`
 }
 const SUBROUTES={
-  school:{food:()=>rSchoolFood(),cal:()=>rSchoolCal(),tt:()=>rSchoolTT(),mt:()=>rMeeting()},
+  school:{food:()=>rSchool(0),cal:()=>rSchool(1),jado:()=>rSchool(2),mt:()=>rSchool(3)},
   comm:{challenge:()=>rChallengePage(),petition:()=>rPetitionPage(),book:()=>rBookPage(),binding:()=>rPrint()}
 }
 function bindNav(){
@@ -1533,33 +1562,112 @@ function fTransferConfirm(mode,toUser,amount,reason,myBal){
   }
 }
 
-function rSchool(){
+// ── 학교 탭: 한 화면씩 슬라이드로 넘기는 덱(급식/학사일정/자습감독표/회의록) ──
+const SCHOOL_SECTS=['급식','학사일정','자습감독표','회의록']
+function rSchool(idx){
   TAB='school'
-  const MENU=[
-    {id:'food',ic:'food',      tint:'org', title:'급식',       desc:'오늘의 학교 급식'},
-    {id:'cal', ic:'cal',       tint:'blue',title:'학사일정',    desc:'시험·행사 일정'},
-    {id:'tt',  ic:'timetable', tint:'pink',title:'시간표',      desc:'학년별 수업 시간표'},
-    {id:'mt',  ic:'video',     tint:'blue',title:'회의록',      desc:'대의원회 영상'},
-  ]
-  app().innerHTML=`<div class="screen fade-in p3">
-    <div class="topbar"><div class="t">학교</div><div style="width:34px"></div></div>
-    <div class="pcard" style="padding:4px 16px">
-      ${MENU.map(m=>`<div class="lrow" data-sid="${m.id}" style="cursor:pointer">
-        <div class="chip ti-${m.tint}">${I[m.ic]}</div>
-        <div class="body"><div class="ti">${m.title}</div><div class="su">${m.desc}</div></div>
-        <span style="color:#c9cdd8;display:flex">${I.chev}</span>
-      </div>`).join('')}
+  const start=Math.max(0,Math.min(3,idx|0))
+  app().innerHTML=`<div class="screen p3 school-screen">
+    <div class="topbar" style="flex:none"><div class="t">학교</div><div style="width:34px"></div></div>
+    <div class="school-tabs" id="sc-tabs">${SCHOOL_SECTS.map((s,i)=>`<button class="school-tab${i===start?' on':''}" data-si="${i}">${s}</button>`).join('')}</div>
+    <div class="school-deck" id="sc-deck">
+      <section class="school-slide" id="slide-0"></section>
+      <section class="school-slide" id="slide-1"></section>
+      <section class="school-slide" id="slide-2"></section>
+      <section class="school-slide" id="slide-3"></section>
     </div>
-    <div style="height:6px"></div>
   </div>${bnav()}`
   bindNav()
-  document.querySelectorAll('[data-sid]').forEach(el=>el.onclick=()=>{
-    const sid=el.dataset.sid
-    if(sid==='food')push(rSchoolFood)
-    else if(sid==='cal')push(rSchoolCal)
-    else if(sid==='tt')push(rSchoolTT)
-    else if(sid==='mt')push(rMeeting)
-  })
+  const deck=document.getElementById('sc-deck')
+  const tabs=[...document.querySelectorAll('#sc-tabs .school-tab')]
+  const go=i=>{const s=document.getElementById('slide-'+i);if(s)deck.scrollTo({left:s.offsetLeft,behavior:'smooth'})}
+  tabs.forEach(t=>t.onclick=()=>go(+t.dataset.si))
+  let raf
+  deck.onscroll=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const i=Math.round(deck.scrollLeft/Math.max(1,deck.clientWidth));tabs.forEach((t,k)=>t.classList.toggle('on',k===i))})}
+  schoolFoodSlide(document.getElementById('slide-0'))
+  schoolCalSlide(document.getElementById('slide-1'))
+  document.getElementById('slide-2').innerHTML=`<div class="sc-inner"><div class="sc-empty">🗒️<div class="sc-empty-t">자습감독표</div><div class="sc-empty-s">준비 중이에요.<br>곧 자습 감독 일정이 여기에 올라와요.</div></div></div>`
+  schoolMeetSlide(document.getElementById('slide-3'))
+  if(start)requestAnimationFrame(()=>{const s=document.getElementById('slide-'+start);if(s)deck.scrollLeft=s.offsetLeft})
+}
+// 급식 슬라이드: 달력 + 그 날 조·중·석 한 번에
+function schoolFoodSlide(el){
+  if(!el)return
+  const now=new Date();let vy=now.getFullYear(),vm=now.getMonth(),sel=now.getDate()
+  const pad=n=>String(n).padStart(2,'0')
+  const draw=()=>{
+    const dim=new Date(vy,vm+1,0).getDate();if(sel>dim)sel=dim
+    const today=(vy===now.getFullYear()&&vm===now.getMonth())?now.getDate():-1
+    const avail={};for(let d=1;d<=dim;d++){if(mealsOf(`${vy}-${pad(vm+1)}-${pad(d)}`))avail[d]=1}
+    const dk=`${vy}-${pad(vm+1)}-${pad(sel)}`
+    const dw=['일','월','화','수','목','금','토'][new Date(vy,vm,sel).getDay()]
+    el.innerHTML=`<div class="sc-inner">
+      <div style="margin:6px 18px 4px">${calGrid(vy,vm,{today,sel,avail,nav:true,clickable:true})}</div>
+      <div class="pcard"><div class="sec" style="margin-bottom:10px">${vm+1}월 ${sel}일 (${dw}) 급식</div>${mealCardsHTML(mealsOf(dk))}</div>
+    </div>`
+    el.querySelectorAll('[data-mcnav]').forEach(b=>b.onclick=()=>{vm+=(+b.dataset.mcnav);if(vm<0){vm=11;vy--}if(vm>11){vm=0;vy++}draw()})
+    el.querySelectorAll('[data-day]').forEach(c=>c.onclick=()=>{sel=+c.dataset.day;draw()})
+  }
+  draw()
+}
+// 학사일정(귀가/등교 포함) 데이터
+function schoolEvents(){
+  const ev=[{date:'2026-08-29',label:'귀가 (집)',type:'home'}]
+  const pad=n=>String(n).padStart(2,'0')
+  const key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
+  // 첫 정규 금요일 귀가는 3주 예외(9/18), 이후 2주 간격 금요일 귀가·일요일 등교
+  let g=new Date(2026,8,18)
+  const end=new Date(2026,11,31)
+  while(g<=end){
+    const b=new Date(g);b.setDate(b.getDate()+2)
+    ev.push({date:key(g),label:'귀가 (집)',type:'home'})
+    ev.push({date:key(b),label:'등교',type:'school'})
+    g.setDate(g.getDate()+14)
+  }
+  ;(SCHEDULE||[]).forEach(s=>ev.push({date:s.date,label:s.label,type:s.type||'event'}))
+  return ev
+}
+// 학사일정 슬라이드: 달력 + 이번 달 일정 리스트
+function schoolCalSlide(el){
+  if(!el)return
+  const ALL=schoolEvents()
+  const now=new Date();let vy=now.getFullYear(),vm=now.getMonth()
+  const todayStr=todayKey()
+  const dotColor=t=>t==='home'?'var(--danger)':t==='school'?'#16A34A':'var(--primary)'
+  const draw=()=>{
+    const pad=n=>String(n).padStart(2,'0')
+    const mStr=`${vy}-${pad(vm+1)}`
+    const evMap={},dotColors={}
+    ALL.filter(s=>s.date.startsWith(mStr)).forEach(s=>{const d=+s.date.split('-')[2];(evMap[d]=evMap[d]||[]).push(s);if(!dotColors[d])dotColors[d]=dotColor(s.type)})
+    const today=(vy===now.getFullYear()&&vm===now.getMonth())?now.getDate():-1
+    const monthEvs=ALL.filter(s=>s.date.startsWith(mStr)).sort((a,b)=>a.date<b.date?-1:1)
+    el.innerHTML=`<div class="sc-inner">
+      <div style="margin:6px 18px 4px">${calGrid(vy,vm,{today,events:evMap,dotColors,nav:true})}</div>
+      <div style="margin:12px 18px 2px"><div class="cal-legend"><span><i style="background:var(--danger)"></i>귀가</span><span><i style="background:#16A34A"></i>등교</span><span><i style="background:var(--primary)"></i>학사일정</span></div></div>
+      ${monthEvs.length?`<div class="pcard"><div class="sec">${vm+1}월 일정</div>${monthEvs.map(s=>{const dd=Math.ceil((new Date(s.date)-new Date(todayStr))/86400000);const tag=dd===0?'오늘':dd>0?`D-${dd}`:s.date.slice(5).replace('-','/');const dw=['일','월','화','수','목','금','토'][new Date(s.date).getDay()];return`<div class="srow"><span class="sc-evdot" style="background:${dotColor(s.type)}"></span><div class="l"><div class="t">${esc(s.label)}</div><div class="d">${s.date.slice(5).replace('-','/')} (${dw})</div></div><span class="dday">${tag}</span></div>`}).join('')}</div>`:'<div class="empty">이번 달 일정이 없어요</div>'}
+    </div>`
+    el.querySelectorAll('[data-mcnav]').forEach(b=>b.onclick=()=>{vm+=(+b.dataset.mcnav);if(vm<0){vm=11;vy--}if(vm>11){vm=0;vy++}draw()})
+  }
+  draw()
+}
+// 회의록 슬라이드
+async function schoolMeetSlide(el){
+  if(!el)return
+  const admin=SESSION.role==='admin'
+  el.innerHTML=`<div class="sc-inner"><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
+  let ms=[]
+  try{const r=await wt(sb.from('okya_meetings').select('*').order('at',{ascending:false}));ms=r.data||[]}catch{}
+  const play='<svg viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M8 5v14l11-7z"/></svg>'
+  const list=ms.length?ms.map(m=>`<div class="lrow" data-url="${esc(m.url)}" style="cursor:pointer"><div class="vthumb">${play}</div><div class="body"><div class="ti">${esc(m.title)}</div><div class="su">${fmtDate(m.at)} 게시</div></div>${admin?`<button class="pbtn out" data-mdel="${m.id}" style="width:auto;padding:7px 12px;font-size:12px">삭제</button>`:`<span style="color:#c9cdd8;display:flex">${I.chev}</span>`}</div>`).join(''):'<div class="empty">등록된 회의 영상이 없어요.</div>'
+  el.innerHTML=`<div class="sc-inner">
+    <div class="pcard"><div class="sec">대의원회 회의록</div><div class="pet-note" style="margin:-2px 0 10px">📹 학생회 회의 영상을 다시 볼 수 있어요.</div>${list}</div>
+    ${admin?`<div class="pcard"><div class="sec">영상 등록</div><div class="field"><label>제목</label><input id="sm-t" placeholder="예: 2학기 2차 대의원회"></div><div class="field"><label>유튜브 링크</label><input id="sm-u" placeholder="https://youtube.com/..."></div><button class="pbtn pri" id="sm-add">등록</button></div>`:''}
+  </div>`
+  el.querySelectorAll('[data-url]').forEach(r=>r.onclick=()=>{const u=r.dataset.url;if(u)window.open(u,'_blank')})
+  if(admin){
+    const add=el.querySelector('#sm-add');if(add)add.onclick=async()=>{const t=el.querySelector('#sm-t').value.trim(),u=el.querySelector('#sm-u').value.trim();if(!t||!u){toast('제목과 링크를 입력해줘');return}try{await wt(sb.from('okya_meetings').insert({id:uid('mt'),title:t,url:u,at:nowISO()}))}catch{toast('등록 실패');return}toast('등록 완료');schoolMeetSlide(el)}
+    el.querySelectorAll('[data-mdel]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_meetings').delete().eq('id',b.dataset.mdel))}catch{};schoolMeetSlide(el)})
+  }
 }
 
 function rSchoolFood(){
