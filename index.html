@@ -650,10 +650,9 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .bnav-subitem{font-family:inherit;border:none;cursor:pointer;}
 .subarr{width:15px;height:15px;color:var(--muted);flex:none;}
 
-.cbtrack{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 11% 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-.cbtrack::-webkit-scrollbar{display:none;}
-.cbcard{scroll-snap-align:center;flex:0 0 78%;min-height:360px;border-radius:24px;box-shadow:var(--sh);background:var(--card);padding:24px;position:relative;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s var(--ease),box-shadow .3s var(--ease);}
-.cbcard:active{transform:scale(.99);}
+.cbtrack{position:relative;height:460px;perspective:1700px;overflow:hidden;padding:0;}
+.cbcard{position:absolute;top:50%;left:50%;width:min(400px,82%);height:420px;border-radius:24px;background:var(--card);padding:26px;overflow:hidden;display:flex;flex-direction:column;transform:translate(-50%,-50%);transform-style:preserve-3d;transition:transform .62s cubic-bezier(.22,1,.36,1),opacity .5s var(--ease),box-shadow .5s;box-shadow:0 18px 46px rgba(20,26,40,.16);cursor:pointer;}
+.cbcard.is-active{box-shadow:0 34px 74px rgba(20,26,40,.30);}
 /* 바로가기: 작은 직사각형 패널 세로 일렬 */
 .qcol{display:flex;flex-direction:column;gap:8px;padding:0 18px;}
 .qbtn{display:flex;align-items:center;gap:11px;background:var(--card);border-radius:13px;box-shadow:var(--sh);padding:11px 14px;cursor:pointer;transition:transform .13s var(--ease);}
@@ -684,17 +683,18 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
   .bnav-exp{display:flex;align-items:center;justify-content:center;width:36px;height:44px;flex:none;color:var(--muted);border-radius:12px;background:none;}
   .bnav-exp svg{width:18px;height:18px;transition:transform .25s var(--ease);}
   .bnav-group.open>.bnav-row .bnav-exp svg{transform:rotate(90deg);}
-  .bnav-sub{display:block;overflow:hidden;max-height:0;transition:max-height .32s var(--ease);}
-  .bnav-group.open>.bnav-sub{max-height:360px;}
-  .bnav-subitem{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:9px 12px 9px 30px;font-size:13.5px;font-weight:600;color:var(--ink2);border-radius:11px;background:none;}
+  .bnav-sub{display:block;overflow:hidden;max-height:0;opacity:0;transition:max-height .34s var(--ease),opacity .3s var(--ease);}
+  .bnav-group.open>.bnav-sub{max-height:380px;opacity:1;}
+  .bnav-subitem{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:9px 12px 9px 30px;font-size:13.5px;font-weight:600;color:var(--ink2);border-radius:11px;background:none;transform:translateX(-7px);transition:transform .32s var(--ease),background .15s,color .15s;}
+  .bnav-group.open .bnav-subitem{transform:none;}
   .bnav-subitem:hover{background:var(--soft);color:var(--ink);}
   .bnav-subitem:hover .subarr{color:var(--primary);}
-  /* 배너: 중앙에 한 장 크게(세로로 긴 직사각형), 양옆 살짝 보임 */
-  .cbtrack{padding-left:calc(50% - 240px);padding-right:calc(50% - 240px);gap:22px;}
-  .cbcard{flex:0 0 480px;min-height:470px;padding:28px;}
-  .cb-petitle{font-size:28px;}
-  /* 바로가기 세로 패널: 배너 아래 중앙 좁게 */
-  .qcol{max-width:480px;margin:0 auto;}
+  /* 배너 커버플로우: 중앙 한 장 크게, 양옆 겹쳐 보임 */
+  .cbtrack{height:600px;perspective:2100px;}
+  .cbcard{width:min(620px,58%);height:560px;padding:34px;}
+  .cb-petitle{font-size:30px;}
+  /* 바로가기 세로 패널: 왼쪽 정렬 */
+  .qcol{max-width:520px;}
 }
 </style>
 </head>
@@ -1649,25 +1649,38 @@ function rComm(){
   })
   initCarousel()
 }
-// 배너 캐러셀: 중앙 스냅(한 장씩 강조, 양옆 살짝 보임) + 점 동기화 + 느린 자동 넘김
+// 배너 커버플로우: 3D로 겹쳐 뒤→앞으로 넘어오는 느낌 + 점 동기화 + 느린 자동(수동 시 타이머 리셋)
 function initCarousel(){
-  const track=document.getElementById('cbtrack');if(!track)return
+  const stage=document.getElementById('cbtrack');if(!stage)return
   const dots=[...document.querySelectorAll('#cbdots i')]
-  const cards=[...track.querySelectorAll('.cbcard')];if(!cards.length)return
-  const centerTarget=i=>cards[i].offsetLeft-(track.clientWidth-cards[i].offsetWidth)/2
-  const idxOf=()=>{const c=track.scrollLeft+track.clientWidth/2;let best=0,bd=1e9;cards.forEach((el,i)=>{const cc=el.offsetLeft+el.offsetWidth/2,d=Math.abs(cc-c);if(d<bd){bd=d;best=i}});return best}
-  const sync=()=>{const i=idxOf();dots.forEach((d,j)=>d.classList.toggle('on',j===i))}
-  const glide=(to,dur=1100)=>{const s=track.scrollLeft,diff=to-s,t0=performance.now();(function st(n){const p=Math.min(1,(n-t0)/dur),e=1-Math.pow(1-p,3);track.scrollLeft=s+diff*e;if(p<1)requestAnimationFrame(st);else sync()})(performance.now())}
-  track.addEventListener('scroll',()=>{clearTimeout(track._t);track._t=setTimeout(sync,60)})
-  dots.forEach((d,i)=>d.onclick=()=>glide(centerTarget(i)))
-  clearInterval(track._auto)
-  track._auto=setInterval(()=>{
-    if(!document.body.contains(track)){clearInterval(track._auto);return}
-    const n=(idxOf()+1)%cards.length
-    glide(centerTarget(n))
-  },7000)
-  track.addEventListener('pointerdown',()=>clearInterval(track._auto),{once:true})
-  requestAnimationFrame(()=>{track.scrollLeft=Math.max(0,centerTarget(0));sync()})
+  const cards=[...stage.querySelectorAll('.cbcard')];const n=cards.length;if(!n)return
+  let active=0,timer=null,sx=null
+  const layout=()=>{
+    const w=cards[0].offsetWidth||360
+    cards.forEach((el,i)=>{
+      let o=i-active
+      if(o>n/2)o-=n; else if(o<-n/2)o+=n            // 최단 경로(돌아가는 느낌)
+      const ao=Math.abs(o)
+      el.style.transition=ao>=2?'none':''            // 멀리서 감싸는 카드는 순간 이동(중앙 가로지르기 방지)
+      if(ao>2){el.style.opacity='0';el.style.pointerEvents='none';el.style.zIndex='0';el.style.transform='translate(-50%,-50%) scale(.55)';el.classList.remove('is-active');return}
+      el.style.opacity=ao===0?'1':(ao===1?'.9':'.5')
+      el.style.pointerEvents='auto'
+      el.style.zIndex=String(30-ao)
+      const x=o*w*0.6
+      const sc=ao===0?1:(ao===1?.85:.7)
+      el.style.transform=`translate(calc(-50% + ${x}px),-50%) scale(${sc}) rotateY(${o*-16}deg)`
+      el.classList.toggle('is-active',ao===0)
+    })
+    dots.forEach((d,j)=>d.classList.toggle('on',j===active))
+  }
+  const stopAuto=()=>{clearTimeout(timer)}
+  const startAuto=()=>{stopAuto();timer=setTimeout(()=>{if(document.body.contains(stage))go(active+1)},9000)}
+  const go=i=>{active=((i%n)+n)%n;layout();startAuto()}          // 이동할 때마다 타이머 리셋 → 동시 넘김 방지
+  dots.forEach((d,i)=>d.onclick=()=>go(i))
+  cards.forEach((el,i)=>el.onclick=()=>{if(i!==active)go(i)})
+  stage.addEventListener('pointerdown',e=>{sx=e.clientX;stopAuto()})
+  window.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(dx<-45)go(active+1);else if(dx>45)go(active-1);else startAuto()})
+  layout();startAuto()
 }
 
 async function rLost(){
