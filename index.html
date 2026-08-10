@@ -545,6 +545,69 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .p3 .ntrow.unread{background:linear-gradient(90deg,var(--primary-tint),transparent 70%);border-radius:12px;margin:0 -6px;padding-left:6px;padding-right:6px;}
 .p3 .ntrow.unread+.lrow{border-top-color:transparent;}
 .p3 .ntrow .ntdot{width:8px;height:8px;border-radius:50%;background:#FF4D4F;flex:none;align-self:center;box-shadow:0 0 0 3px rgba(255,77,79,.14);}
+
+/* ===================================================================
+   홈 2열 래퍼 (세로에선 투명, 가로에서 그리드) + 진입 애니메이션 강화
+   =================================================================== */
+.home-top,.home-cols,.home-col{display:contents;}
+/* 홈 카드 진입: 크게 떠오르며 살짝 오버슈트 (세로/가로 공통) */
+.screen.p3.home-scope>*{animation:none;}
+@keyframes p3rise2{from{opacity:0;transform:translateY(28px) scale(.965);}60%{opacity:1;}to{opacity:1;transform:none;}}
+.screen.p3.home-scope .home-top>*,
+.screen.p3.home-scope .home-col>*{animation:p3rise2 .62s var(--ease) both;}
+.screen.p3.home-scope .home-top>*:nth-child(1){animation-delay:.02s;}
+.screen.p3.home-scope .home-top>*:nth-child(2){animation-delay:.07s;}
+.screen.p3.home-scope .home-col>*:nth-child(1){animation-delay:.13s;}
+.screen.p3.home-scope .home-col>*:nth-child(2){animation-delay:.20s;}
+.screen.p3.home-scope .home-col>*:nth-child(3){animation-delay:.27s;}
+.screen.p3.home-scope .home-col>*:nth-child(4){animation-delay:.34s;}
+
+/* 급식 슬롯 전환 애니메이션 */
+@keyframes mealSwap{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:none;}}
+.p3 .meal.swap{animation:mealSwap .32s var(--ease) both;}
+@keyframes ddPop{0%{transform:scale(.2);opacity:0;}55%{transform:scale(1.18);opacity:1;}100%{transform:scale(1);}}
+.p3 .dot.pop{animation:ddPop .5s var(--ease) both;}
+
+/* ===================================================================
+   출석 보상 축하 연출
+   =================================================================== */
+.celebrate{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden;}
+.celebrate .glow{position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(123,108,255,.42),rgba(123,108,255,0) 70%);animation:celGlow .9s var(--ease) both;}
+@keyframes celGlow{0%{transform:scale(.3);opacity:0;}30%{opacity:1;}100%{transform:scale(1.25);opacity:0;}}
+.celebrate .badge{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;animation:celBadge 1.5s var(--ease) both;}
+@keyframes celBadge{0%{transform:scale(.3) translateY(20px);opacity:0;}18%{transform:scale(1.12) translateY(0);opacity:1;}30%{transform:scale(1);}78%{transform:scale(1);opacity:1;}100%{transform:scale(.92) translateY(-14px);opacity:0;}}
+.celebrate .coin{width:104px;height:104px;border-radius:50%;background:linear-gradient(135deg,#FFD873,#F5A623);display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:800;color:#fff;box-shadow:0 14px 40px rgba(245,166,35,.5),inset 0 3px 8px rgba(255,255,255,.6);animation:coinSpin 1s var(--ease) both;}
+@keyframes coinSpin{0%{transform:rotateY(0);}100%{transform:rotateY(720deg);}}
+.celebrate .amt2{font-size:40px;font-weight:800;letter-spacing:-1.5px;background:linear-gradient(135deg,var(--ga),var(--gb));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 4px 20px rgba(123,108,255,.25);}
+.celebrate .msg2{font-size:15px;font-weight:700;color:var(--ink);background:#fff;padding:8px 18px;border-radius:100px;box-shadow:var(--sh);}
+.celebrate .p{position:absolute;top:50%;left:50%;width:13px;height:13px;border-radius:3px;opacity:0;animation:confetti 1.25s var(--ease) forwards;}
+@keyframes confetti{0%{transform:translate(-50%,-50%) rotate(0);opacity:1;}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0;}}
+
+/* ===================================================================
+   가로모드 (아이패드 기본) — 왼쪽 세로 레일 + 홈 2열
+   =================================================================== */
+@media (min-width:820px) and (min-aspect-ratio:1/1){
+  #app{max-width:none;}
+  /* 하단 탭 → 좌측 세로 레일 */
+  .bnav{position:fixed;left:0;top:0;bottom:0;width:214px;height:100dvh;max-width:none;transform:none;flex-direction:column;align-items:stretch;border-radius:0;padding:20px 13px 16px;gap:3px;background:var(--card);border:none;border-right:1px solid var(--line);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;}
+  .bnav::before{content:"okya";display:flex;align-items:center;font-size:20px;font-weight:800;color:var(--primary);letter-spacing:-.5px;padding:6px 12px 20px;}
+  .bnav-item{flex:none;flex-direction:row;justify-content:flex-start;gap:13px;padding:12px 13px;border-radius:14px;font-size:15px;font-weight:700;}
+  .bnav-item span{font-size:15px;}
+  .bnav-item svg{width:23px;height:23px;}
+  .bnav-item.active{background:var(--primary-tint);}
+  .bnav-item[data-tab="my"]{margin-top:auto;}
+  /* 스테이지 */
+  .screen:not(.no-nav){padding-left:214px;padding-bottom:32px;background:var(--bg);}
+  .screen.p3{background:var(--bg);}
+  .screen.no-nav{max-width:600px;margin:0 auto;}
+  /* 홈 헤더/그리드 폭 정렬 (flex 컬럼에서 쪼그라들지 않게 width:100%) */
+  .p3 .home-top{display:block;width:100%;max-width:924px;margin:0 auto;}
+  .p3 .home-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;width:100%;max-width:924px;margin:6px auto 0;}
+  .p3 .home-col{display:flex;flex-direction:column;gap:16px;}
+  .p3 .home-col>*{margin:0!important;}
+  .p3 .home-top .topbar{padding-left:4px;padding-right:4px;}
+  .p3 .home-top .greet{padding-left:4px;padding-right:4px;}
+}
 </style>
 </head>
 <body>
@@ -689,6 +752,7 @@ function renderHomeMeal(slot){
   seg.innerHTML=MEAL_SLOTS.map(([k])=>`<button class="ppill${k===slot?' on':''}" data-slot="${k}">${k}</button>`).join('')
   const items=((mealsOf(todayKey())||{})[slot]||[]).filter(Boolean)
   ul.innerHTML=items.length?items.map(x=>`<li>${esc(x)}</li>`).join(''):`<div style="padding:6px 0;font-size:13.5px;color:var(--sub)">급식 정보가 없어요</div>`
+  ul.classList.remove('swap');void ul.offsetWidth;ul.classList.add('swap')
   seg.querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>renderHomeMeal(b.dataset.slot))
 }
 // 출석 체크 (+20옥, 하루 1회)
@@ -699,7 +763,23 @@ async function doAttendance(){
   const wk=attWeek(txs),isFri=new Date().getDay()===5,bonus=isFri&&wk[0]&&wk[1]&&wk[2]&&wk[3]
   const amt=bonus?40:20
   const ok=await addTx({from:'u_council',to:SESSION.id,amount:amt,type:'출석',reason:bonus?'출석(개근 보너스)':'출석 체크'})
-  if(ok){toast(bonus?'개근 달성! +40옥 🎉':'출석 완료! +20옥 🎉');rHome()}
+  if(ok){celebrate(amt,bonus);await rHome();const on=app().querySelectorAll('#att-panel .dot.on');const last=on[on.length-1];if(last)last.classList.add('pop')}
+}
+// 출석 보상 축하 연출 (코인 스핀 + 콘페티 버스트 + 금액 팝업)
+function celebrate(amount,bonus){
+  const cols=['#7B6CFF','#CE7AFF','#FFD873','#5AD8A6','#FF7AA2','#6453FF']
+  let conf=''
+  for(let i=0;i<28;i++){
+    const ang=Math.random()*Math.PI*2,dist=110+Math.random()*190
+    const dx=Math.round(Math.cos(ang)*dist),dy=Math.round(Math.sin(ang)*dist*.85+40+Math.random()*140)
+    const c=cols[i%cols.length],rot=Math.round(Math.random()*720-360)+'deg',delay=(Math.random()*.14).toFixed(2)
+    conf+=`<span class="p" style="background:${c};--dx:calc(-50% + ${dx}px);--dy:calc(-50% + ${dy}px);--rot:${rot};animation-delay:${delay}s"></span>`
+  }
+  const ov=document.createElement('div')
+  ov.className='celebrate'
+  ov.innerHTML=`<div class="glow"></div>${conf}<div class="badge"><div class="coin">옥</div><div class="amt2">+${fmt(amount)}옥</div><div class="msg2">${bonus?'개근 달성! 🎉':'출석 완료! 🔥'}</div></div>`
+  document.body.appendChild(ov)
+  setTimeout(()=>ov.remove(),1650)
 }
 function attWeek(txs){const now=new Date(),day=(now.getDay()+6)%7,mon=new Date(now);mon.setDate(now.getDate()-day);const pad=n=>String(n).padStart(2,'0');const res=[];for(let i=0;i<5;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);res.push(txs.some(x=>x.type==='출석'&&x.to===SESSION.id&&(x.at||'').slice(0,10)===`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`))}return res}
 const ICO_CHECK_SM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
@@ -844,39 +924,44 @@ async function rHome(){
     return`<div class="srow"><div class="l"><div class="t">${esc(s.label)}</div><div class="d">${fmtDate(s.date)}</div></div><span class="dday">D-${dd}</span></div>`
   }).join('')
 
-  app().innerHTML=`<div class="screen fade-in p3">
-    ${headerHTML}
-
-    <!-- 잔액 카드 -->
-    <div class="balance">
-      <div class="lbl">${admin?'학생회 총 발행량':'옥야머니 잔액'}</div>
-      <div class="amt"><span id="balnum">0</span><small>옥</small></div>
-      <div class="prog"><i id="progbar" style="width:0"></i></div>
-      <div class="prog-lbl"><span>${new Date().getFullYear()}년</span><span><b id="progpct">0</b>% 지남</span></div>
-      <div class="bbtns">
-        <button class="bbtn" id="ha-send">${I.send}${admin?'발행':'송금'}</button>
-        ${admin?`<button class="bbtn" id="ha-recall">${I.recall}회수</button>`:''}
-        <button class="bbtn" id="ha-hist">${I.hist}내역</button>
+  app().innerHTML=`<div class="screen fade-in p3 home-scope">
+    <div class="home-top">${headerHTML}</div>
+    <div class="home-cols">
+     <div class="home-col">
+      <!-- 잔액 카드 -->
+      <div class="balance">
+        <div class="lbl">${admin?'학생회 총 발행량':'옥야머니 잔액'}</div>
+        <div class="amt"><span id="balnum">0</span><small>옥</small></div>
+        <div class="prog"><i id="progbar" style="width:0"></i></div>
+        <div class="prog-lbl"><span>${new Date().getFullYear()}년</span><span><b id="progpct">0</b>% 지남</span></div>
+        <div class="bbtns">
+          <button class="bbtn" id="ha-send">${I.send}${admin?'발행':'송금'}</button>
+          ${admin?`<button class="bbtn" id="ha-recall">${I.recall}회수</button>`:''}
+          <button class="bbtn" id="ha-hist">${I.hist}내역</button>
+        </div>
       </div>
+
+      <!-- 출석 -->
+      ${admin?'':`<div class="pcard tight att" id="att-panel">${attendancePanelHTML(txs)}</div>`}
+
+      <!-- 오늘 급식 -->
+      <div class="pcard">
+        <div class="chd"><div class="pills" id="home-meal-seg"></div><button id="meal-cal">${ICO_CAL}</button></div>
+        <ul class="meal" id="home-meal"></ul>
+      </div>
+     </div>
+
+     <div class="home-col">
+      <!-- 다가오는 일정 -->
+      ${upcoming.length?`<div class="pcard"><div class="sec">다가오는 일정</div>${ddays}</div>`:''}
+
+      <!-- 이 달 일정 -->
+      <div class="pcard"><div class="sec">이 달 일정</div><div id="home-cal"></div><div id="home-cal-detail" class="cal-detail"></div></div>
+
+      <!-- 학교 공지 -->
+      <div class="pcard"><div class="sec">학교 공지</div>${NOTICES.map(n=>`<div class="lrow"><div class="chip ti-blue">${I.notice}</div><div class="body"><div class="ti">${esc(n.title)}</div><div class="su">${esc(n.cat)} · ${fmtDate(n.at)}</div></div></div>`).join('')}</div>
+     </div>
     </div>
-
-    <!-- 출석 -->
-    ${admin?'':`<div class="pcard tight att" id="att-panel">${attendancePanelHTML(txs)}</div>`}
-
-    <!-- 오늘 급식 -->
-    <div class="pcard">
-      <div class="chd"><div class="pills" id="home-meal-seg"></div><button id="meal-cal">${ICO_CAL}</button></div>
-      <ul class="meal" id="home-meal"></ul>
-    </div>
-
-    <!-- 다가오는 일정 -->
-    ${upcoming.length?`<div class="pcard"><div class="sec">다가오는 일정</div>${ddays}</div>`:''}
-
-    <!-- 이 달 일정 -->
-    <div class="pcard"><div class="sec">이 달 일정</div><div id="home-cal"></div><div id="home-cal-detail" class="cal-detail"></div></div>
-
-    <!-- 학교 공지 -->
-    <div class="pcard"><div class="sec">학교 공지</div>${NOTICES.map(n=>`<div class="lrow"><div class="chip ti-blue">${I.notice}</div><div class="body"><div class="ti">${esc(n.title)}</div><div class="su">${esc(n.cat)} · ${fmtDate(n.at)}</div></div></div>`).join('')}</div>
 
     <div style="height:6px"></div>
   </div>${bnav()}`
