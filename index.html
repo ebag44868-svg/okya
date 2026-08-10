@@ -1141,7 +1141,7 @@ function bnav(){
     {k:'money',l:'머니',ic:I.money},
     {k:'school',l:'학교',ic:I.school,subs:[['food','급식'],['cal','학사일정'],['tt','시간표'],['mt','회의록']]},
     {k:'comm',l:'커뮤',ic:I.comm,subs:[['challenge','챌린지'],['petition','청원'],['book','책 교환'],['binding','제본소']]},
-    {k:'search',l:'검색',ic:I.search},
+    {k:'search',l:'메시지',ic:I.msg},
     {k:'my',l:'MY',ic:I.my}
   ]
   return`<nav class="bnav">${tabs.map(t=>{
@@ -2051,15 +2051,15 @@ function showLostMap(){
   ov.onclick=e=>{if(e.target===ov)ov.remove()}
 }
 
-// ── 검색 탭 ──
+// ── 메시지 탭 (검색 + 최근 대화, 클릭 시 전체화면 채팅) ──
 async function rSearch(){
   TAB='search'
-  const personRow=(u,sub)=>`<div class="lrow" data-uid="${u.id}" style="cursor:pointer"><div class="chip ti-blue" style="border-radius:50%;overflow:hidden;font-weight:800">${u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover">`:esc((u.name||'?').charAt(0))}</div><div class="body"><div class="ti">${esc(u.name)}</div><div class="su">${sub}</div></div><span style="color:#c9cdd8;display:flex">${I.chev}</span></div>`
+  const personRow=(u,sub,unread)=>`<div class="lrow" data-uid="${u.id}" style="cursor:pointer"><div class="chip ti-blue" style="border-radius:50%;overflow:hidden;font-weight:800">${u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover">`:esc((u.name||'?').charAt(0))}</div><div class="body"><div class="ti">${esc(u.name)}${u.role==='admin'?' <span style="font-size:11px;color:var(--primary);font-weight:700">학생회</span>':''}</div><div class="su">${sub}</div></div>${unread?'<span class="dm-unread"></span>':`<span style="color:#c9cdd8;display:flex">${I.chev}</span>`}</div>`
   app().innerHTML=`<div class="screen fade-in p3">
-    <div class="topbar"><div class="t">검색</div><div style="width:34px"></div></div>
-    <div style="padding:2px 18px 0"><div style="display:flex;align-items:center;gap:9px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:12px 15px"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--sub);fill:none;stroke-width:2;stroke-linecap:round;flex:none"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="srch-inp" placeholder="이름으로 검색" style="flex:1;background:none;border:none;outline:none;font-size:14px;padding:0" autocomplete="off"></div></div>
+    <div class="topbar"><div class="t">메시지</div><div style="width:34px"></div></div>
+    <div style="padding:2px 18px 0"><div style="display:flex;align-items:center;gap:9px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:12px 15px"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--sub);fill:none;stroke-width:2;stroke-linecap:round;flex:none"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="srch-inp" placeholder="이름으로 검색해 새 대화 시작" style="flex:1;background:none;border:none;outline:none;font-size:14px;padding:0" autocomplete="off"></div></div>
     <div id="srch-res"></div>
-    <div id="dm-hist"><div class="pcard"><div class="sec">최근 대화</div><div id="dm-hist-list"><div class="loader" style="min-height:80px"><div class="spin"></div></div></div></div></div>
+    <div id="dm-hist"><div class="sec" style="margin:20px 20px 8px">최근 대화</div><div class="pcard"><div id="dm-hist-list"><div class="loader" style="min-height:80px"><div class="spin"></div></div></div></div></div>
   </div>${bnav()}`
   bindNav()
 
@@ -2073,9 +2073,9 @@ async function rSearch(){
     if(!trimmed){res.innerHTML='';return}
     const found=USERS.filter(u=>u.id!==SESSION.id&&u.name.includes(trimmed))
     res.innerHTML=found.length
-      ?`<div class="pcard">${found.map(u=>personRow(u,u.role==='admin'?'학생회':'학생')).join('')}</div>`
+      ?`<div class="sec" style="margin:16px 20px 8px">새 대화</div><div class="pcard">${found.map(u=>personRow(u,u.role==='admin'?'학생회':'학생')).join('')}</div>`
       :`<div class="empty">검색 결과가 없어요</div>`
-    res.querySelectorAll('[data-uid]').forEach(el=>{el.onclick=()=>push(()=>rUserProfile(el.dataset.uid))})
+    res.querySelectorAll('[data-uid]').forEach(el=>{el.onclick=()=>push(()=>rDmChat(el.dataset.uid))})
   }
   inp.oninput=()=>showResults(inp.value)
 
@@ -2088,14 +2088,15 @@ async function rSearch(){
   }catch{}
   const histList=document.getElementById('dm-hist-list')
   if(!histList)return
-  if(!dms.length){histList.innerHTML=`<div style="padding:14px 2px;text-align:center;color:var(--sub);font-size:13.5px">아직 대화가 없어요</div>`;return}
+  if(!dms.length){histList.innerHTML=`<div style="padding:22px 2px;text-align:center;color:var(--sub);font-size:13.5px">아직 대화가 없어요.<br>위에서 이름을 검색해 대화를 시작해보세요.</div>`;return}
   histList.innerHTML=dms.map(dm=>{
     const otherId=dm.from_id===SESSION.id?dm.to_id:dm.from_id
     const other=USERS.find(u=>u.id===otherId)||{id:otherId,name:'알 수 없음'}
-    const preview=dm.text?dm.text.slice(0,22)+(dm.text.length>22?'…':''):'사진'
+    const mine=dm.from_id===SESSION.id
+    const preview=(mine?'나: ':'')+(dm.text?dm.text.slice(0,22)+(dm.text.length>22?'…':''):'사진')
     return personRow(other,`${esc(preview)} · ${timeago(dm.at)}`)
   }).join('')
-  histList.querySelectorAll('[data-uid]').forEach(el=>{el.onclick=()=>push(()=>rUserProfile(el.dataset.uid))})
+  histList.querySelectorAll('[data-uid]').forEach(el=>{el.onclick=()=>push(()=>rDmChat(el.dataset.uid))})
 }
 
 function rUserProfile(userId){
