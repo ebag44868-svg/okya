@@ -710,7 +710,11 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .chal-intro{font-size:12.5px;color:var(--sub);margin-top:3px;line-height:1.5;}
 .chal-hero{width:100%;aspect-ratio:3/4;max-width:460px;margin:2px auto 0;border-radius:20px;overflow:hidden;background:var(--soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;box-shadow:var(--sh);}
 .chal-hero img{width:100%;height:100%;object-fit:cover;}
-.sub-card{background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:14px;margin-bottom:10px;}
+.chal-detail{padding:4px 0 24px;}
+.chal-card{cursor:pointer;animation:chalpop .45s var(--ease) both;}
+@keyframes chalpop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.chal-card:nth-child(2){animation-delay:.05s}.chal-card:nth-child(3){animation-delay:.1s}.chal-card:nth-child(4){animation-delay:.15s}.chal-card:nth-child(n+5){animation-delay:.2s}
+.sub-card{background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:14px;margin:0 18px 10px;animation:chalpop .4s var(--ease) both;}
 .sub-card .sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px;}
 .sub-card .sc-name{font-size:14px;font-weight:800;color:var(--ink);}
 .sub-card .sc-meta{font-size:12px;color:var(--sub);margin-top:2px;}
@@ -1976,27 +1980,29 @@ const _cbPage=(title)=>{app().innerHTML=`<div class="screen no-nav fade-in p3"><
 // ===== 챌린지 (전체화면 포스터 갤러리 → 공모전형 상세 → 인증 → 전원 지급) =====
 async function rChallengePage(){
   const admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen no-nav fade-in p3 fs">
-    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지</div>${admin?`<button id="ch-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 만들기</button>`:`<div style="width:34px"></div>`}</div>
+  app().innerHTML=`<div class="screen fade-in p3">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지</div>${admin?`<button id="ch-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 발행</button>`:`<div style="width:34px"></div>`}</div>
     <div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
-  </div>`
+  </div>${bnav()}`
+  bindNav()
   document.getElementById('bk').onclick=pop
   if(admin)document.getElementById('ch-new').onclick=()=>push(rChallengeNew)
   await iChallengeGallery()
 }
 async function iChallengeGallery(){
+  const admin=SESSION.role==='admin'
   let evs=[]
   try{const r=await wt(sb.from('okya_events').select('*').order('at',{ascending:false}));evs=r.data||[]}catch{}
   evs=evs.filter(e=>!isExpired(e))
   const cb=document.getElementById('cb');if(!cb)return
-  cb.innerHTML=(evs.length?`<div class="chal-grid">${evs.map(e=>`<div class="chal-card" data-open="${e.id}"><div class="chal-poster">${e.poster?`<img src="${esc(e.poster)}">`:`<span class="chal-ph">${I.image}포스터 준비 중</span>`}</div><div class="chal-name">${esc(e.title)}</div><div class="chal-intro">${esc(e.descr||'')}</div></div>`).join('')}</div>`:'<div class="empty">진행 중인 챌린지가 없어요.</div>')+'<div style="height:16px"></div>'
+  cb.innerHTML=(evs.length?`<div class="chal-grid">${evs.map(e=>`<div class="chal-card" data-open="${e.id}"><div class="chal-poster">${e.poster?`<img src="${esc(e.poster)}">`:`<span class="chal-ph">${I.image}포스터 준비 중</span>`}</div><div class="chal-name">${esc(e.title)}</div><div class="chal-intro">${esc(e.descr||'')}</div></div>`).join('')}</div>`:`<div class="empty">진행 중인 챌린지가 없습니다.${admin?'<br><br>우측 상단 <b style="color:var(--primary)">＋ 발행</b>으로 새 챌린지를 만들어보세요.':'<br><br>새로운 챌린지가 곧 올라올 거예요!'}</div>`)+'<div style="height:16px"></div>'
   cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rChallengeDetail(el.dataset.open)))
 }
 function rChallengeNew(){
   let posterFile=null
-  app().innerHTML=`<div class="screen no-nav fade-in p3 fs">
+  app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">새 챌린지</div><div style="width:34px"></div></div>
-    <div class="chal-detail" style="padding:4px 18px 24px">
+    <div class="chal-detail">
       <div class="pcard">
         <div class="field"><label>포스터(팜플렛)</label>
           <label for="cnf" class="upload" id="cnfl">${I.image}<span>포스터 이미지 추가</span></label>
@@ -2008,7 +2014,8 @@ function rChallengeNew(){
         <button class="pbtn pri" id="cnsub" style="margin-top:14px">등록</button>
       </div>
     </div>
-  </div>`
+  </div>${bnav()}`
+  bindNav()
   document.getElementById('bk').onclick=pop
   document.getElementById('cnf').onchange=e=>{const f=e.target.files[0];if(f){posterFile=f;const l=document.getElementById('cnfl');l.classList.add('has');l.innerHTML=`<img src="${URL.createObjectURL(f)}">`}}
   document.getElementById('cnsub').onclick=async()=>{
@@ -2021,18 +2028,27 @@ function rChallengeNew(){
     toast('챌린지 등록 완료');pop()
   }
 }
+async function _payChalSubs(e,list){
+  const ids=new Set()
+  list.forEach(s=>{if(s.by_id)ids.add(s.by_id);(s.names||'').split(/[,\s·]+/).map(x=>x.trim()).filter(Boolean).forEach(nm=>{const u=USERS.find(u=>u.role!=='admin'&&u.name===nm);if(u)ids.add(u.id)})})
+  const arr=[...ids]
+  for(const id of arr)await addTx({from:'u_council',to:id,amount:e.reward,type:'발행',reason:'['+e.title+'] 챌린지 인증'})
+  for(const s of list){try{await wt(sb.from('okya_event_subs').delete().eq('id',s.id))}catch{}}
+  return arr.length
+}
 async function rChallengeDetail(eid){
   const admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen no-nav fade-in p3 fs"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지</div>${admin?`<button id="ch-del" style="font-size:12px;font-weight:700;color:var(--danger);background:none">삭제</button>`:`<div style="width:34px"></div>`}</div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>`
+  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지</div>${admin?`<button id="ch-del" style="font-size:12px;font-weight:700;color:var(--danger);background:none">삭제</button>`:`<div style="width:34px"></div>`}</div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
+  bindNav()
   document.getElementById('bk').onclick=pop
   let e=null,subs=[]
   try{const[r1,r2]=await Promise.allSettled([wt(sb.from('okya_events').select('*').eq('id',eid).single()),wt(sb.from('okya_event_subs').select('*').eq('event_id',eid).order('at',{ascending:false}))]);e=r1.status==='fulfilled'?r1.value.data:null;subs=r2.status==='fulfilled'?(r2.value.data||[]):[]}catch{}
   const cb=document.getElementById('cb');if(!cb)return
   if(!e){cb.innerHTML='<div class="empty">챌린지를 찾을 수 없어요.</div>';return}
   const ddTxt=e.deadline?`~${fmtDate(e.deadline)} 마감`:'상시 진행'
-  const subCards=subs.length?subs.map(s=>`<div class="sub-card"><div class="sc-top"><div><div class="sc-name">${esc(s.names||s.by_name||'-')}</div><div class="sc-meta">제출 ${esc(s.by_name||'')} · ${fmtDate(s.at)}</div></div>${admin?`<button class="minibtn danger" data-sdel="${s.id}">삭제</button>`:''}</div>${s.photo?`<img class="sc-photo" src="${esc(s.photo)}">`:''}${s.note?`<div class="sc-note">${esc(s.note)}</div>`:''}</div>`).join(''):'<div class="empty" style="padding:26px 20px">아직 인증이 없어요.</div>'
+  const subCards=subs.length?subs.map(s=>`<div class="sub-card"><div class="sc-top"><div style="min-width:0"><div class="sc-name">${esc(s.names||s.by_name||'-')}</div><div class="sc-meta">제출 ${esc(s.by_name||'')} · ${fmtDate(s.at)}</div></div>${admin?`<div style="display:flex;gap:6px;flex-shrink:0"><button class="minibtn soft" data-pay="${s.id}">지급</button><button class="minibtn danger" data-sdel="${s.id}">삭제</button></div>`:''}</div>${s.photo?`<img class="sc-photo" src="${esc(s.photo)}">`:''}${s.note?`<div class="sc-note">${esc(s.note)}</div>`:''}</div>`).join(''):'<div class="empty" style="padding:26px 20px">아직 인증이 없어요.</div>'
   cb.innerHTML=`
-    <div class="chal-detail" style="padding:4px 18px 96px">
+    <div class="chal-detail">
       <div class="chal-hero">${e.poster?`<img src="${esc(e.poster)}">`:`<span class="chal-ph">${I.image}포스터 준비 중</span>`}</div>
       <div class="pcard" style="margin-top:14px">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
@@ -2041,25 +2057,29 @@ async function rChallengeDetail(eid){
         </div>
         ${e.descr?`<div style="font-size:14px;line-height:1.7;color:var(--ink2);white-space:pre-wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">${esc(e.descr)}</div>`:''}
       </div>
-      <div class="sec" style="margin:18px 2px 10px">인증 <span style="color:var(--primary)">${subs.length}</span></div>
+      ${admin?'':`<div style="padding:0 18px;margin-top:14px"><button class="pbtn pri" id="ch-verify">인증하기</button></div>`}
+      <div class="sec" style="margin:18px 20px 10px;display:flex;align-items:center;justify-content:space-between">
+        <span>인증 <span style="color:var(--primary)">${subs.length}</span></span>
+        ${admin&&subs.length?`<button id="ch-payall" style="font-size:12.5px;font-weight:800;color:var(--primary);background:none">전원 지급 ›</button>`:''}
+      </div>
       ${subCards}
-    </div>
-    <div style="position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--bg) 34%);padding:14px 18px calc(14px + env(safe-area-inset-bottom))">
-      ${admin?`<button class="pbtn pri" id="ch-payall">인증 학생 전원 ${fmt(e.reward)}옥 지급 · ${subs.length}건</button>`:`<button class="pbtn pri" id="ch-verify">인증하기</button>`}
+      <div style="height:12px"></div>
     </div>`
   if(admin){
     document.getElementById('ch-del').onclick=async()=>{await Promise.allSettled([wt(sb.from('okya_event_subs').delete().eq('event_id',eid)).catch(()=>{}),wt(sb.from('okya_events').delete().eq('id',eid)).catch(()=>{})]);toast('챌린지 삭제');pop()}
     const pa=document.getElementById('ch-payall')
     if(pa)pa.onclick=async()=>{
       if(!subs.length){toast('인증한 학생이 없어요');return}
-      pa.disabled=true;pa.textContent='지급 중...'
-      const ids=new Set()
-      subs.forEach(s=>{if(s.by_id)ids.add(s.by_id);(s.names||'').split(/[,\s·]+/).map(x=>x.trim()).filter(Boolean).forEach(nm=>{const u=USERS.find(u=>u.role!=='admin'&&u.name===nm);if(u)ids.add(u.id)})})
-      const list=[...ids]
-      for(const id of list)await addTx({from:'u_council',to:id,amount:e.reward,type:'발행',reason:'['+e.title+'] 챌린지 인증'})
-      try{await wt(sb.from('okya_event_subs').delete().eq('event_id',eid))}catch{}
-      toast(list.length+'명에게 지급 완료 🎉');pop()
+      pa.textContent='지급 중...'
+      const n=await _payChalSubs(e,subs)
+      toast(n+'명에게 지급 완료 🎉');rChallengeDetail(eid)
     }
+    document.querySelectorAll('[data-pay]').forEach(b=>b.onclick=async()=>{
+      const s=subs.find(x=>x.id===b.dataset.pay);if(!s)return
+      b.textContent='지급중';b.disabled=true
+      const n=await _payChalSubs(e,[s])
+      toast((n||0)+'명 지급 완료 🎉');rChallengeDetail(eid)
+    })
     document.querySelectorAll('[data-sdel]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_event_subs').delete().eq('id',b.dataset.sdel))}catch{};rChallengeDetail(eid)})
   }else{
     document.getElementById('ch-verify').onclick=()=>push(()=>rVerify(eid))
@@ -2129,7 +2149,7 @@ async function rVerify(eid){
   let e=null
   try{const r=await wt(sb.from('okya_events').select('*').eq('id',eid).single());e=r.data}catch{}
   if(!e){toast('챌린지를 찾을 수 없어요');return}
-  app().innerHTML=`<div class="screen no-nav fade-in p3 fs">
+  app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지 인증</div><div style="width:34px"></div></div>
     <div class="chal-detail">
     <div class="pcard"><div style="display:flex;gap:10px;align-items:center"><div class="chip ti-org">${I.star}</div><div style="flex:1"><div class="ti">${esc(e.title)}</div><div class="su">보상 ${fmt(e.reward)}옥 · ${fmtDate(e.deadline)}</div></div></div></div>
@@ -2144,7 +2164,8 @@ async function rVerify(eid){
       <p style="font-size:12px;color:var(--sub);margin-top:12px;text-align:center">학생회가 확인하고 옥야머니를 지급해요.</p>
     </div>
     </div>
-  </div>`
+  </div>${bnav()}`
+  bindNav()
   document.getElementById('bk').onclick=pop
   document.getElementById('vf').onchange=e2=>{const f=e2.target.files[0];if(f){const l=document.getElementById('vfl');l.classList.add('has');l.innerHTML=`<img src="${URL.createObjectURL(f)}">`}}
   document.getElementById('vsub').onclick=async()=>{
