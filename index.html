@@ -781,6 +781,10 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .pet-agree-btn.agreed{background:var(--primary-tint);color:var(--primary);box-shadow:none;}
 
 /* 책 교환 (굿노트 책장) */
+.book-help{margin:10px 18px 2px;padding:13px 15px;background:var(--primary-tint);border-radius:14px;font-size:12.5px;line-height:1.65;color:var(--ink2);}
+.book-help b{color:var(--primary);font-weight:800;}
+.p3 .upload.book-up.has{padding:16px;border-style:solid;border-color:var(--line);background:var(--soft);}
+.p3 .upload.book-up.has img{width:auto;max-width:150px;max-height:206px;aspect-ratio:3/4.1;object-fit:cover;margin:0 auto;border-radius:6px;box-shadow:0 5px 14px rgba(0,0,0,.16);}
 .book-shelf{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 16px;padding:10px 18px 10px;}
 .book-item{cursor:pointer;animation:petrise .45s var(--ease) both;}
 .book-item:active{transform:scale(.97);}
@@ -2204,7 +2208,7 @@ function rBookNew(){
       <div class="pcard">
         <div class="field"><label>교재명</label><input id="bt" placeholder="예: 통합사회1 (비상)"></div>
         <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>학년</label><select id="bg"><option>1학년</option><option>2학년</option><option>3학년</option></select></div><div class="field" style="flex:1"><label>구분</label><select id="bk2"><option>나눔</option><option>교환</option></select></div></div>
-        <div class="field" style="margin-bottom:0"><label>책 표지 사진 (선택)</label><label for="bf" class="upload" id="bfl">${I.image}<span>사진 추가하기</span></label><input id="bf" type="file" accept="image/*" style="display:none"></div>
+        <div class="field" style="margin-bottom:0"><label>책 표지 사진 (선택)</label><label for="bf" class="upload book-up" id="bfl">${I.image}<span>사진 추가하기</span></label><input id="bf" type="file" accept="image/*" style="display:none"></div>
       </div>
       <div style="padding:0 18px"><button class="pbtn pri" id="badd" style="margin-top:4px">등록하기</button><p style="font-size:12px;color:var(--sub);margin:12px 2px 0;text-align:center">사진이 없으면 표지가 자동 생성돼요.</p></div>
     </div>
@@ -2450,9 +2454,17 @@ async function iBook(){
   let books=[]
   try{const r=await wt(sb.from('okya_books').select('*').order('at',{ascending:false}));books=r.data||[]}catch{}
   const cb=document.getElementById('cb');if(!cb)return
+  // 신청되면 남들 화면에선 내려감(중복 신청 방지). 주인·신청자에게만 보임
+  const visible=books.filter(b=>{
+    if(b.owner===SESSION.id)return true
+    if((b.applicants||[]).some(a=>a.id===SESSION.id))return true
+    if(b.status==='matched')return false
+    return (b.applicants||[]).length===0
+  })
+  const help=`<div class="book-help">📚 <b>이용 방법</b> · ＋ 로 책을 등록하고, 표지를 눌러 <b>나눔/교환 신청</b>하세요. 신청하면 그 책은 다른 사람 화면에서 내려가고, <b>취소하면 다시 올라와요.</b> 댓글은 <b>책 주인과 작성자만</b> 볼 수 있어요.</div>`
   const addTile=`<div class="book-item book-add" id="book-add"><div class="book-cover book-addcover"><span>＋</span></div><div class="book-label"><div class="bl-title">새 책 등록</div></div></div>`
-  const items=books.map(b=>`<div class="book-item" data-open="${b.id}">${bookCoverEl(b)}<div class="book-label"><div class="bl-title">${esc(b.title)}</div><div class="bl-meta">${esc(b.grade||'')} · ${esc(b.owner_name||'')}</div></div></div>`).join('')
-  cb.innerHTML=`<div class="book-shelf">${addTile}${items}</div><div style="height:16px"></div>`
+  const items=visible.map(b=>`<div class="book-item" data-open="${b.id}">${bookCoverEl(b)}<div class="book-label"><div class="bl-title">${esc(b.title)}</div><div class="bl-meta">${esc(b.grade||'')} · ${esc(b.owner_name||'')}</div></div></div>`).join('')
+  cb.innerHTML=`${help}<div class="book-shelf">${addTile}${items}</div><div style="height:16px"></div>`
   document.getElementById('book-add').onclick=()=>push(rBookNew)
   cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rBookDetail(el.dataset.open)))
 }
@@ -2474,7 +2486,9 @@ async function rBookDetail(id){
     else act=`<div class="empty" style="padding:14px">${esc(b.recipient_name)}님과 교환 확정됨</div>`
   }
   const apps=(mine&&b.status==='open'&&b.applicants?.length)?`<div class="pet-note" style="margin-top:8px">신청: ${b.applicants.map(a=>esc(a.name)).join(', ')}</div>`:''
-  const comments=cs.length?cs.map(c=>`<div class="bc-item"><div class="bc-head"><span class="bc-by">${esc(c.byName)}</span><span class="bc-at">${timeago(c.at)}</span></div><div class="bc-txt">${esc(c.text)}</div></div>`).join(''):'<div style="font-size:13px;color:var(--sub);padding:10px 0">첫 댓글을 남겨보세요.</div>'
+  // 댓글은 책 주인 또는 그 댓글 작성자에게만 보임
+  const visCs=cs.filter(c=>mine||c.by===SESSION.id)
+  const comments=visCs.length?visCs.map(c=>`<div class="bc-item"><div class="bc-head"><span class="bc-by">${esc(c.byName)}${c.by===b.owner?' · 책 주인':''}</span><span class="bc-at">${timeago(c.at)}</span></div><div class="bc-txt">${esc(c.text)}</div></div>`).join(''):'<div style="font-size:13px;color:var(--sub);padding:10px 0">아직 댓글이 없어요. 궁금한 점을 남겨보세요.</div>'
   cb.innerHTML=`<div class="chal-detail">
     <div class="book-hero">${bookCoverEl(b,true)}</div>
     <div class="pcard" style="margin-top:16px">
@@ -2484,10 +2498,10 @@ async function rBookDetail(id){
       ${apps}
       <div style="margin-top:14px">${act}</div>
     </div>
-    <div class="pcard"><div class="sec">댓글 <span style="color:var(--primary)">${cs.length}</span></div>${comments}<div style="display:flex;gap:8px;margin-top:10px"><input id="bd-cinput" placeholder="댓글 입력" style="flex:1;padding:11px 13px;font-size:14px"><button class="minibtn soft" id="bd-csend">등록</button></div></div>
+    <div class="pcard"><div class="sec">댓글 <span style="color:var(--primary)">${visCs.length}</span></div><div class="pet-note" style="margin:-4px 0 8px">🔒 책 주인과 작성자만 볼 수 있는 비공개 댓글이에요.</div>${comments}<div style="display:flex;gap:8px;margin-top:10px"><input id="bd-cinput" placeholder="댓글 입력" style="flex:1;padding:11px 13px;font-size:14px"><button class="minibtn soft" id="bd-csend">등록</button></div></div>
     <div style="height:10px"></div>
   </div>`
-  const ap=document.getElementById('bd-apply');if(ap)ap.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',id).single());const apps=[...(r.data?.applicants||[])];if(!apps.some(a=>a.id===SESSION.id))apps.push({id:SESSION.id,name:SESSION.name,at:nowISO()});await wt(sb.from('okya_books').update({applicants:apps}).eq('id',id))}catch{toast('오류');return};toast('신청했어요');rBookDetail(id)}
+  const ap=document.getElementById('bd-apply');if(ap)ap.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',id).single());const apps=[...(r.data?.applicants||[])];if(apps.length&&!apps.some(a=>a.id===SESSION.id)){toast('이미 다른 학생이 신청했어요');rBookDetail(id);return}if(!apps.some(a=>a.id===SESSION.id))apps.push({id:SESSION.id,name:SESSION.name,at:nowISO()});await wt(sb.from('okya_books').update({applicants:apps}).eq('id',id))}catch{toast('오류');return};toast('신청했어요');rBookDetail(id)}
   const un=document.getElementById('bd-unapply');if(un)un.onclick=async()=>{try{const r=await wt(sb.from('okya_books').select('applicants').eq('id',id).single());await wt(sb.from('okya_books').update({applicants:(r.data?.applicants||[]).filter(a=>a.id!==SESSION.id)}).eq('id',id))}catch{};rBookDetail(id)}
   const cf=document.getElementById('bd-confirm');if(cf)cf.onclick=()=>push(()=>rConfirmBook(id))
   const cp=document.getElementById('bd-complete');if(cp)cp.onclick=async()=>{try{await wt(sb.from('okya_books').delete().eq('id',id))}catch{};toast('교환 완료 🎉');pop()}
