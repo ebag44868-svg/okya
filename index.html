@@ -792,6 +792,9 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .pr-card{cursor:pointer;transition:transform .15s var(--ease),box-shadow .15s var(--ease);}
 .pr-card:active{transform:scale(.985);}
 .pr-detail-hero{display:flex;flex-direction:column;}
+.book-badge.pr-badge.s0{color:var(--sub);}
+.book-badge.pr-badge.s1{color:#E0930F;}
+.book-badge.pr-badge.s2{background:rgba(20,26,40,.72);color:#fff;}
 
 /* 책 교환 (굿노트 책장) */
 .book-help{margin:10px 18px 2px;padding:13px 15px;background:var(--primary-tint);border-radius:14px;font-size:12.5px;line-height:1.65;color:var(--ink2);}
@@ -1136,8 +1139,8 @@ function bnav(){
   const tabs=[
     {k:'home',l:'홈',ic:I.home},
     {k:'money',l:'머니',ic:I.money},
-    {k:'school',l:'학교',ic:I.school,subs:[['food','급식'],['cal','학사일정'],['tt','시간표'],['study','시험대비'],['room','교실예약'],['mt','회의록']]},
-    {k:'comm',l:'커뮤',ic:I.comm,subs:[['challenge','챌린지'],['petition','청원'],['book','책 교환'],['binding','제본소'],['board','게시판'],['lost','분실물']]},
+    {k:'school',l:'학교',ic:I.school,subs:[['food','급식'],['cal','학사일정'],['tt','시간표'],['mt','회의록']]},
+    {k:'comm',l:'커뮤',ic:I.comm,subs:[['challenge','챌린지'],['petition','청원'],['book','책 교환'],['binding','제본소']]},
     {k:'search',l:'검색',ic:I.search},
     {k:'my',l:'MY',ic:I.my}
   ]
@@ -1149,8 +1152,8 @@ function bnav(){
   }).join('')}</nav>`
 }
 const SUBROUTES={
-  school:{food:()=>rSchoolFood(),cal:()=>rSchoolCal(),tt:()=>rSchoolTT(),study:()=>rStudy(),room:()=>rRoom(),mt:()=>rMeeting()},
-  comm:{challenge:()=>rChallengePage(),petition:()=>rPetitionPage(),book:()=>rBookPage(),binding:()=>rPrint(),board:()=>rBoardPage(),lost:()=>rLost()}
+  school:{food:()=>rSchoolFood(),cal:()=>rSchoolCal(),tt:()=>rSchoolTT(),mt:()=>rMeeting()},
+  comm:{challenge:()=>rChallengePage(),petition:()=>rPetitionPage(),book:()=>rBookPage(),binding:()=>rPrint()}
 }
 function bindNav(){
   document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;STACK=[];routeTab()})
@@ -1516,8 +1519,6 @@ function rSchool(){
     {id:'food',ic:'food',      tint:'org', title:'급식',       desc:'오늘의 학교 급식'},
     {id:'cal', ic:'cal',       tint:'blue',title:'학사일정',    desc:'시험·행사 일정'},
     {id:'tt',  ic:'timetable', tint:'pink',title:'시간표',      desc:'학년별 수업 시간표'},
-    {id:'study',ic:'study',    tint:'green',title:'시험대비자료',desc:'과목별 학습 자료'},
-    {id:'room',ic:'door',      tint:'sky', title:'교실예약',    desc:'자습실 시간대 예약'},
     {id:'mt',  ic:'video',     tint:'blue',title:'회의록',      desc:'대의원회 영상'},
   ]
   app().innerHTML=`<div class="screen fade-in p3">
@@ -1537,8 +1538,6 @@ function rSchool(){
     if(sid==='food')push(rSchoolFood)
     else if(sid==='cal')push(rSchoolCal)
     else if(sid==='tt')push(rSchoolTT)
-    else if(sid==='study')push(rStudy)
-    else if(sid==='room')push(rRoom)
     else if(sid==='mt')push(rMeeting)
   })
 }
@@ -1712,6 +1711,7 @@ function bindLabel(k){const f=BIND_OPTS.find(x=>x[0]===k);return f?f[1]:'스프�
 function bindFee(k){const f=BIND_OPTS.find(x=>x[0]===k);return f?f[2]:500}
 function printCost(copies,bind){return bindFee(bind)*(copies||1)}
 function prSteps(si){return`<div class="pet-steps pr-steps">${PR_STATUS.map((s,i)=>`<div class="pet-step${i<=si?' done':''}${i===si?' cur':''}"><div class="pet-step-dot">${i<si?'✓':i+1}</div><div class="pet-step-l">${s}</div></div>`).join('<div class="pet-step-line"></div>')}</div>`}
+function printCover(p){const si=Math.max(0,PR_STATUS.indexOf(p.status||'접수'));const grad=BOOK_COVERS[((p.title||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0)+3)%BOOK_COVERS.length];return`<div class="book-cover"${p.file?'':` style="background:${grad}"`}>${p.file?`<img src="${esc(p.file)}">`:`<div class="bc-title">${esc(p.title||'')}</div>`}<span class="book-badge pr-badge s${si}">${PR_STATUS[si]}</span></div>`}
 async function rPrint(){
   const admin=SESSION.role==='admin'
   app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야제본소</div>${admin?'<div style="width:34px"></div>':`<button id="pr-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 신청</button>`}</div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
@@ -1726,15 +1726,12 @@ async function iPrint(){
   try{const r=await wt(sb.from('okya_prints').select('*').order('at',{ascending:false}));data=r.data||[]}catch{}
   const prs=admin?data:data.filter(p=>p.owner===SESSION.id)
   const cb=document.getElementById('cb');if(!cb)return
-  const help=`<div class="book-help">🖨️ <b>옥야제본소</b> · 인쇄물을 직접 가져오면 학생회가 <b>제본만</b> 떠드려요. 신청 시 옥야머니가 사용되고, <b>접수 → 제작중 → 완료</b> 순으로 진행돼요.</div>`
-  const card=p=>{
-    const si=Math.max(0,PR_STATUS.indexOf(p.status||'접수'))
-    const pill=`<span class="pr-pill s${si}">${PR_STATUS[si]}</span>`
-    const meta=`${p.pages?p.pages+'장 · ':''}${p.copies||1}부 · ${bindLabel(p.bind)}`
-    return`<div class="pcard pr-card" data-open="${p.id}"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div style="min-width:0"><div class="ti" style="font-size:15px;white-space:normal">${esc(p.title)}</div><div class="su" style="margin-top:3px">${admin?esc(p.owner_name)+' · ':''}${meta}</div></div>${pill}</div>${prSteps(si)}<div class="su" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">신청 ${fmtDate(p.at)} · <b style="color:var(--primary)">${fmt(p.cost||0)}옥</b><span style="color:var(--primary);font-weight:700;font-size:12.5px">진행현황 ›</span></div></div>`
-  }
-  const list=prs.length?prs.map(card).join(''):'<div class="empty">신청 내역이 없어요.</div>'
-  cb.innerHTML=`${help}<div class="sec" style="margin:16px 20px 10px">${admin?'전체 신청':'내 신청'} <span style="color:var(--primary)">${prs.length}</span></div>${list}<div style="height:12px"></div>`
+  const help=`<div class="book-help">🖨️ <b>옥야제본소</b> · 인쇄물을 직접 가져오면 학생회가 <b>제본만</b> 떠드려요. 책 표지를 누르면 <b>진행현황</b>을 볼 수 있어요. (접수 → 제작중 → 완료)</div>`
+  const addTile=admin?'':`<div class="book-item book-add" id="pr-add"><div class="book-cover book-addcover"><span>＋</span></div><div class="book-label"><div class="bl-title">새 제본 신청</div></div></div>`
+  const items=prs.map(p=>`<div class="book-item" data-open="${p.id}">${printCover(p)}<div class="book-label"><div class="bl-title">${esc(p.title)}</div><div class="bl-meta">${admin?esc(p.owner_name||'')+' · ':''}${bindLabel(p.bind)} · ${p.copies||1}부</div></div></div>`).join('')
+  const emptyNote=(!prs.length&&admin)?'<div class="empty">아직 신청이 없어요.</div>':''
+  cb.innerHTML=`${help}<div class="book-shelf">${addTile}${items}</div>${emptyNote}<div style="height:16px"></div>`
+  const at=document.getElementById('pr-add');if(at)at.onclick=()=>push(rPrintNew)
   cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rPrintDetail(el.dataset.open)))
 }
 async function rPrintDetail(id){
@@ -1842,9 +1839,7 @@ function rComm(){
     {id:'challenge',ic:'star',    tint:'org', title:'챌린지',   desc:'옥야머니 이벤트'},
     {id:'book',     ic:'book',    tint:'green',title:'책 교환',  desc:'교재 나눔·교환'},
     {id:'petition', ic:'petition',tint:'blue',title:'청원',     desc:'학교에 건의하기'},
-    {id:'board',    ic:'comm',    tint:'pink',title:'게시판',   desc:'익명 자유게시판'},
-    {id:'binding',  ic:'binding', tint:'sky', title:'옥야제본소',desc:'제본 신청 · 100옥'},
-    {id:'lost',     ic:'lost',    tint:'org', title:'분실물',   desc:'분실물 신고·찾기'},
+    {id:'binding',  ic:'binding', tint:'sky', title:'옥야제본소',desc:'제본 신청'},
   ]
   // 최신 소식 배너 (임시 플레이스홀더 — 사진/실데이터는 이후 연결)
   const BANNER=[
@@ -1876,9 +1871,7 @@ function rComm(){
     if(id==='challenge')push(rChallengePage)
     else if(id==='book')push(rBookPage)
     else if(id==='petition')push(rPetitionPage)
-    else if(id==='board')push(rBoardPage)
     else if(id==='binding')push(rPrint)
-    else if(id==='lost')push(rLost)
   })
   initCarousel()
 }
