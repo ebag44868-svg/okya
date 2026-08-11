@@ -543,10 +543,10 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 
 /* ===== 알림 벨 배지 & 알림센터 ===== */
 [data-bell]{position:relative;}
-.nbadge{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:#FF4D4F;color:#fff;font-size:10px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px var(--card);animation:badgePop .4s var(--ease) both;z-index:5;}
+.nbadge{position:absolute;top:-6px;right:-9px;min-width:13px;height:13px;padding:0 3px;border-radius:99px;background:#FF4D4F;color:#fff;font-size:8.5px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1.5px var(--card);animation:badgePop .4s var(--ease) both;z-index:5;}
 .bnav-item,.bnav-subitem{position:relative;}
 .bnav-item span,.bnav-subitem span{position:relative;}
-.rail-badge{top:-7px;right:-14px;}
+.rail-badge{top:-6px;right:-11px;}
 .bnav.collapsed .bnav-item>.rail-badge{top:4px;right:8px;}
 @keyframes badgePop{0%{transform:scale(0);}60%{transform:scale(1.25);}100%{transform:scale(1);}}
 .p3 .ntrow{position:relative;}
@@ -859,6 +859,8 @@ label{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-bott
 .book-kind{display:inline-block;font-size:11.5px;font-weight:800;padding:4px 11px;border-radius:999px;background:var(--primary-tint);color:var(--primary);}
 .book-kind.give{background:rgba(47,180,166,.14);color:#2FB4A6;}
 .book-kind.grade{background:var(--soft);color:var(--sub);}
+.book-want{margin-top:10px;padding:10px 13px;background:var(--soft);border-radius:12px;font-size:13px;color:var(--ink2);}
+.book-want b{color:var(--ink);}
 .bc-item{padding:11px 0;border-bottom:1px solid var(--line);}
 .bc-head{display:flex;gap:7px;align-items:center;margin-bottom:4px;}
 .bc-by{font-size:13px;font-weight:700;color:var(--ink);}
@@ -2119,10 +2121,10 @@ async function commBannerItems(){
     const[ev,pe,bk]=await Promise.all([q('okya_events'),q('okya_petitions'),q('okya_books')])
     const evs=ev.sort((a,b)=>(a.at<b.at?1:-1))
     const pes=pe.filter(p=>p.status==='approved').sort((a,b)=>petAgrees(b)-petAgrees(a))
-    const bks=bk.filter(b=>b.status!=='matched').sort((a,b)=>(a.at<b.at?1:-1))
+    const bks=bk.filter(b=>b.status!=='matched'&&(b.applicants||[]).length===0).sort((a,b)=>(a.at<b.at?1:-1))
     if(pes[0])items.push({type:'petition',kind:'petition',id:pes[0].id,tag:'주목 청원',title:pes[0].title,sub:pes[0].purpose||'',meta:`익명 · 동의 ${fmt(petAgrees(pes[0]))} · ${timeago(petStart(pes[0]))}`})
     evs.slice(0,2).forEach(e=>items.push({type:'challenge',kind:'challenge',id:e.id,tag:'챌린지',title:e.title,sub:`인증하면 ${fmt(e.reward||0)}옥`,img:e.poster}))
-    bks.slice(0,2).forEach(b=>items.push({type:'book',kind:'book',id:b.id,tag:b.kind==='나눔'?'책 나눔':'책 교환',title:b.title,sub:`${b.grade||''} · ${b.owner_name||''}`,img:b.photo}))
+    bks.slice(0,2).forEach(b=>items.push({type:'book',kind:'book',id:b.id,tag:b.kind==='나눔'?'책 나눔':'책 교환',title:b.title,sub:b.kind==='교환'&&b.want?`↔ ${b.want}`:`${b.grade||''} · ${b.owner_name||''}`,img:b.photo}))
     if(pes[1])items.push({type:'petition',kind:'petition',id:pes[1].id,tag:'청원',title:pes[1].title,sub:pes[1].purpose||'',meta:`익명 · 동의 ${fmt(petAgrees(pes[1]))}`})
   }catch{}
   return items
@@ -2141,7 +2143,7 @@ function startCommPoll(){clearInterval(COMM_TIMER);COMM_TIMER=setInterval(async(
   const items=await commBannerItems();const sig=items.map(i=>i.kind+i.id).join('|')
   if(sig===COMM_SIG)return
   COMM_SIG=sig;renderCommBanner(items)
-},18000)}
+},8000)}
 async function rComm(){
   TAB='comm'
   const CARDS=[
@@ -2615,6 +2617,7 @@ function rBookNew(){
       <div class="pcard">
         <div class="field"><label>교재명</label><input id="bt" placeholder="예: 통합사회1 (비상)"></div>
         <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>학년</label><select id="bg"><option>1학년</option><option>2학년</option><option>3학년</option></select></div><div class="field" style="flex:1"><label>구분</label><select id="bk2"><option>나눔</option><option>교환</option></select></div></div>
+        <div class="field" id="want-field" style="display:none"><label>받고 싶은 책</label><input id="bwant" placeholder="예: 통합사회2 (미래엔)"><p style="font-size:11.5px;color:var(--sub);margin:6px 2px 0">교환으로 받고 싶은 교재를 적어주세요.</p></div>
         <div class="field" style="margin-bottom:0"><label>책 표지 사진 (선택)</label><label for="bf" class="upload book-up" id="bfl">${I.image}<span>사진 추가하기</span></label><input id="bf" type="file" accept="image/*" style="display:none"></div>
       </div>
       <div style="padding:0 18px"><button class="pbtn pri" id="badd" style="margin-top:4px">등록하기</button><p style="font-size:12px;color:var(--sub);margin:12px 2px 0;text-align:center">사진이 없으면 표지가 자동 생성돼요.</p></div>
@@ -2623,13 +2626,16 @@ function rBookNew(){
   bindNav()
   document.getElementById('bk').onclick=pop
   document.getElementById('bf').onchange=e2=>{const f=e2.target.files[0];if(f){photoFile=f;const l=document.getElementById('bfl');l.classList.add('has');l.innerHTML=`<img src="${URL.createObjectURL(f)}">`}}
+  document.getElementById('bk2').onchange=e2=>{document.getElementById('want-field').style.display=e2.target.value==='교환'?'':'none'}
   document.getElementById('badd').onclick=async()=>{
     const title=document.getElementById('bt').value.trim();if(!title){toast('교재명을 입력해줘');return}
+    const kind=document.getElementById('bk2').value
+    const want=kind==='교환'?document.getElementById('bwant').value.trim():null
+    if(kind==='교환'&&!want){toast('받고 싶은 책을 적어줘');return}
     const btn=document.getElementById('badd');btn.disabled=true;btn.textContent='등록 중...'
     let photo=null
     if(photoFile){toast('사진 업로드 중...');photo=await uploadImg(photoFile,'book');if(!photo){btn.disabled=false;btn.textContent='등록하기';return}}
-    const kind=document.getElementById('bk2').value
-    try{await wt(sb.from('okya_books').insert({id:uid('b'),title,grade:document.getElementById('bg').value,kind,photo,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}))}catch{toast('등록 실패 · okya_books에 photo 컬럼이 필요해요');btn.disabled=false;btn.textContent='등록하기';return}
+    try{await wt(sb.from('okya_books').insert({id:uid('b'),title,grade:document.getElementById('bg').value,kind,want,photo,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}))}catch{toast('등록 실패 · okya_books에 photo/want 컬럼이 필요해요');btn.disabled=false;btn.textContent='등록하기';return}
     notifyStudents('book',`새 ${kind} 책`,`'${title}' 책이 올라왔어요`)
     popMsg('책이 등록됐어요','📚');pop()
   }
@@ -2905,6 +2911,7 @@ async function rBookDetail(id){
       <div style="display:flex;gap:7px;margin-bottom:9px"><span class="book-kind ${b.kind==='나눔'?'give':'swap'}">${esc(b.kind||'교환')}</span><span class="book-kind grade">${esc(b.grade||'')}</span></div>
       <div class="ti" style="font-size:19px;white-space:normal">${esc(b.title)}</div>
       <div class="su" style="margin-top:4px">${esc(b.owner_name)} · ${timeago(b.at)}</div>
+      ${b.kind==='교환'&&b.want?`<div class="book-want">🔁 받고 싶은 책 · <b>${esc(b.want)}</b></div>`:''}
       ${apps}
       <div style="margin-top:14px">${act}</div>
     </div>
