@@ -987,6 +987,23 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .cb-petbody{margin:auto 4px;display:flex;flex-direction:column;align-items:center;gap:10px;}
 .cb-petitle{font-size:32px;font-weight:900;line-height:1.34;letter-spacing:-.6px;color:var(--ink);word-break:keep-all;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;}
 .cbmeta{font-size:12.5px;color:var(--sub);font-weight:600;margin-top:12px;}
+
+/* 커뮤니티 최근 소식(재설계): 코버플로우 → 스캔형 리스트 */
+.cfeed{margin:0 var(--page-x);background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;}
+.cfeed-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:15px 16px;background:transparent;animation:rowSlide .38s var(--ease) both;}
+.cfeed-row+.cfeed-row{border-top:1px solid var(--divider);}
+.cfeed-row:active{background:var(--surface-2);}
+.cfeed-main{flex:1;min-width:0;}
+.cfeed-tag{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:var(--radius-full);background:var(--accent-soft);color:var(--accent);margin-bottom:7px;}
+.cfeed-tag.t-challenge{background:#FFF3E4;color:#E0930F;}
+.cfeed-tag.t-book{background:#E7F8EF;color:#16A34A;}
+.cfeed-title{font-size:15px;font-weight:800;letter-spacing:-.2px;color:var(--text-1);line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.cfeed-sub{font-size:12.5px;color:var(--text-3);font-weight:500;margin-top:4px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.cfeed-thumb{width:52px;height:52px;border-radius:var(--radius-md);overflow:hidden;flex:none;background:var(--surface-2);}
+.cfeed-thumb img{width:100%;height:100%;object-fit:cover;}
+.cfeed-chev{color:var(--text-3);font-size:20px;flex:none;}
+.cfeed-empty{text-align:center;padding:44px 20px;font-size:14px;font-weight:700;color:var(--text-2);line-height:1.7;}
+.cfeed-empty span{font-size:12.5px;font-weight:500;color:var(--text-3);}
 .cbimg{width:100%;max-width:400px;aspect-ratio:1/1.32;flex:none;margin:14px auto 12px;border-radius:16px;background:var(--soft);border:1.6px dashed #cfd4e0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .cbimg.has-img{border:none;background:none;}
 .cbimg img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -2408,7 +2425,12 @@ function schoolCalSlide(el){
     ALL.filter(s=>s.date.startsWith(mStr)).forEach(s=>{const d=+s.date.split('-')[2];(evMap[d]=evMap[d]||[]).push(s)})
     const today=(vy===now.getFullYear()&&vm===now.getMonth())?now.getDate():-1
     const monthEvs=ALL.filter(s=>s.date.startsWith(mStr)).sort((a,b)=>a.date<b.date?-1:1)
+    // 다가오는 일정(달월 무관, 가까운 순 5개) — 달력보다 먼저, 가장 크게
+    const up=ALL.filter(s=>s.date>=todayStr).sort((a,b)=>a.date<b.date?-1:1).slice(0,5)
+    const upHTML=up.length?`<div class="pcard"><div class="sec">다가오는 일정</div>${up.map((s,i)=>{const dd=Math.ceil((new Date(s.date)-new Date(todayStr))/86400000);const tag=dd===0?'오늘':`D-${dd}`;const dw=['일','월','화','수','목','금','토'][new Date(s.date).getDay()];const p=s.date.split('-');return`<div class="srow" style="animation:fadeUp .35s var(--ease) both;animation-delay:${i*35}ms"><span class="sc-evdot" style="background:${dotColor(s.type)}"></span><div class="l"><div class="t">${esc(s.label)}</div><div class="d">${+p[1]}월 ${+p[2]}일 (${dw})</div></div><span class="dday">${tag}</span></div>`}).join('')}</div>`:''
     el.innerHTML=`<div class="sc-inner">
+      ${upHTML}
+      <div class="sec" style="margin:22px 18px 8px;color:var(--text-3);font-size:13px;font-weight:700">달력에서 날짜별로 보기</div>
       <div style="margin:6px 18px 4px">${acalGrid(vy,vm,evMap,todayStr)}</div>
       <div style="margin:12px 18px 2px"><div class="cal-legend"><span><i style="background:var(--danger)"></i>귀가</span><span><i style="background:#16A34A"></i>등교</span><span><i style="background:#E0424D"></i>시험</span><span><i style="background:#E0930F"></i>모의고사</span></div></div>
       ${monthEvs.length?`<div class="pcard"><div class="sec">${vm+1}월 일정</div>${monthEvs.map((s,i)=>{const dd=Math.ceil((new Date(s.date)-new Date(todayStr))/86400000);const tag=dd===0?'오늘':dd>0?`D-${dd}`:s.date.slice(5).replace('-','/');const dw=['일','월','화','수','목','금','토'][new Date(s.date).getDay()];return`<div class="srow" style="animation:fadeUp .35s var(--ease) both;animation-delay:${i*35}ms"><span class="sc-evdot" style="background:${dotColor(s.type)}"></span><div class="l"><div class="t">${esc(s.label)}</div><div class="d">${s.date.slice(5).replace('-','/')} (${dw})</div></div><span class="dday">${tag}</span></div>`}).join('')}</div>`:'<div class="empty">이번 달 일정이 없어요</div>'}
@@ -2763,7 +2785,7 @@ function startCommPoll(){clearInterval(COMM_TIMER);COMM_TIMER=setInterval(async(
   if(TAB!=='comm'){clearInterval(COMM_TIMER);COMM_TIMER=null;return}
   const items=await commBannerItems();const sig=items.map(i=>i.kind+i.id).join('|')
   if(sig===COMM_SIG)return
-  COMM_SIG=sig;renderCommBanner(items)
+  COMM_SIG=sig;renderCommFeed(items)
 },8000)}
 async function rComm(){
   TAB='comm'
@@ -2776,10 +2798,7 @@ async function rComm(){
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="topbar"><div class="t">커뮤</div><div style="width:34px"></div></div>
     <div class="sec" style="margin:2px 18px 10px">최근 소식</div>
-    <div class="cbanner">
-      <div class="cbtrack" id="cbtrack"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
-      <div class="cbdots" id="cbdots"></div>
-    </div>
+    <div id="comm-feed"><div class="loader" style="min-height:140px"><div class="spin"></div></div></div>
     <div class="sec" style="margin:22px 18px 10px">바로가기</div>
     <div class="qcol">
       ${CARDS.map((c,i)=>`<div class="qbtn" data-cid="${c.id}" style="animation:fadeUp .4s var(--ease) both;animation-delay:${i*55}ms"><div class="qic ti-${c.tint}">${I[c.ic]}</div><div class="qt">${c.title}</div><span class="qchev">${I.chev}</span></div>`).join('')}
@@ -2795,8 +2814,21 @@ async function rComm(){
     else if(id==='binding')push(rPrint)
   })
   const items=await commBannerItems();COMM_SIG=items.map(i=>i.kind+i.id).join('|')
-  if(TAB==='comm')renderCommBanner(items)
+  if(TAB==='comm')renderCommFeed(items)
   startCommPoll()
+}
+// 최근 소식(재설계): 실데이터 → 스캔형 리스트(카테고리·제목·설명·썸네일). data-go로 상세 이동
+function renderCommFeed(items){
+  const box=document.getElementById('comm-feed');if(!box)return
+  if(!items.length){box.innerHTML=`<div class="cfeed-empty">아직 올라온 소식이 없어요<br><span>첫 챌린지·청원·책을 올려보세요</span></div>`;return}
+  box.innerHTML=`<div class="cfeed">${items.map(b=>{
+    const meta=b.meta||b.sub||''
+    const thumb=b.img?`<div class="cfeed-thumb"><img src="${esc(b.img)}" loading="lazy"></div>`:''
+    return`<button class="cfeed-row" data-go="${b.kind}:${b.id}">
+      <div class="cfeed-main"><span class="cfeed-tag t-${b.type}">${esc(b.tag)}</span><div class="cfeed-title">${esc(b.title)}</div>${meta?`<div class="cfeed-sub">${esc(meta)}</div>`:''}</div>${thumb}<span class="cfeed-chev">›</span>
+    </button>`
+  }).join('')}</div>`
+  box.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>{const[k,id]=el.dataset.go.split(':');if(k==='challenge')push(()=>rChallengeDetail(id));else if(k==='petition')push(()=>rPetitionDetail(id));else if(k==='book')push(()=>rBookDetail(id))})
 }
 // 배너 커버플로우: 3D로 겹쳐 뒤→앞으로 넘어오는 느낌 + 점 동기화 + 느린 자동(수동 시 타이머 리셋)
 function initCarousel(){
@@ -3724,6 +3756,14 @@ async function rMy(){
       <div class="my-lv-sub">활동점수 ${fmt(pts)}p · 다음 레벨까지 ${fmt(Math.max(0,need-cur))}p</div>
       <div class="my-act"><div class="my-act-c"><div class="v">${bookCount}</div><div class="k">등록한 책</div></div><div class="my-act-c"><div class="v">${petiCount}</div><div class="k">참여 청원</div></div></div>
     </div>
+    <div class="menu">
+      <div class="mrow" id="mm-tx"><span class="mic">${I.hist}</span>거래 내역<span class="cev">${I.chev}</span></div>
+      <div class="mrow" id="mm-chal"><span class="mic">${I.star}</span>챌린지<span class="cev">${I.chev}</span></div>
+      <div class="mrow" id="mm-peti"><span class="mic">${I.petition}</span>청원<span class="cev">${I.chev}</span></div>
+      <div class="mrow" id="mm-noti"><span class="mic">${I.bell}</span>알림<span class="cev">${I.chev}</span></div>
+      <div class="mrow" id="mm-out"><span class="mic" style="color:var(--danger)">${I.logout}</span><span style="color:var(--danger)">로그아웃</span></div>
+    </div>
+    <div class="sec" style="margin:22px 18px 0;color:var(--text-3);font-size:13px;font-weight:700">개인 설정</div>
     <div class="pcard">
       <div class="sec" style="margin-bottom:2px">색상 테마</div>
       <div style="font-size:12px;color:var(--sub)">스펙트럼 버튼을 눌러 색을 펼쳐보세요</div>
@@ -3732,13 +3772,6 @@ async function rMy(){
         ${pfis}
         <label class="pfi pick" data-custom="1"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><input type="color" id="my-color" value="${curPri}" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer"></label>
       </div>
-    </div>
-    <div class="menu">
-      <div class="mrow" id="mm-tx"><span class="mic">${I.hist}</span>거래 내역<span class="cev">${I.chev}</span></div>
-      <div class="mrow" id="mm-chal"><span class="mic">${I.star}</span>챌린지<span class="cev">${I.chev}</span></div>
-      <div class="mrow" id="mm-peti"><span class="mic">${I.petition}</span>청원<span class="cev">${I.chev}</span></div>
-      <div class="mrow" id="mm-noti"><span class="mic">${I.bell}</span>알림<span class="cev">${I.chev}</span></div>
-      <div class="mrow" id="mm-out"><span class="mic" style="color:var(--danger)">${I.logout}</span><span style="color:var(--danger)">로그아웃</span></div>
     </div>
     <div class="ver">옥야 v1.0 · 창녕옥야고 학생회</div>
   </div>${bnav()}`
