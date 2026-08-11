@@ -210,7 +210,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .tab.active{background:var(--primary);color:#fff;}
 
 /* ── 토스트 ── */
-.toast{position:fixed;left:50%;bottom:calc(98px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(8px);background:rgba(25,31,40,.92);color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:200;white-space:nowrap;backdrop-filter:blur(12px);}
+.toast{position:fixed;left:50%;bottom:calc(98px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(8px);background:rgba(25,31,40,.92);color:#fff;padding:12px 18px;border-radius:14px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:400;white-space:nowrap;backdrop-filter:blur(12px);display:inline-flex;align-items:center;gap:9px;max-width:calc(100% - 40px);}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
 
 /* ── 로더 ── */
@@ -256,6 +256,52 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 @keyframes slideBack{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
 .fade-in{animation:slideUp .25s cubic-bezier(.22,1,.36,1) both;}
 .slide-back{animation:slideBack .22s cubic-bezier(.22,1,.36,1) both;}
+/* 상세(push) 화면: 오른쪽에서 밀려 들어옴 — 탭 전환(rise)과 구분 */
+@keyframes pushIn{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+.screen.pushin{animation:pushIn var(--dur-standard) var(--ease-out) both;}
+
+/* ── Phase 2: Bottom Sheet ── */
+.sheet-backdrop{position:fixed;inset:0;background:rgba(15,18,28,.44);opacity:0;transition:opacity var(--dur-standard) var(--ease-out);z-index:300;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+.sheet-backdrop.on{opacity:1;}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:430px;margin:0 auto;background:var(--surface-elevated);border-radius:26px 26px 0 0;box-shadow:var(--shadow-lg);z-index:301;transform:translateY(101%);transition:transform var(--dur-standard) var(--ease-spring);max-height:88dvh;display:flex;flex-direction:column;padding-bottom:calc(14px + env(safe-area-inset-bottom));will-change:transform;}
+.sheet.on{transform:translateY(0);}
+.sheet-handle{width:38px;height:4px;border-radius:99px;background:var(--surface-3);margin:10px auto 2px;flex:none;}
+.sheet-head{padding:8px 22px 2px;}
+.sheet-title{font-size:19px;font-weight:800;color:var(--text-1);letter-spacing:-.02em;}
+.sheet-body{padding:12px 22px 6px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sheet-actions{padding:12px 22px 2px;display:flex;gap:10px;}
+.sheet-actions>*{flex:1;}
+
+/* ── Phase 2: Modal (confirm) ── */
+.modal{position:fixed;left:50%;top:48%;transform:translate(-50%,-50%) scale(.94);opacity:0;z-index:301;width:min(340px,86%);background:var(--surface-elevated);border-radius:22px;box-shadow:var(--shadow-lg);padding:22px 22px 16px;transition:transform var(--dur-standard) var(--ease-spring),opacity var(--dur-standard) var(--ease-out);}
+.modal.on{transform:translate(-50%,-50%) scale(1);opacity:1;}
+.modal-title{font-size:17px;font-weight:800;color:var(--text-1);text-align:center;}
+.modal-body{font-size:14px;color:var(--text-2);line-height:1.6;text-align:center;margin-top:8px;}
+.modal-actions{display:flex;gap:10px;margin-top:18px;}
+.modal-actions>*{flex:1;}
+
+/* ── Phase 2: Skeleton ── */
+.skeleton{position:relative;overflow:hidden;background:var(--surface-2);border-radius:10px;}
+.skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);animation:skelShimmer 1.3s var(--ease-inout) infinite;}
+@keyframes skelShimmer{100%{transform:translateX(100%)}}
+.skel-line{height:12px;border-radius:7px;margin:9px 0;}
+.skel-title{height:18px;width:56%;border-radius:8px;margin:4px 0 12px;}
+.skel-circle{border-radius:50%;}
+.skel-card{height:96px;border-radius:var(--radius-lg);margin:10px 0;}
+
+/* ── Phase 2: Empty state (개선) ── */
+.empty-state{display:flex;flex-direction:column;align-items:center;text-align:center;padding:46px 28px;gap:5px;animation:slideUp .3s var(--ease-out) both;}
+.empty-ic{width:56px;height:56px;border-radius:18px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:8px;}
+.empty-title{font-size:16px;font-weight:700;color:var(--text-1);}
+.empty-desc{font-size:13.5px;color:var(--text-3);line-height:1.6;max-width:250px;}
+.empty-action{margin-top:16px;width:100%;max-width:220px;}
+
+/* ── Phase 2: Toast 타입 ── */
+.toast-ic{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;flex:none;background:rgba(255,255,255,.18);color:#fff;}
+.toast.t-success .toast-ic{background:#2FBF71;}
+.toast.t-error .toast-ic{background:var(--danger);}
+.toast.t-info .toast-ic{background:var(--accent);}
+@media (prefers-reduced-motion:reduce){.skeleton::after{animation:none;}.sheet,.modal{transition-duration:.001ms;}}
 
 /* ── 스플래시 화면 ── */
 .splash-screen{
@@ -1085,9 +1131,77 @@ function wt(p,ms=7000){return Promise.race([p,new Promise((_,rej)=>setTimeout(()
 let SESSION=null,USERS=[],TAB='home',STACK=[],commTab='challenge'
 const openBooks=new Set()
 const app=()=>document.getElementById('app')
-function toast(m){const t=document.getElementById('toast');if(!t)return;t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500)}
+// 타입별 토스트: toast(m) / toast(m,'success'|'error'|'info'|'loading')
+function toast(m,type){const t=document.getElementById('toast');if(!t)return;
+  const ic={success:'✓',error:'!',info:'i'}[type]||'';
+  t.className='toast'+(type?' t-'+type:'');
+  t.innerHTML=ic?`<span class="toast-ic">${ic}</span><span>${esc(m)}</span>`:esc(m);
+  t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),type==='error'?3200:2500)}
 // 무언가 올렸을 때 화면 중앙 하단에 톡 떠오르는 알림
 function popMsg(text,emoji){const el=document.createElement('div');el.className='popmsg';el.innerHTML=`${emoji?`<span class="pm-ic">${emoji}</span>`:''}<span>${esc(text)}</span>`;document.body.appendChild(el);setTimeout(()=>el.classList.add('out'),1500);setTimeout(()=>el.remove(),1980)}
+
+// ── Phase 2: 재사용 Bottom Sheet / Modal / Skeleton / Empty ──
+let SHEET_OPEN=null,MODAL_OPEN=null
+function lockScroll(on){const sc=app().querySelector('.screen');if(sc)sc.style.overflow=on?'hidden':''}
+function openSheet({title='',body='',actions='',onMount}={}){
+  closeSheet(true)
+  const bd=document.createElement('div');bd.className='sheet-backdrop'
+  const sh=document.createElement('div');sh.className='sheet'
+  sh.innerHTML=`<div class="sheet-handle"></div>${title?`<div class="sheet-head"><div class="sheet-title">${esc(title)}</div></div>`:''}<div class="sheet-body">${body}</div>${actions?`<div class="sheet-actions">${actions}</div>`:''}`
+  document.body.appendChild(bd);document.body.appendChild(sh)
+  requestAnimationFrame(()=>{bd.classList.add('on');sh.classList.add('on')})
+  lockScroll(true)
+  const close=()=>closeSheet()
+  bd.addEventListener('click',close)
+  // 아래로 스와이프하면 닫힘 (본문 맨 위에서만)
+  const bodyEl=sh.querySelector('.sheet-body');let sy=null,dy=0
+  sh.addEventListener('touchstart',e=>{if(bodyEl.scrollTop>2){sy=null;return}sy=e.touches[0].clientY;dy=0},{passive:true})
+  sh.addEventListener('touchmove',e=>{if(sy==null)return;dy=e.touches[0].clientY-sy;if(dy>0){sh.style.transition='none';sh.style.transform=`translateY(${dy}px)`}},{passive:true})
+  sh.addEventListener('touchend',()=>{if(sy==null)return;sh.style.transition='';if(dy>110)close();else sh.style.transform='';sy=null})
+  SHEET_OPEN={bd,sh}
+  if(onMount)onMount(sh)
+  return{close,el:sh}
+}
+function closeSheet(instant){
+  if(!SHEET_OPEN)return
+  const{bd,sh}=SHEET_OPEN;SHEET_OPEN=null;lockScroll(false)
+  if(instant){bd.remove();sh.remove();return}
+  bd.classList.remove('on');sh.classList.remove('on');sh.style.transform=''
+  setTimeout(()=>{bd.remove();sh.remove()},280)
+}
+function openModal({title='',body='',actions='',onMount}={}){
+  closeModal(true)
+  const bd=document.createElement('div');bd.className='sheet-backdrop'
+  const md=document.createElement('div');md.className='modal'
+  md.innerHTML=`${title?`<div class="modal-title">${esc(title)}</div>`:''}${body?`<div class="modal-body">${body}</div>`:''}${actions?`<div class="modal-actions">${actions}</div>`:''}`
+  document.body.appendChild(bd);document.body.appendChild(md)
+  requestAnimationFrame(()=>{bd.classList.add('on');md.classList.add('on')})
+  const close=()=>closeModal();bd.addEventListener('click',close)
+  MODAL_OPEN={bd,md}
+  if(onMount)onMount(md)
+  return{close,el:md}
+}
+function closeModal(instant){
+  if(!MODAL_OPEN)return
+  const{bd,md}=MODAL_OPEN;MODAL_OPEN=null
+  if(instant){bd.remove();md.remove();return}
+  bd.classList.remove('on');md.classList.remove('on')
+  setTimeout(()=>{bd.remove();md.remove()},280)
+}
+// 확인 다이얼로그: confirmDialog('삭제할까요?','되돌릴 수 없어요',()=>{...},{okText,danger})
+function confirmDialog(title,msg,onOk,opt={}){
+  const{okText='확인',cancelText='취소',danger=false}=opt
+  const{close,el}=openModal({title,body:msg,
+    actions:`<button class="pbtn" id="md-cancel" style="background:var(--surface-2);color:var(--text-2)">${esc(cancelText)}</button><button class="pbtn ${danger?'':'pri'}" id="md-ok" ${danger?'style="background:var(--danger);color:#fff"':''}>${esc(okText)}</button>`})
+  el.querySelector('#md-cancel').onclick=close
+  el.querySelector('#md-ok').onclick=()=>{close();onOk&&onOk()}
+}
+// Skeleton 헬퍼
+const skelLines=(n=3,w=[92,80,66])=>Array.from({length:n},(_,i)=>`<div class="skeleton skel-line" style="width:${w[i%w.length]}%"></div>`).join('')
+const skelBlock=()=>`<div style="padding:6px 2px"><div class="skeleton skel-title"></div>${skelLines(3)}</div>`
+// Empty state 헬퍼
+function emptyHTML({icon='📭',title='',desc='',action=''}={}){return`<div class="empty-state"><div class="empty-ic">${icon}</div><div class="empty-title">${esc(title)}</div>${desc?`<div class="empty-desc">${esc(desc)}</div>`:''}${action?`<div class="empty-action">${action}</div>`:''}</div>`}
 const nameOf=id=>(USERS.find(u=>u.id===id)||{name:'학생회'}).name
 
 // ── 알림 (okya_notifications). 테이블 없으면 조용히 무시(앱 흐름 방해 X) ──
@@ -1150,6 +1264,8 @@ document.addEventListener('keydown',e=>{
   if(!btn&&scr)btn=scr.querySelector('.pbtn.pri:not([disabled])')||scr.querySelector('.pr-subbtn:not([disabled])')
   if(btn){e.preventDefault();btn.click()}
 })
+// ESC → 열린 시트/모달 닫기
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(MODAL_OPEN){closeModal()}else if(SHEET_OPEN){closeSheet()}})
 
 async function getAllTx(){try{const{data}=await wt(sb.from('okya_tx').select('*').order('at',{ascending:false}));return data||[]}catch{return[]}}
 function balOf(id,txs){return txs.filter(t=>t.to===id).reduce((s,t)=>s+t.amount,0)-txs.filter(t=>t.from===id).reduce((s,t)=>s+t.amount,0)}
@@ -1397,7 +1513,7 @@ function bindNav(){
   applyRailBadges();startNotifPolling()
 }
 function routeTab(){({home:rHome,money:rMoney,school:rSchool,comm:rComm,search:rSearch,my:rMy})[TAB]?.()}
-function push(fn){STACK.push(fn);fn()}
+function push(fn){STACK.push(fn);closeSheet(true);fn();const s=app().querySelector('.screen');if(s){s.classList.remove('fade-in');s.classList.add('pushin')}}
 function pop(){STACK.pop();if(STACK.length)STACK[STACK.length-1]();else routeTab();const s=app().querySelector('.fade-in');if(s){s.classList.remove('fade-in');s.classList.add('slide-back')}}
 
 async function rHome(){
