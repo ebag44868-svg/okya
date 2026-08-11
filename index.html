@@ -1068,6 +1068,43 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .pet-c-foot{display:flex;align-items:center;justify-content:space-between;margin-top:15px;font-size:12.5px;color:var(--sub);}
 .pet-c-foot b{color:var(--primary);font-weight:900;font-size:14px;}
 .pet-card:nth-child(2){animation-delay:.04s}.pet-card:nth-child(3){animation-delay:.08s}.pet-card:nth-child(4){animation-delay:.12s}.pet-card:nth-child(5){animation-delay:.16s}.pet-card:nth-child(6){animation-delay:.2s}.pet-card:nth-child(n+7){animation-delay:.24s}
+
+/* 청원(재설계): 대표 청원 진행률 + 스캔형 리스트 */
+.pet-bar{height:8px;border-radius:var(--radius-full);background:var(--surface-3);overflow:hidden;}
+.pet-bar.sm{height:6px;}
+.pet-bar i{display:block;height:100%;border-radius:var(--radius-full);background:linear-gradient(90deg,var(--accent),var(--accent-d));transition:width .6s var(--ease-out);}
+.pet-hero{display:block;width:100%;text-align:left;margin:10px var(--page-x) 2px;width:calc(100% - var(--page-x)*2);background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);border:1px solid var(--border);padding:20px;animation:petrise .5s var(--ease) both;}
+.pet-hero:active{transform:scale(.99);}
+.pet-hero-tag{font-size:12.5px;font-weight:800;color:var(--accent);margin-bottom:11px;}
+.pet-hero-title{font-size:20px;font-weight:900;line-height:1.35;letter-spacing:-.4px;color:var(--text-1);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.pet-hero-stats{display:flex;align-items:baseline;justify-content:space-between;margin:18px 0 9px;}
+.pet-hero-n{font-size:15px;font-weight:700;color:var(--text-2);}
+.pet-hero-n b{color:var(--accent);font-weight:900;font-size:22px;letter-spacing:-.5px;margin-right:2px;}
+.pet-hero-goal{font-size:13px;font-weight:600;color:var(--text-3);}
+.pet-hero-foot{display:flex;align-items:center;justify-content:space-between;margin-top:9px;}
+.pet-hero-pct{font-size:13px;font-weight:900;color:var(--accent);}
+.pet-hero-dday{font-size:13px;font-weight:900;color:var(--text-2);font-variant-numeric:tabular-nums;}
+
+.pet-secrow{display:flex;align-items:center;justify-content:space-between;padding:18px var(--page-x) 0;}
+.sec2{font-size:15px;font-weight:800;letter-spacing:-.3px;color:var(--text-1);}
+.sec2 .pet-cnt{color:var(--accent);}
+.pet-sort{font-size:12.5px;font-weight:700;color:var(--text-2);background:var(--surface-2);padding:6px 12px;border-radius:var(--radius-full);}
+.pet-sort:active{background:var(--surface-3);}
+.pet-cats{display:flex;gap:7px;overflow-x:auto;padding:12px var(--page-x) 4px;scrollbar-width:none;}
+.pet-cats::-webkit-scrollbar{display:none;}
+.pet-chip2{flex:none;font-size:13px;font-weight:700;padding:7px 14px;border-radius:var(--radius-full);background:var(--surface-2);color:var(--text-2);transition:background var(--dur-standard),color var(--dur-standard);}
+.pet-chip2.on{background:var(--accent);color:#fff;}
+.pet-list{margin:8px var(--page-x) 0;background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;}
+.pet-item{display:block;width:100%;text-align:left;padding:16px;background:transparent;animation:rowSlide .38s var(--ease) both;}
+.pet-item+.pet-item{border-top:1px solid var(--divider);}
+.pet-item:active{background:var(--surface-2);}
+.pet-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.pet-item-dday{font-size:12px;font-weight:900;color:var(--text-2);font-variant-numeric:tabular-nums;}
+.pet-item-title{font-size:15.5px;font-weight:800;line-height:1.4;letter-spacing:-.2px;color:var(--text-1);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.pet-item-prog{display:flex;align-items:center;gap:11px;margin-top:12px;}
+.pet-item-prog .pet-bar{flex:1;}
+.pet-item-n{font-size:12.5px;font-weight:600;color:var(--text-3);white-space:nowrap;flex:none;}
+.pet-item-n b{color:var(--accent);font-weight:900;font-size:14px;}
 @keyframes petrise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 /* 작성 폼 분야 선택 */
 .pet-catsel{display:flex;flex-wrap:wrap;gap:8px;}
@@ -3601,21 +3638,40 @@ async function iPetition(){
   const pub=ps.filter(p=>p.status==='approved'),pend=ps.filter(p=>p.status==='pending')
   const cb=document.getElementById('cb');if(!cb)return
   const ptitle=p=>esc(p.title||p.txt||'제목 없음')
+  const pctOf=p=>Math.min(100,Math.round(petAgrees(p)/PET_GOAL*100))
+  const ddayTxt=p=>{const d=petDaysLeft(p);return d>0?`D-${d}`:d===0?'오늘 마감':'마감'}
   const top=[...pub].sort((a,b)=>petAgrees(b)-petAgrees(a))[0]
-  const banner=top?`<div class="pet-feat" data-open="${top.id}">
-    <div class="pet-feat-tag">🔥 지금 가장 주목받는 청원</div>
-    <div class="pet-feat-title">${ptitle(top)}</div>
-    ${top.purpose?`<div class="pet-feat-sub">${esc(top.purpose)}</div>`:''}
-    <div class="pet-feat-meta"><span class="pet-cat">${esc(top.category||'기타')}</span><span class="pet-feat-n"><b>${fmt(petAgrees(top))}</b>명 동의</span></div>
-  </div>`:''
-  const grid=pub.length?`<div class="pet-grid">${pub.map(p=>`<div class="pet-card" data-open="${p.id}">
-    <span class="pet-cat sm">${esc(p.category||'기타')}</span>
-    <div class="pet-c-title">${ptitle(p)}</div>
-    <div class="pet-c-foot"><span class="pet-c-n">동의 <b>${fmt(petAgrees(p))}</b></span><span>${timeago(petStart(p))}</span></div>
-  </div>`).join('')}</div>`:'<div class="empty">아직 공개된 청원이 없습니다.<br><br>우측 상단 <b style="color:var(--primary)">＋ 청원</b>으로 첫 청원을 올려보세요.</div>'
+  // 대표 청원: 참여자·목표·진행률·마감을 한눈에 (장식보다 정보 우선)
+  const banner=top?`<button class="pet-hero" data-open="${top.id}">
+    <div class="pet-hero-tag">🔥 지금 가장 주목받는 청원</div>
+    <div class="pet-hero-title">${ptitle(top)}</div>
+    <div class="pet-hero-stats"><span class="pet-hero-n"><b>${fmt(petAgrees(top))}</b>명 참여</span><span class="pet-hero-goal">목표 ${PET_GOAL}명</span></div>
+    <div class="pet-bar"><i style="width:${pctOf(top)}%"></i></div>
+    <div class="pet-hero-foot"><span class="pet-hero-pct">${pctOf(top)}%</span><span class="pet-hero-dday">${ddayTxt(top)}</span></div>
+  </button>`:''
   const pendSec=admin&&pend.length?`<div class="pcard"><div class="sec">검토 대기 (${pend.length})</div>${pend.map(p=>`<div class="post"><div class="pbody" style="font-weight:800">${ptitle(p)}</div><div class="pmeta" style="margin:4px 0 8px">${esc(p.category||'기타')} · 접수 ${timeago(p.at)}</div><div style="display:flex;gap:8px"><button class="minibtn soft" data-ap="${p.id}">공개</button><button class="minibtn danger" data-rj="${p.id}">반려</button></div></div>`).join('')}</div>`:''
-  cb.innerHTML=`${banner}${pendSec}<div class="sec" style="margin:18px 20px 10px">공개된 청원 <span style="color:var(--primary)">${pub.length}</span></div>${grid}<div style="height:16px"></div>`
-  cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rPetitionDetail(el.dataset.open)))
+  // 필터(카테고리)·정렬(인기/최신) 상태
+  let fcat='전체',sort='인기'
+  const listHTML=()=>{
+    let arr=pub.filter(p=>fcat==='전체'||(p.category||'기타')===fcat)
+    arr=arr.slice().sort(sort==='인기'?(a,b)=>petAgrees(b)-petAgrees(a):(a,b)=>petStart(a)<petStart(b)?1:-1)
+    if(!arr.length)return'<div class="empty" style="padding:40px 20px">해당하는 청원이 없어요.</div>'
+    return`<div class="pet-list">${arr.map(p=>`<button class="pet-item" data-open="${p.id}">
+      <div class="pet-item-top"><span class="pet-cat sm">${esc(p.category||'기타')}</span><span class="pet-item-dday">${ddayTxt(p)}</span></div>
+      <div class="pet-item-title">${ptitle(p)}</div>
+      <div class="pet-item-prog"><div class="pet-bar sm"><i style="width:${pctOf(p)}%"></i></div><span class="pet-item-n"><b>${fmt(petAgrees(p))}</b> / ${PET_GOAL}</span></div>
+    </button>`).join('')}</div>`
+  }
+  const empty='<div class="empty">아직 공개된 청원이 없습니다.<br><br>우측 상단 <b style="color:var(--primary)">＋ 청원</b>으로 첫 청원을 올려보세요.</div>'
+  cb.innerHTML=`${banner}${pendSec}
+    <div class="pet-secrow"><div class="sec2">전체 청원 <span class="pet-cnt">${pub.length}</span></div>${pub.length?`<button class="pet-sort" id="pet-sort">${sort}순 ⇅</button>`:''}</div>
+    ${pub.length?`<div class="pet-cats" id="pet-cats">${['전체',...PET_CATS].map(c=>`<button class="pet-chip2${c===fcat?' on':''}" data-fc="${c}">${c}</button>`).join('')}</div>`:''}
+    <div id="pet-listwrap">${pub.length?listHTML():empty}</div><div style="height:16px"></div>`
+  const bindOpen=()=>cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rPetitionDetail(el.dataset.open)))
+  const rerender=()=>{const w=document.getElementById('pet-listwrap');if(w){w.innerHTML=listHTML();bindOpen()}}
+  bindOpen()
+  cb.querySelectorAll('#pet-cats [data-fc]').forEach(b=>b.onclick=()=>{fcat=b.dataset.fc;cb.querySelectorAll('#pet-cats [data-fc]').forEach(x=>x.classList.toggle('on',x===b));rerender()})
+  const sb2=document.getElementById('pet-sort');if(sb2)sb2.onclick=()=>{sort=sort==='인기'?'최신':'인기';sb2.textContent=sort+'순 ⇅';rerender()}
   document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=async()=>{const pt=pend.find(x=>x.id===b.dataset.ap);try{await wt(sb.from('okya_petitions').update({status:'approved',approved_at:nowISO()}).eq('id',b.dataset.ap))}catch{};if(pt)notifyStudents('petition','새 청원 공개',`'${ptitle(pt)}' 청원에 동의해보세요`);iPetition()})
   document.querySelectorAll('[data-rj]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_petitions').delete().eq('id',b.dataset.rj))}catch{};iPetition()})
 }
