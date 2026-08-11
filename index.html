@@ -2042,7 +2042,7 @@ function schoolFoodSlide(el){
 async function renderMealRate(dateKey){
   const box=document.getElementById('meal-rate');if(!box)return
   const m=mealsOf(dateKey)
-  if(!m||dateKey>todayKey()){box.innerHTML='';return}
+  if(!m){box.innerHTML='';return}  // 메뉴가 있는 날이면 언제든 평가 가능(방학·개학 대비 미래 제한 제거)
   const slots=['조식','중식','석식'].filter(k=>(m[k]||[]).some(Boolean))
   if(!slots.length){box.innerHTML='';return}
   let rows=null
