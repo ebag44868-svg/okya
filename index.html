@@ -1000,6 +1000,16 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .cb-petbody{margin:auto 4px;display:flex;flex-direction:column;align-items:center;gap:10px;}
 .cb-petitle{font-size:32px;font-weight:900;line-height:1.34;letter-spacing:-.6px;color:var(--ink);word-break:keep-all;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;}
 .cbmeta{font-size:12.5px;color:var(--sub);font-weight:600;margin-top:12px;}
+
+/* 커뮤니티 → 청원 진입 CTA(아코디언 배너는 유지, 청원만 별도 강조) */
+.comm-petcta{display:flex;align-items:center;gap:13px;width:calc(100% - var(--page-x)*2);margin:16px var(--page-x) 0;padding:15px 16px;background:var(--accent-soft);border-radius:var(--radius-lg);text-align:left;transition:transform var(--dur-micro) var(--ease-spring);}
+.comm-petcta:active{transform:scale(.98);}
+.comm-petcta-ic{width:42px;height:42px;border-radius:var(--radius-md);background:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;flex:none;}
+.comm-petcta-tx{flex:1;min-width:0;}
+.comm-petcta-t{font-size:15px;font-weight:800;letter-spacing:-.2px;color:var(--accent-d);}
+.comm-petcta-s{font-size:12.5px;font-weight:600;color:var(--accent);opacity:.85;margin-top:2px;}
+.comm-petcta-go{color:var(--accent);display:flex;flex:none;}
+.comm-petcta-go svg{width:20px;height:20px;}
 .cbimg{width:100%;max-width:400px;aspect-ratio:1/1.32;flex:none;margin:14px auto 12px;border-radius:16px;background:var(--soft);border:1.6px dashed #cfd4e0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .cbimg.has-img{border:none;background:none;}
 .cbimg img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -2806,6 +2816,11 @@ async function rComm(){
       <div class="cbtrack" id="cbtrack"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
       <div class="cbdots" id="cbdots"></div>
     </div>
+    <button class="comm-petcta" id="comm-pet">
+      <div class="comm-petcta-ic">📢</div>
+      <div class="comm-petcta-tx"><div class="comm-petcta-t">학교에 목소리를 내보세요</div><div class="comm-petcta-s">청원을 올리고 함께 참여하기</div></div>
+      <span class="comm-petcta-go">${I.chev}</span>
+    </button>
     <div class="sec" style="margin:22px 18px 10px">바로가기</div>
     <div class="qcol">
       ${CARDS.map((c,i)=>`<div class="qbtn" data-cid="${c.id}" style="animation:fadeUp .4s var(--ease) both;animation-delay:${i*55}ms"><div class="qic ti-${c.tint}">${I[c.ic]}</div><div class="qt">${c.title}</div><span class="qchev">${I.chev}</span></div>`).join('')}
@@ -2813,6 +2828,7 @@ async function rComm(){
     <div style="height:8px"></div>
   </div>${bnav()}`
   bindNav()
+  document.getElementById('comm-pet').onclick=()=>push(rPetitionPage)
   document.querySelectorAll('[data-cid]').forEach(el=>el.onclick=()=>{
     const id=el.dataset.cid
     if(id==='challenge')push(rChallengePage)
