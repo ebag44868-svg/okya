@@ -115,7 +115,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
   *{scroll-behavior:auto!important;}
   button:active,.pressable:active{transform:none;}
   /* 장식적 등장 애니메이션 억제(피드백 모션은 JS에서 별도 가드) */
-  .mhero,.mhero .mmenu li,.pet-item,.pet-hero,.cfeed-row,.mother,.srow{animation:none!important;}
+  .mhero,.mhero .mmenu li,.pet-item,.pet-hero,.mother,.srow{animation:none!important;}
 }
 
 /* ── Layout ── */
@@ -989,23 +989,6 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .cb-petbody{margin:auto 4px;display:flex;flex-direction:column;align-items:center;gap:10px;}
 .cb-petitle{font-size:32px;font-weight:900;line-height:1.34;letter-spacing:-.6px;color:var(--ink);word-break:keep-all;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;}
 .cbmeta{font-size:12.5px;color:var(--sub);font-weight:600;margin-top:12px;}
-
-/* 커뮤니티 최근 소식(재설계): 코버플로우 → 스캔형 리스트 */
-.cfeed{margin:0 var(--page-x);background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;}
-.cfeed-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:15px 16px;background:transparent;animation:rowSlide .38s var(--ease) both;}
-.cfeed-row+.cfeed-row{border-top:1px solid var(--divider);}
-.cfeed-row:active{background:var(--surface-2);}
-.cfeed-main{flex:1;min-width:0;}
-.cfeed-tag{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:var(--radius-full);background:var(--accent-soft);color:var(--accent);margin-bottom:7px;}
-.cfeed-tag.t-challenge{background:#FFF3E4;color:#E0930F;}
-.cfeed-tag.t-book{background:#E7F8EF;color:#16A34A;}
-.cfeed-title{font-size:15px;font-weight:800;letter-spacing:-.2px;color:var(--text-1);line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-.cfeed-sub{font-size:12.5px;color:var(--text-3);font-weight:500;margin-top:4px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-.cfeed-thumb{width:52px;height:52px;border-radius:var(--radius-md);overflow:hidden;flex:none;background:var(--surface-2);}
-.cfeed-thumb img{width:100%;height:100%;object-fit:cover;}
-.cfeed-chev{color:var(--text-3);font-size:20px;flex:none;}
-.cfeed-empty{text-align:center;padding:44px 20px;font-size:14px;font-weight:700;color:var(--text-2);line-height:1.7;}
-.cfeed-empty span{font-size:12.5px;font-weight:500;color:var(--text-3);}
 .cbimg{width:100%;max-width:400px;aspect-ratio:1/1.32;flex:none;margin:14px auto 12px;border-radius:16px;background:var(--soft);border:1.6px dashed #cfd4e0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .cbimg.has-img{border:none;background:none;}
 .cbimg img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -1130,6 +1113,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 @keyframes petrise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 /* 작성 폼 분야 선택 */
 .pet-catsel{display:flex;flex-wrap:wrap;gap:8px;}
+.pet-goalsel{display:flex;flex-wrap:wrap;gap:8px;}
 .pet-chip{font-size:13px;font-weight:700;padding:8px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;transition:all .15s;}
 .pet-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;}
 /* 상세 - 하나의 시트(표 형식) */
@@ -1884,7 +1868,12 @@ async function rHome(){
       <!-- 출석 -->
       ${admin?'':`<div class="pcard tight att" id="att-panel">${attendancePanelHTML(txs)}</div>`}
 
-      <!-- 옥야머니 잔액 (우선순위 하향 — 화면 주인공이 되지 않게 아래로) -->
+      <!-- 다가오는 일정 -->
+      ${upcoming.length?`<div class="pcard"><div class="sec">다가오는 일정</div>${ddays}</div>`:''}
+     </div>
+
+     <div class="home-col">
+      <!-- 옥야머니 잔액 -->
       <div class="balance compact">
         <div class="lbl">${admin?'학생회 총 발행량':'옥야머니 잔액'}</div>
         <div class="amt"><span id="balnum">0</span><small>옥</small></div>
@@ -1896,11 +1885,6 @@ async function rHome(){
           <button class="bbtn" id="ha-hist">${I.hist}내역</button>
         </div>
       </div>
-     </div>
-
-     <div class="home-col">
-      <!-- 다가오는 일정 -->
-      ${upcoming.length?`<div class="pcard"><div class="sec">다가오는 일정</div>${ddays}</div>`:''}
 
       <!-- 이 달 일정 -->
       <div class="pcard"><div class="sec">이 달 일정</div><div id="home-cal"></div><div id="home-cal-detail" class="cal-detail"></div></div>
@@ -2787,7 +2771,7 @@ function startCommPoll(){clearInterval(COMM_TIMER);COMM_TIMER=setInterval(async(
   if(TAB!=='comm'){clearInterval(COMM_TIMER);COMM_TIMER=null;return}
   const items=await commBannerItems();const sig=items.map(i=>i.kind+i.id).join('|')
   if(sig===COMM_SIG)return
-  COMM_SIG=sig;renderCommFeed(items)
+  COMM_SIG=sig;renderCommBanner(items)
 },8000)}
 async function rComm(){
   TAB='comm'
@@ -2800,7 +2784,10 @@ async function rComm(){
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="topbar"><div class="t">커뮤</div><div style="width:34px"></div></div>
     <div class="sec" style="margin:2px 18px 10px">최근 소식</div>
-    <div id="comm-feed"><div class="loader" style="min-height:140px"><div class="spin"></div></div></div>
+    <div class="cbanner">
+      <div class="cbtrack" id="cbtrack"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
+      <div class="cbdots" id="cbdots"></div>
+    </div>
     <div class="sec" style="margin:22px 18px 10px">바로가기</div>
     <div class="qcol">
       ${CARDS.map((c,i)=>`<div class="qbtn" data-cid="${c.id}" style="animation:fadeUp .4s var(--ease) both;animation-delay:${i*55}ms"><div class="qic ti-${c.tint}">${I[c.ic]}</div><div class="qt">${c.title}</div><span class="qchev">${I.chev}</span></div>`).join('')}
@@ -2816,21 +2803,8 @@ async function rComm(){
     else if(id==='binding')push(rPrint)
   })
   const items=await commBannerItems();COMM_SIG=items.map(i=>i.kind+i.id).join('|')
-  if(TAB==='comm')renderCommFeed(items)
+  if(TAB==='comm')renderCommBanner(items)
   startCommPoll()
-}
-// 최근 소식(재설계): 실데이터 → 스캔형 리스트(카테고리·제목·설명·썸네일). data-go로 상세 이동
-function renderCommFeed(items){
-  const box=document.getElementById('comm-feed');if(!box)return
-  if(!items.length){box.innerHTML=`<div class="cfeed-empty">아직 올라온 소식이 없어요<br><span>첫 챌린지·청원·책을 올려보세요</span></div>`;return}
-  box.innerHTML=`<div class="cfeed">${items.map(b=>{
-    const meta=b.meta||b.sub||''
-    const thumb=b.img?`<div class="cfeed-thumb"><img src="${esc(b.img)}" loading="lazy"></div>`:''
-    return`<button class="cfeed-row" data-go="${b.kind}:${b.id}">
-      <div class="cfeed-main"><span class="cfeed-tag t-${b.type}">${esc(b.tag)}</span><div class="cfeed-title">${esc(b.title)}</div>${meta?`<div class="cfeed-sub">${esc(meta)}</div>`:''}</div>${thumb}<span class="cfeed-chev">›</span>
-    </button>`
-  }).join('')}</div>`
-  box.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>{const[k,id]=el.dataset.go.split(':');if(k==='challenge')push(()=>rChallengeDetail(id));else if(k==='petition')push(()=>rPetitionDetail(id));else if(k==='book')push(()=>rBookDetail(id))})
 }
 // 배너 커버플로우: 3D로 겹쳐 뒤→앞으로 넘어오는 느낌 + 점 동기화 + 느린 자동(수동 시 타이머 리셋)
 function initCarousel(){
@@ -3357,7 +3331,8 @@ function rBookNew(){
 }
 const PET_CATS=['교실','기숙사','급식','체육관','학교 시스템','기타']
 const PET_PHASES=['청원진행','회의 회부','심사중']
-const PET_GOAL=100
+const PET_GOAL=100  // 기본 목표(청원별 goal 미설정 시)
+function petGoal(p){const g=+((p||{}).goal);return g>0?g:PET_GOAL}
 function petAgrees(p){return Object.keys(p.reacts||{}).length}
 function petStart(p){return p.approved_at||p.at}
 function petDeadline(p){const d=new Date(petStart(p));d.setDate(d.getDate()+30);return d}
@@ -3380,6 +3355,10 @@ function rPetitionNew(){
       <div class="pcard">
         <div class="field"><label>청원 제목</label><input id="pn-title" placeholder="예: 급식에 디저트를 늘려주세요"></div>
         <div class="field"><label>청원 분야</label><div class="pet-catsel" id="pn-cats">${PET_CATS.map((c,i)=>`<button type="button" class="pet-chip${i===0?' on':''}" data-cat="${c}">${c}</button>`).join('')}</div></div>
+        <div class="field"><label>목표 참여 수</label>
+          <div class="pet-goalsel" id="pn-goalsel">${[50,100,200,300].map((g,i)=>`<button type="button" class="pet-chip${i===1?' on':''}" data-goal="${g}">${g}명</button>`).join('')}</div>
+          <input id="pn-goal" type="number" inputmode="numeric" min="1" value="100" placeholder="직접 입력" style="margin-top:9px">
+          <p style="font-size:11.5px;color:var(--sub);margin:6px 2px 0">이 인원이 동의하면 목표 달성이에요.</p></div>
         <div class="field"><label>청원의 취지</label><textarea id="pn-purpose" rows="3" placeholder="이 청원을 올리는 이유를 간단히 적어주세요" style="resize:none"></textarea></div>
         <div class="field" style="margin-bottom:0"><label>청원의 내용</label><textarea id="pn-content" rows="6" placeholder="구체적인 내용을 자유롭게 작성해주세요" style="resize:none"></textarea></div>
       </div>
@@ -3390,12 +3369,20 @@ function rPetitionNew(){
   bindNav()
   document.getElementById('bk').onclick=pop
   document.querySelectorAll('#pn-cats .pet-chip').forEach(b=>b.onclick=()=>{cat=b.dataset.cat;document.querySelectorAll('#pn-cats .pet-chip').forEach(x=>x.classList.toggle('on',x===b))})
+  // 목표 수: 칩 클릭 → 입력창 반영, 직접 입력 → 칩 하이라이트 동기화
+  const goalInp=document.getElementById('pn-goal')
+  document.querySelectorAll('#pn-goalsel .pet-chip').forEach(b=>b.onclick=()=>{goalInp.value=b.dataset.goal;document.querySelectorAll('#pn-goalsel .pet-chip').forEach(x=>x.classList.toggle('on',x===b))})
+  goalInp.oninput=()=>document.querySelectorAll('#pn-goalsel .pet-chip').forEach(x=>x.classList.toggle('on',x.dataset.goal===goalInp.value))
   document.getElementById('pn-sub').onclick=async()=>{
     const title=document.getElementById('pn-title').value.trim();if(!title){toast('제목을 입력해줘');return}
     const purpose=document.getElementById('pn-purpose').value.trim()
     const content=document.getElementById('pn-content').value.trim()
+    const goal=Math.max(1,parseInt(goalInp.value,10)||PET_GOAL)
     const btn=document.getElementById('pn-sub');btn.disabled=true;btn.textContent='제출 중...'
-    try{await wt(sb.from('okya_petitions').insert({id:uid('p'),title,category:cat,purpose,content,txt:title,status:'pending',phase:'청원진행',by_id:SESSION.id,at:nowISO(),reacts:{}}))}catch{toast('제출 실패 · okya_petitions에 title/category/purpose/content/phase 열이 필요해요');btn.disabled=false;btn.textContent='청원 제출';return}
+    const row={id:uid('p'),title,category:cat,purpose,content,txt:title,status:'pending',phase:'청원진행',goal,by_id:SESSION.id,at:nowISO(),reacts:{}}
+    let{error}=await wt(sb.from('okya_petitions').insert(row)).catch(e=>({error:e}))
+    if(error&&/goal/i.test(error.message||'')){delete row.goal;({error}=await wt(sb.from('okya_petitions').insert(row)).catch(e=>({error:e})))}
+    if(error){toast('제출 실패 · okya_petitions에 title/category/purpose/content/phase 열이 필요해요');btn.disabled=false;btn.textContent='청원 제출';return}
     notifyAdmins('petition','새 청원 검토 요청',`익명 청원 '${title}'이 접수됐어요`)
     popMsg('청원이 접수됐어요 · 검토 후 공개','📝');pop()
   }
@@ -3412,7 +3399,7 @@ async function rPetitionDetail(pid){
   const agrees=petAgrees(p),mine=(p.reacts||{})[SESSION.id]
   const start=petStart(p),dl=petDeadline(p),left=petDaysLeft(p)
   const phase=p.phase||'청원진행',curIdx=PET_PHASES.indexOf(phase)
-  const pct=Math.min(100,Math.round(agrees/PET_GOAL*100))
+  const goal=petGoal(p),pct=Math.min(100,Math.round(agrees/goal*100))
   const stepper=`<div class="pet-steps">${PET_PHASES.map((s,i)=>`<div class="pet-step${i<=curIdx?' done':''}${i===curIdx?' cur':''}"><div class="pet-step-dot">${i<curIdx?'✓':i+1}</div><div class="pet-step-l">${s}</div></div>`).join('<div class="pet-step-line"></div>')}</div>`
   const adminPanel=admin?`<div class="pcard"><div class="sec">학생회 · 진행단계 변경</div><div class="pet-phasebtns">${PET_PHASES.map(ph=>`<button class="pet-chip${ph===phase?' on':''}" data-phase="${ph}">${ph}</button>`).join('')}</div>
       <div class="sec" style="margin-top:18px">학생회 답변</div>
@@ -3427,7 +3414,7 @@ async function rPetitionDetail(pid){
       <div class="pet-row"><div class="k">청원분야</div><div class="v"><span class="pet-cat">${esc(p.category||'기타')}</span></div></div>
       <div class="pet-row"><div class="k">진행단계</div><div class="v" style="font-weight:800;color:var(--primary)">${esc(phase)}</div></div>
       <div class="pet-row"><div class="k">동의기간</div><div class="v">${fmtDate(start)} ~ ${fmtDate(dl)}<div class="pet-note">청원 공개 이후 30일 이내 · ${left>=0?left+'일 남음':'마감됨'}</div></div></div>
-      <div class="pet-row"><div class="k">동의수</div><div class="v"><div class="pet-agree-line"><span class="pet-agree-big">${fmt(agrees)}명</span><span class="pet-pct">${pct}%</span></div><div class="pet-prog"><i style="width:${pct}%"></i></div><div class="pet-note">목표 ${fmt(PET_GOAL)}명</div></div></div>
+      <div class="pet-row"><div class="k">동의수</div><div class="v"><div class="pet-agree-line"><span class="pet-agree-big">${fmt(agrees)}명</span><span class="pet-pct">${pct}%</span></div><div class="pet-prog"><i style="width:${pct}%"></i></div><div class="pet-note">목표 ${fmt(goal)}명</div></div></div>
       <div class="pet-row"><div class="k">청원인</div><div class="v" style="display:flex;align-items:center;gap:9px"><span id="pet-author">익명</span>${admin?`<button class="minibtn out" id="pd-reveal" style="padding:4px 10px;font-size:11.5px">🔒 확인</button>`:''}</div></div>
       <div class="pet-row col"><div class="k">청원의 취지</div><div class="v pet-body">${esc(p.purpose||'-')}</div></div>
       <div class="pet-row col"><div class="k">청원의 내용</div><div class="v pet-body">${esc(p.content||p.txt||'-')}</div></div>
@@ -3676,14 +3663,14 @@ async function iPetition(){
   const pub=ps.filter(p=>p.status==='approved'),pend=ps.filter(p=>p.status==='pending')
   const cb=document.getElementById('cb');if(!cb)return
   const ptitle=p=>esc(p.title||p.txt||'제목 없음')
-  const pctOf=p=>Math.min(100,Math.round(petAgrees(p)/PET_GOAL*100))
+  const pctOf=p=>Math.min(100,Math.round(petAgrees(p)/petGoal(p)*100))
   const ddayTxt=p=>{const d=petDaysLeft(p);return d>0?`D-${d}`:d===0?'오늘 마감':'마감'}
   const top=[...pub].sort((a,b)=>petAgrees(b)-petAgrees(a))[0]
   // 대표 청원: 참여자·목표·진행률·마감을 한눈에 (장식보다 정보 우선)
   const banner=top?`<button class="pet-hero" data-open="${top.id}">
     <div class="pet-hero-tag">🔥 지금 가장 주목받는 청원</div>
     <div class="pet-hero-title">${ptitle(top)}</div>
-    <div class="pet-hero-stats"><span class="pet-hero-n"><b>${fmt(petAgrees(top))}</b>명 참여</span><span class="pet-hero-goal">목표 ${PET_GOAL}명</span></div>
+    <div class="pet-hero-stats"><span class="pet-hero-n"><b>${fmt(petAgrees(top))}</b>명 참여</span><span class="pet-hero-goal">목표 ${fmt(petGoal(top))}명</span></div>
     <div class="pet-bar"><i style="width:${pctOf(top)}%"></i></div>
     <div class="pet-hero-foot"><span class="pet-hero-pct">${pctOf(top)}%</span><span class="pet-hero-dday">${ddayTxt(top)}</span></div>
   </button>`:''
@@ -3697,7 +3684,7 @@ async function iPetition(){
     return`<div class="pet-list">${arr.map(p=>`<button class="pet-item" data-open="${p.id}">
       <div class="pet-item-top"><span class="pet-cat sm">${esc(p.category||'기타')}</span><span class="pet-item-dday">${ddayTxt(p)}</span></div>
       <div class="pet-item-title">${ptitle(p)}</div>
-      <div class="pet-item-prog"><div class="pet-bar sm"><i style="width:${pctOf(p)}%"></i></div><span class="pet-item-n"><b>${fmt(petAgrees(p))}</b> / ${PET_GOAL}</span></div>
+      <div class="pet-item-prog"><div class="pet-bar sm"><i style="width:${pctOf(p)}%"></i></div><span class="pet-item-n"><b>${fmt(petAgrees(p))}</b> / ${fmt(petGoal(p))}</span></div>
     </button>`).join('')}</div>`
   }
   const empty='<div class="empty">아직 공개된 청원이 없습니다.<br><br>우측 상단 <b style="color:var(--primary)">＋ 청원</b>으로 첫 청원을 올려보세요.</div>'
