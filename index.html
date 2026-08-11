@@ -355,7 +355,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 
 /* topbar / greet (투명, 회색 배경 위) */
 .p3 .topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 18px 8px;}
-.p3 .topbar .t{font-size:18px;font-weight:800;letter-spacing:-.4px;display:flex;align-items:center;gap:8px;color:var(--ink);}
+.p3 .topbar .t{font-size:20px;font-weight:900;letter-spacing:-.4px;display:flex;align-items:center;gap:8px;color:var(--ink);}
 .p3 .topbar .t.brand{color:var(--primary);font-size:20px;}
 .p3 .topbar button{width:34px;height:34px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;color:#3a3f4b;flex:none;}
 .p3 .topbar button svg{width:21px;height:21px;}
@@ -1481,13 +1481,16 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 /* ===== 학교 탭 슬라이드 덱 ===== */
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .school-screen{height:100dvh;overflow:hidden;}
-.school-tabs{display:flex;gap:6px;padding:4px 18px 10px;flex:none;}
-.school-tab{flex:1;padding:9px 0;border:none;border-radius:12px;background:var(--soft);color:var(--sub);font-weight:800;font-size:13px;font-family:inherit;cursor:pointer;transition:background .25s var(--ease),color .25s,box-shadow .25s;}
-.school-tab.on{background:var(--grad);color:#fff;box-shadow:var(--sh-blue);}
+.school-tabs{display:flex;gap:6px;padding:4px 20px 12px;flex:none;}
+.school-tab{flex:1;padding:11px 0;border:none;border-radius:12px;background:var(--surface-2);color:var(--text-2);font-weight:800;font-size:13.5px;font-family:inherit;cursor:pointer;transition:background .25s var(--ease),color .25s;}
+.school-tab.on{background:var(--accent);color:#fff;box-shadow:none;}
 .school-deck{display:flex;flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .school-deck::-webkit-scrollbar{display:none;}
 .school-slide{flex:0 0 100%;width:100%;scroll-snap-align:start;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.sc-inner{padding:2px 0 26px;max-width:940px;margin:0 auto;animation:fadeUp .4s var(--ease) both;}
+.sc-inner{padding:2px 0 26px;max-width:none;margin:0 auto;animation:fadeUp .4s var(--ease) both;}
+/* 학사일정 2.0: pcard 박스 대신 플랫 섹션 + 큰 제목 */
+.sc2-sec{padding:10px 20px 6px;}
+.sc2-t{font-size:20px;font-weight:900;letter-spacing:-.02em;color:var(--text-1);margin-bottom:4px;}
 .bk.mini{width:30px;height:30px;background:none;}
 .cal-dows{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;}
 .cal-dow{text-align:center;font-size:10.5px;font-weight:700;padding:4px 0;color:var(--sub);}
@@ -2661,13 +2664,13 @@ function schoolCalSlide(el){
     const monthEvs=ALL.filter(s=>s.date.startsWith(mStr)).sort((a,b)=>a.date<b.date?-1:1)
     // 다가오는 일정(달월 무관, 가까운 순 5개) — 달력보다 먼저, 가장 크게
     const up=ALL.filter(s=>s.date>=todayStr).sort((a,b)=>a.date<b.date?-1:1).slice(0,5)
-    const upHTML=up.length?`<div class="pcard"><div class="sec">다가오는 일정</div>${up.map((s,i)=>{const dd=Math.ceil((new Date(s.date)-new Date(todayStr))/86400000);const tag=dd===0?'오늘':`D-${dd}`;const dw=['일','월','화','수','목','금','토'][new Date(s.date).getDay()];const p=s.date.split('-');return`<div class="srow" style="animation:fadeUp .35s var(--ease) both;animation-delay:${i*35}ms"><span class="sc-evdot" style="background:${dotColor(s.type)}"></span><div class="l"><div class="t">${esc(s.label)}</div><div class="d">${+p[1]}월 ${+p[2]}일 (${dw})</div></div><span class="dday">${tag}</span></div>`}).join('')}</div>`:''
+    const upHTML=up.length?`<div class="sc2-sec"><h2 class="sc2-t">다가오는 일정</h2>${up.map((s,i)=>{const dd=Math.ceil((new Date(s.date)-new Date(todayStr))/86400000);const tag=dd===0?'오늘':`D-${dd}`;const dw=['일','월','화','수','목','금','토'][new Date(s.date).getDay()];const p=s.date.split('-');return`<div class="srow" style="animation:fadeUp .35s var(--ease) both;animation-delay:${i*35}ms"><span class="sc-evdot" style="background:${dotColor(s.type)}"></span><div class="l"><div class="t">${esc(s.label)}</div><div class="d">${+p[1]}월 ${+p[2]}일 (${dw})</div></div><span class="dday">${tag}</span></div>`}).join('')}</div>`:''
     el.innerHTML=`<div class="sc-inner">
       ${upHTML}
-      <div class="sec" style="margin:22px 18px 8px;color:var(--text-3);font-size:13px;font-weight:700">달력에서 날짜별로 보기</div>
-      <div style="margin:6px 18px 4px">${acalGrid(vy,vm,evMap,todayStr)}</div>
-      <div style="margin:12px 18px 2px"><div class="cal-legend"><span><i style="background:var(--danger)"></i>귀가</span><span><i style="background:#16A34A"></i>등교</span><span><i style="background:#E0424D"></i>시험</span><span><i style="background:#E0930F"></i>모의고사</span></div></div>
-      ${monthEvs.length?`<div class="pcard"><div class="sec">${vm+1}월 일정</div>${monthEvs.map((s,i)=>{const dd=Math.ceil((new Date(s.date)-new Date(todayStr))/86400000);const tag=dd===0?'오늘':dd>0?`D-${dd}`:s.date.slice(5).replace('-','/');const dw=['일','월','화','수','목','금','토'][new Date(s.date).getDay()];return`<div class="srow" style="animation:fadeUp .35s var(--ease) both;animation-delay:${i*35}ms"><span class="sc-evdot" style="background:${dotColor(s.type)}"></span><div class="l"><div class="t">${esc(s.label)}</div><div class="d">${s.date.slice(5).replace('-','/')} (${dw})</div></div><span class="dday">${tag}</span></div>`}).join('')}</div>`:'<div class="empty">이번 달 일정이 없어요</div>'}
+      <div class="sec" style="margin:24px 20px 8px;color:var(--text-3);font-size:13px;font-weight:700">달력에서 날짜별로 보기</div>
+      <div style="margin:6px 20px 4px">${acalGrid(vy,vm,evMap,todayStr)}</div>
+      <div style="margin:12px 20px 2px"><div class="cal-legend"><span><i style="background:var(--danger)"></i>귀가</span><span><i style="background:#16A34A"></i>등교</span><span><i style="background:#E0424D"></i>시험</span><span><i style="background:#E0930F"></i>모의고사</span></div></div>
+      ${monthEvs.length?`<div class="sc2-sec"><h2 class="sc2-t">${vm+1}월 일정</h2>${monthEvs.map((s,i)=>{const dd=Math.ceil((new Date(s.date)-new Date(todayStr))/86400000);const tag=dd===0?'오늘':dd>0?`D-${dd}`:s.date.slice(5).replace('-','/');const dw=['일','월','화','수','목','금','토'][new Date(s.date).getDay()];return`<div class="srow" style="animation:fadeUp .35s var(--ease) both;animation-delay:${i*35}ms"><span class="sc-evdot" style="background:${dotColor(s.type)}"></span><div class="l"><div class="t">${esc(s.label)}</div><div class="d">${s.date.slice(5).replace('-','/')} (${dw})</div></div><span class="dday">${tag}</span></div>`}).join('')}</div>`:'<div class="empty">이번 달 일정이 없어요</div>'}
     </div>`
     el.querySelectorAll('[data-mcnav]').forEach(b=>b.onclick=()=>{vm+=(+b.dataset.mcnav);if(vm<0){vm=11;vy--}if(vm>11){vm=0;vy++}draw()})
   }
