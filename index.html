@@ -1121,10 +1121,32 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .pet-item-prog .pet-bar{flex:1;}
 .pet-item-n{font-size:12.5px;font-weight:600;color:var(--text-3);white-space:nowrap;flex:none;}
 .pet-item-n b{color:var(--accent);font-weight:900;font-size:14px;}
+/* 청원 상태 배지 */
+.pet-badge{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:var(--radius-full);letter-spacing:-.01em;}
+.pet-badge.st-review{background:var(--surface-3);color:var(--text-2);}
+.pet-badge.st-active{background:var(--accent-soft);color:var(--accent);}
+.pet-badge.st-urgent{background:#FDECEC;color:#E0424D;}
+.pet-badge.st-success{background:#E7F8EF;color:#16A34A;}
+.pet-badge.st-closed{background:var(--surface-3);color:var(--text-3);}
+.pet-badge.st-done{background:#E8F0FF;color:#3B6FE0;}
+.pet-badge.lg{font-size:12.5px;padding:5px 12px;}
+.pet-status-row{display:flex;align-items:center;justify-content:space-between;margin:6px 20px 0;animation:petrise .4s var(--ease) both;}
+.pet-status-dday{font-size:13px;font-weight:900;color:var(--text-2);font-variant-numeric:tabular-nums;}
+.pet-result-empty{font-size:13.5px;color:var(--text-3);font-weight:500;padding:6px 0 2px;line-height:1.6;}
 @keyframes petrise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 /* 작성 폼 분야 선택 */
 .pet-catsel{display:flex;flex-wrap:wrap;gap:8px;}
 .pet-goalsel{display:flex;flex-wrap:wrap;gap:8px;}
+.req{color:var(--danger);}
+/* 청원 작성 위저드 단계 표시 */
+.pw-steps{display:flex;align-items:flex-start;padding:8px var(--page-x) 16px;}
+.pw-step{display:flex;flex-direction:column;align-items:center;gap:6px;flex:none;width:56px;}
+.pw-num{width:28px;height:28px;border-radius:50%;background:var(--surface-3);color:var(--text-3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;transition:background var(--dur-standard) var(--ease-out),color var(--dur-standard);}
+.pw-step.on .pw-num{background:var(--accent);color:#fff;box-shadow:0 0 0 4px var(--accent-soft);}
+.pw-step.done .pw-num{background:var(--accent-soft);color:var(--accent);}
+.pw-l{font-size:11px;font-weight:700;color:var(--text-3);white-space:nowrap;}
+.pw-step.on .pw-l{color:var(--text-1);}
+.pw-line{flex:1;height:2px;background:var(--divider);border-radius:2px;margin:14px 2px 0;}
 .pet-chip{font-size:13px;font-weight:700;padding:8px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;transition:all .15s;}
 .pet-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;}
 /* 상세 - 하나의 시트(표 형식) */
@@ -3330,6 +3352,25 @@ const PET_PHASES=['청원진행','회의 회부','심사중']
 const PET_GOAL=100  // 기본 목표(청원별 goal 미설정 시)
 function petGoal(p){const g=+((p||{}).goal);return g>0?g:PET_GOAL}
 function petAgrees(p){return Object.keys(p.reacts||{}).length}
+// 청원 상태(데이터에서 파생): 검토중→동의 진행중→마감 임박→목표 달성/마감→답변 완료
+function petStatus(p){
+  const agrees=petAgrees(p),goal=petGoal(p),left=petDaysLeft(p)
+  if(p.status==='pending')return{label:'검토중',tone:'review'}
+  if(p.answer)return{label:'답변 완료',tone:'done'}
+  if(agrees>=goal)return{label:'목표 달성',tone:'success'}
+  if(left<0)return{label:'마감',tone:'closed'}
+  if(left<=3)return{label:'마감 임박',tone:'urgent'}
+  return{label:'동의 진행중',tone:'active'}
+}
+// 청원 생애주기 단계 인덱스(제출·검토·공개·동의 진행·종료·결과)
+const PET_LIFE=['제출','검토','공개','동의 진행','종료','결과']
+function petStage(p){
+  const agrees=petAgrees(p),goal=petGoal(p),left=petDaysLeft(p)
+  if(p.status==='pending')return 1
+  if(p.answer)return 5
+  if(agrees>=goal||left<0)return 4
+  return 3
+}
 function petStart(p){return p.approved_at||p.at}
 function petDeadline(p){const d=new Date(petStart(p));d.setDate(d.getDate()+30);return d}
 function petDaysLeft(p){return Math.ceil((petDeadline(p)-new Date())/86400000)}
@@ -3343,45 +3384,76 @@ async function rPetitionPage(){
   document.getElementById('pt-new').onclick=()=>push(rPetitionNew)
   await iPetition()
 }
+// 청원 작성 위저드: ①기본 정보 → ②청원 작성 → ③미리보기·제출 (단계별 검증)
 function rPetitionNew(){
-  let cat=PET_CATS[0]
-  app().innerHTML=`<div class="screen fade-in p3">
-    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">청원 올리기</div><div style="width:34px"></div></div>
-    <div class="chal-detail">
-      <div class="pcard">
-        <div class="field"><label>청원 제목</label><input id="pn-title" placeholder="예: 급식에 디저트를 늘려주세요"></div>
-        <div class="field"><label>청원 분야</label><div class="pet-catsel" id="pn-cats">${PET_CATS.map((c,i)=>`<button type="button" class="pet-chip${i===0?' on':''}" data-cat="${c}">${c}</button>`).join('')}</div></div>
-        <div class="field"><label>목표 참여 수</label>
-          <div class="pet-goalsel" id="pn-goalsel">${[50,100,200,300].map((g,i)=>`<button type="button" class="pet-chip${i===1?' on':''}" data-goal="${g}">${g}명</button>`).join('')}</div>
-          <input id="pn-goal" type="number" inputmode="numeric" min="1" value="100" placeholder="직접 입력" style="margin-top:9px">
+  const data={title:'',cat:PET_CATS[0],goal:100,purpose:'',content:''}
+  const STEPS=['기본 정보','청원 작성','미리보기']
+  let step=0
+  const render=()=>{
+    app().innerHTML=`<div class="screen fade-in p3">
+      <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">청원 올리기</div><div style="width:34px"></div></div>
+      <div class="pw-steps">${STEPS.map((s,i)=>`<div class="pw-step${i===step?' on':''}${i<step?' done':''}"><span class="pw-num">${i<step?'✓':i+1}</span><span class="pw-l">${s}</span></div>`).join('<span class="pw-line"></span>')}</div>
+      <div class="chal-detail" id="pw-body"></div>
+    </div>${bnav()}`
+    bindNav()
+    document.getElementById('bk').onclick=()=>{if(step>0){step--;render()}else pop()}
+    const body=document.getElementById('pw-body')
+    if(step===0){
+      body.innerHTML=`<div class="pcard">
+        <div class="field" id="f-title"><label>청원 제목 <span class="req">*</span></label><input id="pn-title" placeholder="예: 급식에 디저트를 늘려주세요" value="${esc(data.title)}"><p class="field-help err" id="e-title" style="display:none">제목을 입력해줘</p></div>
+        <div class="field"><label>청원 분야</label><div class="pet-catsel" id="pn-cats">${PET_CATS.map(c=>`<button type="button" class="pet-chip${c===data.cat?' on':''}" data-cat="${c}">${c}</button>`).join('')}</div></div>
+        <div class="field" style="margin-bottom:0"><label>목표 참여 수</label>
+          <div class="pet-goalsel" id="pn-goalsel">${[50,100,200,300].map(g=>`<button type="button" class="pet-chip${g===data.goal?' on':''}" data-goal="${g}">${g}명</button>`).join('')}</div>
+          <input id="pn-goal" type="number" inputmode="numeric" min="1" value="${data.goal}" placeholder="직접 입력" style="margin-top:9px">
           <p style="font-size:11.5px;color:var(--sub);margin:6px 2px 0">이 인원이 동의하면 목표 달성이에요.</p></div>
-        <div class="field"><label>청원의 취지</label><textarea id="pn-purpose" rows="3" placeholder="이 청원을 올리는 이유를 간단히 적어주세요" style="resize:none"></textarea></div>
-        <div class="field" style="margin-bottom:0"><label>청원의 내용</label><textarea id="pn-content" rows="6" placeholder="구체적인 내용을 자유롭게 작성해주세요" style="resize:none"></textarea></div>
       </div>
-      <div style="padding:0 18px"><button class="pbtn pri" id="pn-sub" style="margin-top:4px">청원 제출</button>
-      <p style="font-size:12px;color:var(--sub);margin:12px 2px 0;text-align:center">익명으로 접수되며, 학생회 검토 후 공개됩니다.</p></div>
-    </div>
-  </div>${bnav()}`
-  bindNav()
-  document.getElementById('bk').onclick=pop
-  document.querySelectorAll('#pn-cats .pet-chip').forEach(b=>b.onclick=()=>{cat=b.dataset.cat;document.querySelectorAll('#pn-cats .pet-chip').forEach(x=>x.classList.toggle('on',x===b))})
-  // 목표 수: 칩 클릭 → 입력창 반영, 직접 입력 → 칩 하이라이트 동기화
-  const goalInp=document.getElementById('pn-goal')
-  document.querySelectorAll('#pn-goalsel .pet-chip').forEach(b=>b.onclick=()=>{goalInp.value=b.dataset.goal;document.querySelectorAll('#pn-goalsel .pet-chip').forEach(x=>x.classList.toggle('on',x===b))})
-  goalInp.oninput=()=>document.querySelectorAll('#pn-goalsel .pet-chip').forEach(x=>x.classList.toggle('on',x.dataset.goal===goalInp.value))
-  document.getElementById('pn-sub').onclick=async()=>{
-    const title=document.getElementById('pn-title').value.trim();if(!title){toast('제목을 입력해줘');return}
-    const purpose=document.getElementById('pn-purpose').value.trim()
-    const content=document.getElementById('pn-content').value.trim()
-    const goal=Math.max(1,parseInt(goalInp.value,10)||PET_GOAL)
-    const btn=document.getElementById('pn-sub');btn.disabled=true;btn.textContent='제출 중...'
-    const row={id:uid('p'),title,category:cat,purpose,content,txt:title,status:'pending',phase:'청원진행',goal,by_id:SESSION.id,at:nowISO(),reacts:{}}
-    let{error}=await wt(sb.from('okya_petitions').insert(row)).catch(e=>({error:e}))
-    if(error&&/goal/i.test(error.message||'')){delete row.goal;({error}=await wt(sb.from('okya_petitions').insert(row)).catch(e=>({error:e})))}
-    if(error){toast('제출 실패 · okya_petitions에 title/category/purpose/content/phase 열이 필요해요');btn.disabled=false;btn.textContent='청원 제출';return}
-    notifyAdmins('petition','새 청원 검토 요청',`익명 청원 '${title}'이 접수됐어요`)
-    popMsg('청원이 접수됐어요 · 검토 후 공개','📝');pop()
+      <div style="padding:0 18px"><button class="pbtn pri" id="pw-next">다음</button></div>`
+      document.querySelectorAll('#pn-cats .pet-chip').forEach(b=>b.onclick=()=>{data.cat=b.dataset.cat;document.querySelectorAll('#pn-cats .pet-chip').forEach(x=>x.classList.toggle('on',x===b))})
+      const gi=document.getElementById('pn-goal')
+      document.querySelectorAll('#pn-goalsel .pet-chip').forEach(b=>b.onclick=()=>{gi.value=b.dataset.goal;data.goal=+b.dataset.goal;document.querySelectorAll('#pn-goalsel .pet-chip').forEach(x=>x.classList.toggle('on',x===b))})
+      gi.oninput=()=>{data.goal=Math.max(1,parseInt(gi.value,10)||100);document.querySelectorAll('#pn-goalsel .pet-chip').forEach(x=>x.classList.toggle('on',x.dataset.goal===gi.value))}
+      document.getElementById('pn-title').oninput=e=>{data.title=e.target.value;if(e.target.value.trim()){document.getElementById('f-title').classList.remove('has-error');document.getElementById('e-title').style.display='none'}}
+      document.getElementById('pw-next').onclick=()=>{
+        data.title=document.getElementById('pn-title').value.trim()
+        if(!data.title){document.getElementById('f-title').classList.add('has-error');document.getElementById('e-title').style.display='block';return}
+        step=1;render()
+      }
+    }else if(step===1){
+      body.innerHTML=`<div class="pcard">
+        <div class="field"><label>청원의 취지</label><textarea id="pn-purpose" rows="3" placeholder="무엇을 바꾸고 싶은지 한 줄로 적어주세요" style="resize:none">${esc(data.purpose)}</textarea></div>
+        <div class="field" id="f-content" style="margin-bottom:0"><label>청원의 내용 <span class="req">*</span></label><textarea id="pn-content" rows="7" placeholder="구체적인 이유와 내용을 자유롭게 작성해주세요" style="resize:none">${esc(data.content)}</textarea><p class="field-help err" id="e-content" style="display:none">내용을 입력해줘</p></div>
+      </div>
+      <div style="padding:0 18px;display:flex;gap:10px"><button class="pbtn out" id="pw-back" style="flex:1">이전</button><button class="pbtn pri" id="pw-next" style="flex:2">미리보기</button></div>`
+      document.getElementById('pn-content').oninput=e=>{data.content=e.target.value;if(e.target.value.trim()){document.getElementById('f-content').classList.remove('has-error');document.getElementById('e-content').style.display='none'}}
+      const save=()=>{data.purpose=document.getElementById('pn-purpose').value;data.content=document.getElementById('pn-content').value}
+      document.getElementById('pw-back').onclick=()=>{save();step=0;render()}
+      document.getElementById('pw-next').onclick=()=>{
+        save();data.purpose=data.purpose.trim();data.content=data.content.trim()
+        if(!data.content){document.getElementById('f-content').classList.add('has-error');document.getElementById('e-content').style.display='block';return}
+        step=2;render()
+      }
+    }else{
+      body.innerHTML=`<div class="pcard pet-sheet">
+        <div class="pet-title-row"><span class="pet-doc">${I.petition}</span><div class="pet-d-title">${esc(data.title)}</div></div>
+        <div class="pet-row"><div class="k">청원분야</div><div class="v"><span class="pet-cat">${esc(data.cat)}</span></div></div>
+        <div class="pet-row"><div class="k">목표 참여</div><div class="v" style="font-weight:800">${fmt(data.goal)}명</div></div>
+        <div class="pet-row col"><div class="k">청원의 취지</div><div class="v pet-body">${esc(data.purpose||'-')}</div></div>
+        <div class="pet-row col"><div class="k">청원의 내용</div><div class="v pet-body">${esc(data.content||'-')}</div></div>
+      </div>
+      <div style="padding:0 18px"><p style="font-size:12px;color:var(--sub);margin:0 2px 12px;text-align:center">익명으로 접수되며, 학생회 검토 후 공개됩니다.</p><div style="display:flex;gap:10px"><button class="pbtn out" id="pw-back" style="flex:1">이전</button><button class="pbtn pri" id="pn-sub" style="flex:2">청원 제출</button></div></div>`
+      document.getElementById('pw-back').onclick=()=>{step=1;render()}
+      document.getElementById('pn-sub').onclick=async()=>{
+        const btn=document.getElementById('pn-sub');btn.disabled=true;btn.textContent='제출 중...'
+        const row={id:uid('p'),title:data.title,category:data.cat,purpose:data.purpose,content:data.content,txt:data.title,status:'pending',phase:'청원진행',goal:data.goal,by_id:SESSION.id,at:nowISO(),reacts:{}}
+        let{error}=await wt(sb.from('okya_petitions').insert(row)).catch(e=>({error:e}))
+        if(error&&/goal/i.test(error.message||'')){delete row.goal;({error}=await wt(sb.from('okya_petitions').insert(row)).catch(e=>({error:e})))}
+        if(error){toast('제출 실패 · okya_petitions에 title/category/purpose/content/phase 열이 필요해요');btn.disabled=false;btn.textContent='청원 제출';return}
+        notifyAdmins('petition','새 청원 검토 요청',`익명 청원 '${data.title}'이 접수됐어요`)
+        popMsg('청원이 접수됐어요 · 검토 후 공개','📝');pop()
+      }
+    }
   }
+  render()
 }
 async function rPetitionDetail(pid){
   const admin=SESSION.role==='admin'
@@ -3396,14 +3468,18 @@ async function rPetitionDetail(pid){
   const start=petStart(p),dl=petDeadline(p),left=petDaysLeft(p)
   const phase=p.phase||'청원진행',curIdx=PET_PHASES.indexOf(phase)
   const goal=petGoal(p),pct=Math.min(100,Math.round(agrees/goal*100))
-  const stepper=`<div class="pet-steps">${PET_PHASES.map((s,i)=>`<div class="pet-step${i<=curIdx?' done':''}${i===curIdx?' cur':''}"><div class="pet-step-dot">${i<curIdx?'✓':i+1}</div><div class="pet-step-l">${s}</div></div>`).join('<div class="pet-step-line"></div>')}</div>`
+  const st=petStatus(p),stage=petStage(p)
+  // 생애주기 스테퍼(데이터 파생): 제출→검토→공개→동의 진행→종료→결과
+  const stepper=`<div class="pet-steps">${PET_LIFE.map((s,i)=>`<div class="pet-step${i<=stage?' done':''}${i===stage?' cur':''}"><div class="pet-step-dot">${i<stage?'✓':i+1}</div><div class="pet-step-l">${s}</div></div>`).join('<div class="pet-step-line"></div>')}</div>`
   const adminPanel=admin?`<div class="pcard"><div class="sec">학생회 · 진행단계 변경</div><div class="pet-phasebtns">${PET_PHASES.map(ph=>`<button class="pet-chip${ph===phase?' on':''}" data-phase="${ph}">${ph}</button>`).join('')}</div>
       <div class="sec" style="margin-top:18px">학생회 답변</div>
       <textarea id="pd-answer" rows="3" placeholder="이 청원에 대한 학생회 답변을 남겨주세요" style="resize:none">${esc(p.answer||'')}</textarea>
       <button class="minibtn soft" id="pd-answer-save" style="margin-top:9px">답변 저장</button></div>`:''
-  const answerCard=p.answer?`<div class="pcard pet-answer"><div class="pet-ans-head">💬 학생회 답변</div><div class="pet-ans-body">${esc(p.answer)}</div></div>`:''
+  const resultCard=p.answer
+    ?`<div class="pcard pet-answer"><div class="pet-ans-head">💬 학생회 답변 · 처리 결과</div><div class="pet-ans-body">${esc(p.answer)}</div></div>`
+    :(stage>=4?`<div class="pcard"><div class="sec">처리 결과</div><div class="pet-result-empty">아직 처리 결과가 등록되지 않았어요.</div></div>`:'')
   cb.innerHTML=`<div class="chal-detail">
-    <div class="pet-eyebrow">동의진행 청원</div>
+    <div class="pet-status-row"><span class="pet-badge lg st-${st.tone}">${st.label}</span><span class="pet-status-dday">${left>=0?'D-'+left:'마감됨'}</span></div>
     <div class="pcard pet-sheet">
       <div class="pet-title-row"><span class="pet-doc">${I.petition}</span><div class="pet-d-title">${esc(p.title||p.txt||'제목 없음')}</div></div>
       ${stepper}
@@ -3415,11 +3491,16 @@ async function rPetitionDetail(pid){
       <div class="pet-row col"><div class="k">청원의 취지</div><div class="v pet-body">${esc(p.purpose||'-')}</div></div>
       <div class="pet-row col"><div class="k">청원의 내용</div><div class="v pet-body">${esc(p.content||p.txt||'-')}</div></div>
     </div>
-    ${answerCard}
+    ${resultCard}
     ${adminPanel}
-    <div class="pet-cta"><button class="pbtn pri pet-agree-btn${mine?' agreed':''}" id="pd-agree">${mine?'✓ 동의 완료':left<0?'동의 기간 마감':'동의하기'}</button></div>
+    <div class="pet-cta"><button class="pbtn pri pet-agree-btn${mine?' agreed':''}" id="pd-agree">${mine?'✓ 동의 완료':left<0?'동의 기간 마감':'동의하기'}</button>
+      <button class="pbtn out" id="pd-share" style="margin-top:10px">청원 공유하기</button></div>
     <div style="height:10px"></div>
   </div>`
+  const shareBtn=document.getElementById('pd-share');if(shareBtn)shareBtn.onclick=async()=>{
+    const txt=`[옥야 청원] ${p.title||p.txt||'청원'}\n현재 ${fmt(agrees)}명 참여 (목표 ${fmt(goal)}명)\n옥야 앱에서 동의해주세요!`
+    try{if(navigator.share){await navigator.share({title:'옥야 청원',text:txt})}else{await navigator.clipboard.writeText(txt);toast('청원 내용을 복사했어요','success')}}catch{}
+  }
   document.getElementById('pd-agree').onclick=async()=>{
     if(left<0){toast('동의 기간이 마감되었어요');return}
     let reacts={}
@@ -3671,27 +3752,29 @@ async function iPetition(){
     <div class="pet-hero-foot"><span class="pet-hero-pct">${pctOf(top)}%</span><span class="pet-hero-dday">${ddayTxt(top)}</span></div>
   </button>`:''
   const pendSec=admin&&pend.length?`<div class="pcard"><div class="sec">검토 대기 (${pend.length})</div>${pend.map(p=>`<div class="post"><div class="pbody" style="font-weight:800">${ptitle(p)}</div><div class="pmeta" style="margin:4px 0 8px">${esc(p.category||'기타')} · 접수 ${timeago(p.at)}</div><div style="display:flex;gap:8px"><button class="minibtn soft" data-ap="${p.id}">공개</button><button class="minibtn danger" data-rj="${p.id}">반려</button></div></div>`).join('')}</div>`:''
-  // 필터(카테고리)·정렬(인기/최신) 상태
-  let fcat='전체',sort='인기'
+  // 필터(상태)·정렬(인기/최신) 상태
+  const STF=['전체','진행중','마감임박','목표달성','마감']
+  const matchStatus=(p,f)=>{if(f==='전체')return true;const t=petStatus(p).tone;if(f==='진행중')return t==='active'||t==='urgent';if(f==='마감임박')return t==='urgent';if(f==='목표달성')return t==='success'||t==='done';if(f==='마감')return t==='closed';return true}
+  let fstat='전체',sort='인기'
   const listHTML=()=>{
-    let arr=pub.filter(p=>fcat==='전체'||(p.category||'기타')===fcat)
+    let arr=pub.filter(p=>matchStatus(p,fstat))
     arr=arr.slice().sort(sort==='인기'?(a,b)=>petAgrees(b)-petAgrees(a):(a,b)=>petStart(a)<petStart(b)?1:-1)
     if(!arr.length)return'<div class="empty" style="padding:40px 20px">해당하는 청원이 없어요.</div>'
-    return`<div class="pet-list">${arr.map(p=>`<button class="pet-item" data-open="${p.id}">
-      <div class="pet-item-top"><span class="pet-cat sm">${esc(p.category||'기타')}</span><span class="pet-item-dday">${ddayTxt(p)}</span></div>
+    return`<div class="pet-list">${arr.map(p=>{const st=petStatus(p);return`<button class="pet-item" data-open="${p.id}">
+      <div class="pet-item-top"><span class="pet-badge st-${st.tone}">${st.label}</span><span class="pet-item-dday">${esc(p.category||'기타')} · ${ddayTxt(p)}</span></div>
       <div class="pet-item-title">${ptitle(p)}</div>
       <div class="pet-item-prog"><div class="pet-bar sm"><i style="width:${pctOf(p)}%"></i></div><span class="pet-item-n"><b>${fmt(petAgrees(p))}</b> / ${fmt(petGoal(p))}</span></div>
-    </button>`).join('')}</div>`
+    </button>`}).join('')}</div>`
   }
   const empty='<div class="empty">아직 공개된 청원이 없습니다.<br><br>우측 상단 <b style="color:var(--primary)">＋ 청원</b>으로 첫 청원을 올려보세요.</div>'
   cb.innerHTML=`${banner}${pendSec}
     <div class="pet-secrow"><div class="sec2">전체 청원 <span class="pet-cnt">${pub.length}</span></div>${pub.length?`<button class="pet-sort" id="pet-sort">${sort}순 ⇅</button>`:''}</div>
-    ${pub.length?`<div class="pet-cats" id="pet-cats">${['전체',...PET_CATS].map(c=>`<button class="pet-chip2${c===fcat?' on':''}" data-fc="${c}">${c}</button>`).join('')}</div>`:''}
+    ${pub.length?`<div class="pet-cats" id="pet-stats">${STF.map(c=>`<button class="pet-chip2${c===fstat?' on':''}" data-fs="${c}">${c}</button>`).join('')}</div>`:''}
     <div id="pet-listwrap">${pub.length?listHTML():empty}</div><div style="height:16px"></div>`
   const bindOpen=()=>cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rPetitionDetail(el.dataset.open)))
   const rerender=()=>{const w=document.getElementById('pet-listwrap');if(w){w.innerHTML=listHTML();bindOpen()}}
   bindOpen()
-  cb.querySelectorAll('#pet-cats [data-fc]').forEach(b=>b.onclick=()=>{fcat=b.dataset.fc;cb.querySelectorAll('#pet-cats [data-fc]').forEach(x=>x.classList.toggle('on',x===b));rerender()})
+  cb.querySelectorAll('#pet-stats [data-fs]').forEach(b=>b.onclick=()=>{fstat=b.dataset.fs;cb.querySelectorAll('#pet-stats [data-fs]').forEach(x=>x.classList.toggle('on',x===b));rerender()})
   const sb2=document.getElementById('pet-sort');if(sb2)sb2.onclick=()=>{sort=sort==='인기'?'최신':'인기';sb2.textContent=sort+'순 ⇅';rerender()}
   document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=async()=>{const pt=pend.find(x=>x.id===b.dataset.ap);try{await wt(sb.from('okya_petitions').update({status:'approved',approved_at:nowISO()}).eq('id',b.dataset.ap))}catch{};if(pt)notifyStudents('petition','새 청원 공개',`'${ptitle(pt)}' 청원에 동의해보세요`);iPetition()})
   document.querySelectorAll('[data-rj]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_petitions').delete().eq('id',b.dataset.rj))}catch{};iPetition()})
