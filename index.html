@@ -400,7 +400,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .h2-slotseg{display:inline-flex;gap:6px;margin-top:16px;background:var(--surface-2);padding:4px;border-radius:14px;align-self:flex-start;}
 .h2-slotbtn{padding:8px 16px;border-radius:11px;font-size:14px;font-weight:800;color:var(--text-2);transition:background var(--dur-standard) var(--ease-out),color var(--dur-standard);}
 .h2-slotbtn.on{background:var(--surface);color:var(--accent);box-shadow:var(--shadow-sm);}
-.h2-menu{list-style:none;margin:18px 0 0;display:flex;flex-direction:column;gap:11px;}
+.h2-menu{list-style:none;margin:28px 0 0;display:flex;flex-direction:column;gap:11px;}
 .h2-menu li{font-size:25px;font-weight:800;letter-spacing:-.02em;color:var(--text-1);line-height:1.12;animation:mheroIn .5s var(--ease-out) both;}
 .h2-menu li.h2-menu-empty{font-size:17px;font-weight:600;color:var(--text-3);}
 .h2-cta{align-self:flex-start;margin-top:22px;display:inline-flex;align-items:center;gap:8px;background:var(--text-1);color:#fff;font-size:15px;font-weight:800;padding:13px 22px;border-radius:var(--radius-full);transition:transform var(--dur-micro) var(--ease-spring);}
@@ -432,7 +432,24 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .h2-dots{display:flex;gap:7px;justify-content:center;margin-top:14px;}
 .h2-dot{width:7px;height:7px;border-radius:50%;background:var(--surface-3);transition:width var(--dur-standard) var(--ease-out),background var(--dur-standard);}
 .h2-dot.on{width:22px;border-radius:4px;background:var(--accent);}
-/* Feature rail */
+/* 바로가기 타일: 각진 정사각형, 여백 없이 붙여서 가로 슬라이드(이미지 꽉 채움 슬롯) */
+.h2-sec-flush{padding-left:0;padding-right:0;}
+.h2-grid{display:flex;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.h2-grid::-webkit-scrollbar{display:none;}
+.h2-sc{flex:0 0 auto;width:130px;aspect-ratio:1;position:relative;overflow:hidden;background-size:cover;background-position:center;display:block;scroll-snap-align:start;}
+.h2-sc::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.4),transparent 58%);}
+.h2-sc-emoji{position:absolute;top:12px;right:13px;font-size:29px;z-index:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,.25));}
+.h2-sc-l{position:absolute;left:14px;bottom:13px;z-index:1;font-size:14px;font-weight:800;color:#fff;letter-spacing:-.01em;text-shadow:0 1px 5px rgba(0,0,0,.32);}
+.h2-sc:active{filter:brightness(.93);}
+.sc-0{background:linear-gradient(145deg,#6C5CE7,#A29BFE);}
+.sc-1{background:linear-gradient(145deg,#E84393,#FD79A8);}
+.sc-2{background:linear-gradient(145deg,#E17055,#FDA085);}
+.sc-3{background:linear-gradient(145deg,#00B894,#55EFC4);}
+.sc-4{background:linear-gradient(145deg,#0984E3,#74B9FF);}
+.sc-5{background:linear-gradient(145deg,#6D5DFC,#9B8CFF);}
+.sc-6{background:linear-gradient(145deg,#00CEC9,#81ECEC);}
+.sc-7{background:linear-gradient(145deg,#C86DFD,#F78FD6);}
+/* Feature rail(구) */
 .h2-rail{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px;}
 .h2-rail::-webkit-scrollbar{display:none;}
 .h2-feat{flex:0 0 auto;width:106px;height:114px;border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;transition:transform var(--dur-micro) var(--ease-spring);}
@@ -474,6 +491,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
   .h2-menu{margin-top:auto;}
   .h2-sec{padding:36px 30px 2px;}
   .h2-slide{flex-basis:46%;max-width:560px;}
+  .h2-sc{width:172px;}
   .h2-today-cols{flex-direction:row;align-items:stretch;}
   .h2-today-cols>*{flex:1;}
 }
@@ -1975,14 +1993,7 @@ function todaySummaryHTML(txs,admin){
     <div class="today-strip">${strip}</div>
   </div>`
 }
-// ── 옥야 2.0 홈: landscape-first, 카드 스택 폐기 → Hero + 학교 갤러리 + 가로 rail + Today ──
-const H2_GAL=[
-  {t:'옥야의 아침',s:'교문에서 시작하는 하루'},
-  {t:'점심 시간',s:'급식실의 활기'},
-  {t:'수업 풍경',s:'집중하는 순간들'},
-  {t:'방과 후',s:'동아리와 자습'},
-  {t:'하교길',s:'노을 지는 옥야'}
-]
+// ── 옥야 2.0 홈: landscape-first, 카드 스택 폐기 → Hero + 바로가기 타일 + Today ──
 function renderHeroMeal(slot){
   const seg=document.getElementById('hero-seg'),ul=document.getElementById('hero-menu')
   if(!seg||!ul)return
@@ -2013,11 +2024,9 @@ async function rHome(){
   const dateLine=`${d.getMonth()+1}월 ${d.getDate()}일 ${DOW[d.getDay()]}요일`
   const slot0=defaultMealSlot()
 
-  const gal=H2_GAL.map((g,i)=>`<div class="h2-slide gal-${i%5}"><div class="h2-slide-grad"></div><div class="h2-slide-cap"><div class="h2-slide-n">${String(i+1).padStart(2,'0')} / ${String(H2_GAL.length).padStart(2,'0')}</div><div class="h2-slide-t">${g.t}</div><div class="h2-slide-s">${g.s}</div></div></div>`).join('')
-  const dots=H2_GAL.map((_,i)=>`<span class="h2-dot${i===0?' on':''}" data-di="${i}"></span>`).join('')
-
-  const FEAT=[['school-food','급식','🍚'],['petition','청원','📢'],['comm','커뮤니티','💬'],['money','옥야머니','💰'],['school-cal','학사일정','📅']]
-  const feat=FEAT.map(([k,l,e])=>`<button class="h2-feat" data-goto="${k}"><div class="h2-feat-ic">${e}</div><div class="h2-feat-l">${l}</div></button>`).join('')
+  // 바로가기 타일: 각진 정사각형, 여백 없이 붙여서 가로 슬라이드. 각 타일은 향후 이미지를 꽉 채워 넣을 슬롯
+  const SHORTCUTS=[['money','옥야머니','💰'],['petition','청원','📢'],['challenge','챌린지','🔥'],['school-food','급식','🍚'],['school-cal','학사일정','📅'],['school-mt','회의록','📹'],['book','책교환','📚'],['print','제본소','📖']]
+  const shortcuts=SHORTCUTS.map(([k,l,e],i)=>`<button class="h2-sc sc-${i}" data-goto="${k}"><span class="h2-sc-emoji">${e}</span><span class="h2-sc-l">${l}</span></button>`).join('')
 
   const up=upcoming.slice(0,3).map(s=>{const dd=Math.max(0,Math.ceil((new Date(s.date)-new Date(todayStr))/86400000));return`<div class="h2-up-row"><div><div class="h2-up-t">${esc(s.label)}</div><div class="h2-up-d">${fmtDate(s.date)}</div></div><div class="h2-up-dd">D-${dd}</div></div>`}).join('')||`<div class="h2-empty">다가오는 일정이 없어요</div>`
 
@@ -2034,15 +2043,9 @@ async function rHome(){
       <div class="h2-hero-visual meal-visual" data-slot="MealGraphicSlot"><div class="h2-visual-emoji">🍱</div></div>
     </section>
 
-    <section class="h2-sec">
-      <div class="h2-sec-head"><h2 class="h2-sec-t">옥야의 하루</h2><span class="h2-sec-s">학교에서 보내는 오늘의 순간들</span></div>
-      <div class="h2-gallery" id="h2-gallery">${gal}</div>
-      <div class="h2-dots" id="h2-dots">${dots}</div>
-    </section>
-
-    <section class="h2-sec">
-      <div class="h2-sec-head"><h2 class="h2-sec-t">바로가기</h2></div>
-      <div class="h2-rail">${feat}</div>
+    <section class="h2-sec h2-sec-flush">
+      <div class="h2-sec-head" style="padding:0 20px"><h2 class="h2-sec-t">바로가기</h2></div>
+      <div class="h2-grid" id="h2-grid">${shortcuts}</div>
     </section>
 
     <section class="h2-sec">
@@ -2067,16 +2070,18 @@ async function rHome(){
   bindNav()
   renderHeroMeal(slot0)
 
-  // 학교 갤러리: 가로 스와이프 + 점 동기화
-  const gwrap=document.getElementById('h2-gallery'),dwrap=document.getElementById('h2-dots')
-  if(gwrap&&dwrap){
-    let raf
-    gwrap.onscroll=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const one=gwrap.querySelector('.h2-slide');if(!one)return;const w=one.offsetWidth+16;const i=Math.round(gwrap.scrollLeft/Math.max(1,w));dwrap.querySelectorAll('.h2-dot').forEach((x,k)=>x.classList.toggle('on',k===i))})}
-    dwrap.querySelectorAll('[data-di]').forEach(dt=>dt.onclick=()=>{const s=gwrap.querySelectorAll('.h2-slide')[+dt.dataset.di];if(s)gwrap.scrollTo({left:s.offsetLeft,behavior:'smooth'})})
-  }
-
   // click-through: 기존 라우팅 유지
-  const goHome=k=>{if(k==='school-food'){TAB='school';STACK=[];rSchool(0)}else if(k==='school-cal'){TAB='school';STACK=[];rSchool(1)}else if(k==='money'){TAB='money';STACK=[];rMoney()}else if(k==='petition'){push(rPetitionPage)}else if(k==='comm'){TAB='comm';STACK=[];rComm()}}
+  const goHome=k=>{
+    if(k==='school-food'){TAB='school';STACK=[];rSchool(0)}
+    else if(k==='school-cal'){TAB='school';STACK=[];rSchool(1)}
+    else if(k==='school-mt'){TAB='school';STACK=[];rSchool(3)}
+    else if(k==='money'){TAB='money';STACK=[];rMoney()}
+    else if(k==='comm'){TAB='comm';STACK=[];rComm()}
+    else if(k==='petition'){push(rPetitionPage)}
+    else if(k==='challenge'){push(rChallengePage)}
+    else if(k==='book'){push(rBookPage)}
+    else if(k==='print'){push(rPrint)}
+  }
   document.querySelectorAll('.home2 [data-goto]').forEach(el=>{
     el.addEventListener('click',()=>goHome(el.dataset.goto))
     if(el.getAttribute('role')==='button')el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();goHome(el.dataset.goto)}})
