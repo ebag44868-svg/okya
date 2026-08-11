@@ -368,6 +368,9 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .p3 .balance .lbl{font-size:13px;opacity:.92;font-weight:600;}
 .p3 .balance .amt{font-size:32px;font-weight:800;letter-spacing:-1px;margin:4px 0 14px;}
 .p3 .balance .amt small{font-size:16px;font-weight:700;opacity:.9;margin-left:3px;}
+/* 홈 잔액 카드: 주인공 아님 → 글로우/크기 축소(브랜드 컬러는 유지) */
+.p3 .balance.compact{padding:16px 18px 14px;border-radius:20px;box-shadow:var(--shadow-md);}
+.p3 .balance.compact .amt{font-size:26px;margin:3px 0 12px;}
 .p3 .prog{height:6px;background:rgba(255,255,255,.28);border-radius:6px;overflow:hidden;margin-bottom:5px;position:relative;}
 .p3 .prog i{display:block;height:100%;background:#fff;border-radius:6px;position:relative;overflow:hidden;box-shadow:0 0 9px rgba(255,255,255,.6);transition:width 1.3s cubic-bezier(.16,1,.3,1);}
 .p3 .prog i::after{content:"";position:absolute;top:0;left:0;height:100%;width:60%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);transform:translateX(-140%);animation:progShine 2.6s var(--ease) 1.5s infinite;}
@@ -1852,8 +1855,18 @@ async function rHome(){
     <div class="home-top">${headerHTML}${todaySummaryHTML(txs,admin)}</div>
     <div class="home-cols">
      <div class="home-col">
-      <!-- 잔액 카드 -->
-      <div class="balance">
+      <!-- 오늘 급식 (우선순위 2위 — 홈에서 가장 먼저 닿게) -->
+      <div class="pcard">
+        <div class="chd"><div class="sec" style="margin:0">오늘 급식</div><button id="meal-cal" aria-label="급식 달력">${ICO_CAL}</button></div>
+        <div class="pills" id="home-meal-seg" style="margin:11px 0 12px"></div>
+        <ul class="meal" id="home-meal"></ul>
+      </div>
+
+      <!-- 출석 -->
+      ${admin?'':`<div class="pcard tight att" id="att-panel">${attendancePanelHTML(txs)}</div>`}
+
+      <!-- 옥야머니 잔액 (우선순위 하향 — 화면 주인공이 되지 않게 아래로) -->
+      <div class="balance compact">
         <div class="lbl">${admin?'학생회 총 발행량':'옥야머니 잔액'}</div>
         <div class="amt"><span id="balnum">0</span><small>옥</small></div>
         <div class="prog"><i id="progbar" style="width:0"></i></div>
@@ -1863,15 +1876,6 @@ async function rHome(){
           ${admin?`<button class="bbtn" id="ha-recall">${I.recall}회수</button>`:''}
           <button class="bbtn" id="ha-hist">${I.hist}내역</button>
         </div>
-      </div>
-
-      <!-- 출석 -->
-      ${admin?'':`<div class="pcard tight att" id="att-panel">${attendancePanelHTML(txs)}</div>`}
-
-      <!-- 오늘 급식 -->
-      <div class="pcard">
-        <div class="chd"><div class="pills" id="home-meal-seg"></div><button id="meal-cal">${ICO_CAL}</button></div>
-        <ul class="meal" id="home-meal"></ul>
       </div>
      </div>
 
