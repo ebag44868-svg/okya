@@ -518,13 +518,17 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .m2-more{display:flex;align-items:center;gap:2px;font-size:13px;font-weight:700;color:var(--text-3);}
 .m2-more svg{width:15px;height:15px;stroke:var(--text-3);}
 .m2-txlist .lrow{padding:14px 0;}
+/* 거래 타입 필터 칩 */
+.m2-cats{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding:8px 0 6px;}
+.m2-cats::-webkit-scrollbar{display:none;}
+.m2-cat{flex:none;font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:var(--radius-full);background:var(--surface-2);color:var(--text-2);transition:background var(--dur-standard) var(--ease-out),color var(--dur-standard);}
+.m2-cat.on{background:var(--accent);color:#fff;}
 .money2 .m2-hero,.money2 .m2-sec{animation:p3rise2 .7s var(--ease-out) both;}
 .money2 .m2-sec{animation-delay:.08s;}
 @media (min-width:820px) and (min-aspect-ratio:1/1){
-  .m2-hero{display:flex;align-items:center;justify-content:space-between;gap:34px;}
-  .m2-hero-l{flex:1;min-width:0;}
-  .m2-actions{margin-top:0;flex-direction:column;width:210px;flex:none;}
-  .m2-bal{font-size:66px;}
+  /* 잔액 카드는 왼쪽에 붙이고 폭을 약 1/3로 축소 */
+  .m2-hero{max-width:400px;margin-right:auto;}
+  .m2-bal{font-size:56px;}
 }
 .p3 .prog{height:6px;background:rgba(255,255,255,.28);border-radius:6px;overflow:hidden;margin-bottom:5px;position:relative;}
 .p3 .prog i{display:block;height:100%;background:#fff;border-radius:6px;position:relative;overflow:hidden;box-shadow:0 0 9px rgba(255,255,255,.6);transition:width 1.3s cubic-bezier(.16,1,.3,1);}
@@ -2193,8 +2197,11 @@ async function rMoney(){
   const gotM=mine.filter(t=>t.to===SESSION.id&&(t.at||'').slice(0,7)===ym).reduce((s,t)=>s+t.amount,0)
   const useM=mine.filter(t=>t.from===SESSION.id&&(t.at||'').slice(0,7)===ym).reduce((s,t)=>s+t.amount,0)
   const rbal=admin?{}:runningBal(mine,bal)
-  const list=(admin?txs.filter(t=>t.type==='발행'||t.type==='회수'):mine).slice(0,20)
-  const rows=list.length?list.map(t=>txRow(t,admin,rbal[t.id])).join(''):'<div class="empty">내역이 없어요.</div>'
+  const baseList=admin?txs.filter(t=>t.type==='발행'||t.type==='회수'):mine
+  const cats=admin?['전체','발행','회수','챌린지']:['전체','출석','송금','챌린지','발행']
+  const catMatch=(t,cat)=>{if(cat==='전체')return true;if(cat==='챌린지')return t.type==='발행'&&/챌린지|인증/.test(t.reason||'');if(cat==='발행')return t.type==='발행'&&!/챌린지|인증/.test(t.reason||'');return t.type===cat}
+  const rowsFor=cat=>{const l=baseList.filter(t=>catMatch(t,cat)).slice(0,20);return{l,html:l.length?l.map(t=>txRow(t,admin,rbal[t.id])).join(''):'<div class="empty" style="padding:30px 20px">해당 거래가 없어요.</div>'}}
+  const first=rowsFor('전체')
 
   app().innerHTML=`<div class="screen fade-in p3 money2">
     <div class="topbar"><div class="t">옥야머니</div><div style="width:34px"></div></div>
@@ -2212,7 +2219,8 @@ async function rMoney(){
     </section>
     <section class="m2-sec">
       <div class="m2-sec-head"><h2 class="m2-sec-t">${admin?'발행 내역':'최근 거래'}</h2><button class="m2-more" id="m-all">전체보기 ${I.chev}</button></div>
-      <div class="m2-txlist">${rows}</div>
+      <div class="m2-cats" id="m2-cats">${cats.map((c,i)=>`<button class="m2-cat${i===0?' on':''}" data-cat="${c}">${c}</button>`).join('')}</div>
+      <div class="m2-txlist" id="m2-txlist">${first.html}</div>
     </section>
   </div>${bnav()}`
   bindNav()
@@ -2221,7 +2229,12 @@ async function rMoney(){
   document.getElementById('m-hist').onclick=()=>push(()=>rHistory())
   document.getElementById('m-all').onclick=()=>push(()=>rHistory())
   countUp(document.getElementById('mbalnum'),admin?issued:bal)
-  wireTxRows(list)
+  wireTxRows(first.l)
+  document.querySelectorAll('#m2-cats [data-cat]').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#m2-cats [data-cat]').forEach(x=>x.classList.toggle('on',x===b))
+    const r=rowsFor(b.dataset.cat),el=document.getElementById('m2-txlist')
+    if(el){el.innerHTML=r.html;wireTxRows(r.l)}
+  })
 }
 // 거래 행 탭 → 상세 바텀시트
 function wireTxRows(list){document.querySelectorAll('.lrow-tap[data-txid]').forEach(el=>el.onclick=()=>{const t=(list||[]).find(x=>x.id===el.dataset.txid);if(t)txDetailSheet(t)})}
