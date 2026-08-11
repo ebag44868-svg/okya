@@ -603,6 +603,19 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .p3 .stat{flex:1;background:var(--card);border-radius:15px;box-shadow:var(--sh);padding:14px 8px;text-align:center;}
 .p3 .stat .v{font-size:16px;font-weight:800;color:var(--primary);}
 .p3 .stat .k{font-size:11px;color:var(--sub);margin-top:3px;}
+/* 나의 옥야 대시보드 */
+.my-dash{padding:16px 18px;}
+.my-dash-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.my-lv-badge{font-size:15px;font-weight:900;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-d));padding:5px 14px;border-radius:999px;letter-spacing:-.01em;box-shadow:0 3px 10px rgba(123,108,255,.28);}
+.my-streak{font-size:13px;font-weight:700;color:var(--text-2);}
+.my-streak b{color:#F0863C;font-size:16px;}
+.my-lv-bar{height:9px;border-radius:999px;background:var(--surface-2);overflow:hidden;}
+.my-lv-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-d));transition:width .7s var(--ease-out);}
+.my-lv-sub{font-size:11.5px;color:var(--text-3);margin-top:7px;font-weight:600;}
+.my-act{display:flex;gap:10px;margin-top:15px;}
+.my-act-c{flex:1;background:var(--surface-2);border-radius:var(--radius-md);padding:12px 8px;text-align:center;}
+.my-act-c .v{font-size:19px;font-weight:900;color:var(--text-1);}
+.my-act-c .k{font-size:11.5px;color:var(--text-3);margin-top:2px;font-weight:600;}
 .p3 .palgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:13px 6px;}
 .p3 .palitem{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
 .p3 .palitem .c{width:38px;height:38px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.12);}
@@ -721,6 +734,10 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .p3 .ntrow.unread{background:linear-gradient(90deg,var(--primary-tint),transparent 70%);border-radius:12px;margin:0 -6px;padding-left:6px;padding-right:6px;}
 .p3 .ntrow.unread+.lrow{border-top-color:transparent;}
 .p3 .ntrow .ntdot{width:8px;height:8px;border-radius:50%;background:#FF4D4F;flex:none;align-self:center;box-shadow:0 0 0 3px rgba(255,77,79,.14);}
+.p3 .ntrow{cursor:pointer;transition:background var(--dur-micro) ease;}
+.p3 .ntrow:active{background:var(--surface-2);}
+.p3 .ntrow .ntchev{flex:none;align-self:center;color:var(--text-3);display:flex;opacity:.5;}
+.p3 .ntrow .ntchev svg{width:16px;height:16px;}
 
 /* ===================================================================
    홈 2열 래퍼 (세로에선 투명, 가로에서 그리드) + 진입 애니메이션 강화
@@ -1821,6 +1838,21 @@ async function rHistory(){
 
 // 알림 센터
 const NT_META={money:{ic:'money',tint:'green'},dm:{ic:'send',tint:'blue'},petition:{ic:'notice',tint:'org'},notice:{ic:'notice',tint:'blue'},book:{ic:'book',tint:'blue'},print:{ic:'print',tint:'org'},challenge:{ic:'star',tint:'green'}}
+// 알림 → 날짜 버킷(오늘/어제/이번 주/이전)
+function notifBucket(at){const d=new Date(at).getTime(),now=new Date(),s=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime(),D=86400000;return d>=s?'오늘':d>=s-D?'어제':d>=s-7*D?'이번 주':'이전'}
+// 알림 클릭 → 해당 기능/상세로 딥링크. link 필드에 id가 있으면 상세로, 없으면 목록으로
+function openNotif(n){
+  const lk=(n.link||'').trim(),go=fn=>{pop();push(fn)}
+  switch(n.type){
+    case'dm':if(lk){go(()=>rDmChat(lk))}else{pop();TAB='search';routeTab()}break
+    case'petition':go(lk?()=>rPetitionDetail(lk):rPetitionPage);break
+    case'book':go(lk?()=>rBookDetail(lk):rBookPage);break
+    case'challenge':go(rChallengePage);break
+    case'binding':case'print':go(rPrint);break
+    case'money':go(rHistory);break
+    default:break
+  }
+}
 async function rNotifications(){
   app().innerHTML=`<div class="screen no-nav fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">알림</div><button id="nt-clear" style="font-size:12.5px;font-weight:700;color:var(--primary);background:none">모두 읽음</button></div>
@@ -1829,13 +1861,17 @@ async function rNotifications(){
   </div>`
   document.getElementById('bk').onclick=pop
   await loadNotifs()
+  const rowHTML=n=>{
+    const m=NT_META[n.type]||{ic:'bell',tint:'gray'}
+    return`<div class="lrow ntrow${n.read?'':' unread'}" data-nid="${n.id}"><div class="chip ti-${m.tint}">${I[m.ic]||I.bell}</div><div class="body"><div class="ti">${esc(n.title)}</div><div class="su">${esc(n.body)}${n.body?' · ':''}${timeago(n.at)}</div></div>${n.read?`<span class="ntchev">${I.chev}</span>`:'<span class="ntdot"></span>'}</div>`
+  }
   const render=()=>{
     const b=document.getElementById('nt-body');if(!b)return
-    if(!NOTIFS.length){b.innerHTML=`<div class="empty" style="padding:64px 20px;text-align:center;color:var(--muted);font-size:14px">아직 알림이 없어요</div>`;return}
-    b.innerHTML=`<div class="pcard" style="margin-top:8px">`+NOTIFS.map(n=>{
-      const m=NT_META[n.type]||{ic:'bell',tint:'gray'}
-      return`<div class="lrow ntrow${n.read?'':' unread'}"><div class="chip ti-${m.tint}">${I[m.ic]||I.bell}</div><div class="body"><div class="ti">${esc(n.title)}</div><div class="su">${esc(n.body)}${n.body?' · ':''}${timeago(n.at)}</div></div>${n.read?'':'<span class="ntdot"></span>'}</div>`
-    }).join('')+`</div>`
+    if(!NOTIFS.length){b.innerHTML=emptyHTML({icon:'🔔',title:'아직 알림이 없어요',desc:'새 소식이 오면 여기에서 알려줄게요.'});return}
+    const order=['오늘','어제','이번 주','이전'],groups={}
+    NOTIFS.forEach(n=>{(groups[notifBucket(n.at)]=groups[notifBucket(n.at)]||[]).push(n)})
+    b.innerHTML=order.filter(k=>groups[k]).map(k=>`<div class="sec" style="margin:16px 20px 8px">${k}</div><div class="pcard">${groups[k].map(rowHTML).join('')}</div>`).join('')
+    b.querySelectorAll('[data-nid]').forEach(el=>el.onclick=()=>{const n=NOTIFS.find(x=>x.id===el.dataset.nid);if(n)openNotif(n)})
   }
   render()
   markNotifsRead()   // 화면 열면 읽음 처리
@@ -2810,7 +2846,7 @@ async function rDmChat(userId){
     const btn=document.getElementById('dm-snd');btn.disabled=true
     try{
       await wt(sb.from('okya_dm').insert({id:uid('dm'),from_id:myId,to_id:userId,text,at:nowISO()}))
-      notify(userId,'dm','새 메시지',`${nameOf(myId)}님: ${text.length>30?text.slice(0,30)+'…':text}`)
+      notify(userId,'dm','새 메시지',`${nameOf(myId)}님: ${text.length>30?text.slice(0,30)+'…':text}`,myId)
       dmtxt.value='';dmtxt.style.height='auto'
       await loadDms()
     }catch{toast('전송 실패')}
@@ -3352,6 +3388,13 @@ async function rMy(){
   const issued=txs.filter(t=>t.type==='발행').reduce((s,t)=>s+t.amount,0)
   const attend=txs.filter(t=>t.type==='출석'&&t.to===SESSION.id).length
   let chal=0;try{const r=await wt(sb.from('okya_event_subs').select('id').eq('by_id',SESSION.id));chal=(r.data||[]).length}catch{}
+  // 나의 옥야 대시보드: 활동 통계·스트릭·레벨
+  let bookCount=0;try{const r=await wt(sb.from('okya_books').select('id').eq('owner',SESSION.id));bookCount=(r.data||[]).length}catch{}
+  let petiCount=0;try{const r=await wt(sb.from('okya_petitions').select('by_id,reacts'));petiCount=(r.data||[]).filter(p=>p.by_id===SESSION.id||(p.reacts&&p.reacts[SESSION.id])).length}catch{}
+  const attDays=new Set(txs.filter(t=>t.type==='출석'&&t.to===SESSION.id).map(t=>dayKeyOf(t.at)))
+  const streak=(()=>{let s=0;const d=new Date();if(!attDays.has(dayKeyOf(d)))d.setDate(d.getDate()-1);while(attDays.has(dayKeyOf(d))){s++;d.setDate(d.getDate()-1)}return s})()
+  const pts=attend*10+chal*20+bookCount*15+petiCount*10
+  const {lv,cur,need,pct}=(()=>{let lv=1,need=100,acc=0;while(pts>=acc+need){acc+=need;lv++;need=Math.round(need*1.4)}return{lv,cur:pts-acc,need,pct:Math.max(4,Math.round((pts-acc)/need*100))}})()
 
   const photoSrc=SESSION.photo||null,initials=esc(SESSION.name.charAt(0))
   let curPri='#7B6CFF';try{const st=JSON.parse(localStorage.getItem('okya-theme')||'null');if(st&&st.primary)curPri=st.primary}catch{}
@@ -3372,6 +3415,12 @@ async function rMy(){
       <div class="stat"><div class="v">${attend}일</div><div class="k">출석</div></div>
       <div class="stat"><div class="v">${chal}개</div><div class="k">챌린지</div></div>
     </div>
+    <div class="pcard my-dash">
+      <div class="my-dash-head"><div class="my-lv-badge">Lv.${lv}</div><div class="my-streak">🔥 <b>${streak}</b>일 연속 출석</div></div>
+      <div class="my-lv-bar"><i style="width:0%"></i></div>
+      <div class="my-lv-sub">활동점수 ${fmt(pts)}p · 다음 레벨까지 ${fmt(Math.max(0,need-cur))}p</div>
+      <div class="my-act"><div class="my-act-c"><div class="v">${bookCount}</div><div class="k">등록한 책</div></div><div class="my-act-c"><div class="v">${petiCount}</div><div class="k">참여 청원</div></div></div>
+    </div>
     <div class="pcard">
       <div class="sec" style="margin-bottom:2px">색상 테마</div>
       <div style="font-size:12px;color:var(--sub)">스펙트럼 버튼을 눌러 색을 펼쳐보세요</div>
@@ -3391,6 +3440,7 @@ async function rMy(){
     <div class="ver">옥야 v1.0 · 창녕옥야고 학생회</div>
   </div>${bnav()}`
   bindNav()
+  requestAnimationFrame(()=>{const bar=document.querySelector('.my-lv-bar i');if(bar)bar.style.width=pct+'%'})
 
   document.getElementById('my-photo-input').onchange=async(e)=>{
     const f=e.target.files[0];if(!f)return
