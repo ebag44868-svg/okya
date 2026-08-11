@@ -826,6 +826,40 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .my-streak b{color:#F0863C;font-size:16px;}
 .my-lv-bar{height:9px;border-radius:999px;background:var(--surface-2);overflow:hidden;}
 .my-lv-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-d));transition:width .7s var(--ease-out);}
+
+/* ===================== 옥야 2.0 MY (프로필 컴팩트, 큰 통계, 플랫 메뉴) ===================== */
+.my2{background:var(--bg);}
+.my2-prof{display:flex;align-items:center;gap:14px;padding:8px 20px 6px;}
+.my2-prof .av{width:64px;height:64px;border-radius:50%;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:800;box-shadow:var(--sh-blue);overflow:hidden;position:relative;flex:none;}
+.my2-prof .av img{width:100%;height:100%;object-fit:cover;}
+.my2-prof .camera{position:absolute;bottom:0;right:0;width:24px;height:24px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid var(--bg);}
+.my2-prof .camera svg{width:11px;height:11px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;}
+.my2-id{flex:1;min-width:0;}
+.my2-name{font-size:22px;font-weight:900;letter-spacing:-.02em;color:var(--text-1);}
+.my2-cl{font-size:13px;color:var(--text-3);margin-top:2px;}
+.my2-lv{flex:none;font-size:14px;font-weight:900;color:var(--accent);background:var(--accent-soft);padding:6px 13px;border-radius:var(--radius-full);}
+.my2-block{padding:16px 20px 2px;}
+.my2-sec-t{font-size:15px;font-weight:800;color:var(--text-1);margin-bottom:10px;}
+.my2-lvsub{font-size:12.5px;color:var(--text-3);margin-top:9px;}
+.my2-lvsub b{color:var(--accent);font-weight:800;}
+.my2-stats{display:flex;gap:9px;padding:16px 20px 2px;overflow-x:auto;scrollbar-width:none;}
+.my2-stats::-webkit-scrollbar{display:none;}
+.my2-stat{flex:1;min-width:74px;background:var(--surface);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);padding:15px 8px;text-align:center;}
+.my2-stat .v{font-size:20px;font-weight:900;color:var(--text-1);letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
+.my2-stat .k{font-size:11.5px;color:var(--text-3);font-weight:600;margin-top:4px;white-space:nowrap;}
+.my2-row{display:flex;align-items:center;gap:13px;width:100%;padding:15px 2px;background:transparent;text-align:left;transition:opacity var(--dur-micro);}
+.my2-row+.my2-row{border-top:1px solid var(--divider);}
+.my2-row:active{opacity:.55;}
+.my2-row .mic{width:22px;height:22px;color:var(--text-2);display:flex;flex:none;}
+.my2-row .mic svg{width:22px;height:22px;}
+.my2-row-l{flex:1;font-size:15px;font-weight:600;color:var(--text-1);}
+.my2-row .cev{color:var(--text-3);display:flex;flex:none;}
+.my2-row .cev svg{width:18px;height:18px;}
+.my2-theme-t{font-size:14px;font-weight:800;color:var(--text-1);margin-bottom:2px;}
+@media (min-width:820px) and (min-aspect-ratio:1/1){
+  .my2-stat{padding:18px 10px;}
+  .my2-stat .v{font-size:24px;}
+}
 .my-lv-sub{font-size:11.5px;color:var(--text-3);margin-top:7px;font-weight:600;}
 .my-act{display:flex;gap:10px;margin-top:15px;}
 .my-act-c{flex:1;background:var(--surface-2);border-radius:var(--radius-md);padding:12px 8px;text-align:center;}
@@ -4080,47 +4114,49 @@ async function rMy(){
   const grad=p=>{const[a,b]=deriveGrad(p);return`linear-gradient(135deg,${a},${b})`}
   const pfis=PRESETS.map(([n,p])=>{const on=p.toLowerCase()===curPri.toLowerCase();return`<div class="pfi${on?' on':''}" data-pri="${p}" data-name="${n}" style="background:${grad(p)}"><div class="pl">${n}</div></div>`}).join('')
 
-  app().innerHTML=`<div class="screen fade-in p3">
+  app().innerHTML=`<div class="screen fade-in p3 my2">
     <div class="topbar"><div class="t">MY</div><button id="my-bell" data-bell>${I.bell}</button></div>
-    <div class="prof">
+    <section class="my2-prof">
       <div class="av">${photoSrc?`<img src="${photoSrc}">`:initials}<label class="camera" for="my-photo-input"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></label></div>
       <input id="my-photo-input" type="file" accept="image/*" style="display:none">
-      <div class="nm">${esc(SESSION.name)}</div>
-      <div class="cl">창녕옥야고등학교 · ${isAdmin?'학생회':'학생'}</div>
-    </div>
-    <div class="stats">
-      <div class="stat"><div class="v">${fmt(isAdmin?issued:bal)}</div><div class="k">${isAdmin?'발행량':'옥야머니'}</div></div>
-      <div class="stat"><div class="v">${attend}일</div><div class="k">출석</div></div>
-      <div class="stat"><div class="v">${chal}개</div><div class="k">챌린지</div></div>
-    </div>
-    <div class="pcard my-dash">
-      <div class="my-dash-head"><div class="my-lv-badge">Lv.${lv}</div><div class="my-streak">🔥 <b>${streak}</b>일 연속 출석</div></div>
+      <div class="my2-id"><div class="my2-name">${esc(SESSION.name)}</div><div class="my2-cl">창녕옥야고등학교 · ${isAdmin?'학생회':'학생'}</div></div>
+      <div class="my2-lv">Lv.${lv}</div>
+    </section>
+    <section class="my2-block">
       <div class="my-lv-bar"><i style="width:0%"></i></div>
-      <div class="my-lv-sub">활동점수 ${fmt(pts)}p · 다음 레벨까지 ${fmt(Math.max(0,need-cur))}p</div>
-      <div class="my-act"><div class="my-act-c"><div class="v">${bookCount}</div><div class="k">등록한 책</div></div><div class="my-act-c"><div class="v">${petiCount}</div><div class="k">참여 청원</div></div></div>
+      <div class="my2-lvsub">활동점수 <b>${fmt(pts)}</b>p · 다음 레벨까지 ${fmt(Math.max(0,need-cur))}p · 🔥 ${streak}일 연속</div>
+    </section>
+    <div class="my2-stats">
+      <div class="my2-stat"><div class="v">${fmt(isAdmin?issued:bal)}</div><div class="k">${isAdmin?'발행량':'옥야머니'}</div></div>
+      <div class="my2-stat"><div class="v">${attend}</div><div class="k">출석</div></div>
+      <div class="my2-stat"><div class="v">${chal}</div><div class="k">챌린지</div></div>
+      <div class="my2-stat"><div class="v">${bookCount}</div><div class="k">등록 책</div></div>
+      <div class="my2-stat"><div class="v">${petiCount}</div><div class="k">참여 청원</div></div>
     </div>
-    <div class="menu">
-      <div class="mrow" id="mm-tx"><span class="mic">${I.hist}</span>거래 내역<span class="cev">${I.chev}</span></div>
-      <div class="mrow" id="mm-chal"><span class="mic">${I.star}</span>챌린지<span class="cev">${I.chev}</span></div>
-      <div class="mrow" id="mm-peti"><span class="mic">${I.petition}</span>청원<span class="cev">${I.chev}</span></div>
-      <div class="mrow" id="mm-noti"><span class="mic">${I.bell}</span>알림<span class="cev">${I.chev}</span></div>
-      <div class="mrow" id="mm-out"><span class="mic" style="color:var(--danger)">${I.logout}</span><span style="color:var(--danger)">로그아웃</span></div>
-    </div>
-    <div class="sec" style="margin:22px 18px 0;color:var(--text-3);font-size:13px;font-weight:700">개인 설정</div>
-    <div class="pcard">
-      <div class="sec" style="margin-bottom:2px">색상 테마</div>
-      <div style="font-size:12px;color:var(--sub)">스펙트럼 버튼을 눌러 색을 펼쳐보세요</div>
+    <section class="my2-block">
+      <div class="my2-menu">
+        <button class="my2-row" id="mm-tx"><span class="mic">${I.hist}</span><span class="my2-row-l">거래 내역</span><span class="cev">${I.chev}</span></button>
+        <button class="my2-row" id="mm-chal"><span class="mic">${I.star}</span><span class="my2-row-l">챌린지</span><span class="cev">${I.chev}</span></button>
+        <button class="my2-row" id="mm-peti"><span class="mic">${I.petition}</span><span class="my2-row-l">청원</span><span class="cev">${I.chev}</span></button>
+        <button class="my2-row" id="mm-noti"><span class="mic">${I.bell}</span><span class="my2-row-l">알림</span><span class="cev">${I.chev}</span></button>
+        <button class="my2-row" id="mm-out"><span class="mic" style="color:var(--danger)">${I.logout}</span><span class="my2-row-l" style="color:var(--danger)">로그아웃</span></button>
+      </div>
+    </section>
+    <section class="my2-block">
+      <h2 class="my2-sec-t">개인 설정</h2>
+      <div class="my2-theme-t">색상 테마</div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:4px">스펙트럼 버튼을 눌러 색을 펼쳐보세요</div>
       <div class="palfan" id="palfan">
         <button class="palfan-btn" id="palfan-btn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
         ${pfis}
         <label class="pfi pick" data-custom="1"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><input type="color" id="my-color" value="${curPri}" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer"></label>
       </div>
-    </div>
+    </section>
     <div class="ver">옥야 v1.0 · 창녕옥야고 학생회</div>
   </div>${bnav()}`
   bindNav()
   requestAnimationFrame(()=>{const bar=document.querySelector('.my-lv-bar i');if(bar)bar.style.width=pct+'%'})
-  const av=document.querySelector('.prof .av');if(av)av.addEventListener('click',()=>eggTap('av',5,()=>{av.classList.remove('egg-wobble');void av.offsetWidth;av.classList.add('egg-wobble');confettiBurst();popMsg('숨은 옥야 발견!','🥚')}))
+  const av=document.querySelector('.my2-prof .av');if(av)av.addEventListener('click',()=>eggTap('av',5,()=>{av.classList.remove('egg-wobble');void av.offsetWidth;av.classList.add('egg-wobble');confettiBurst();popMsg('숨은 옥야 발견!','🥚')}))
 
   document.getElementById('my-photo-input').onchange=async(e)=>{
     const f=e.target.files[0];if(!f)return
