@@ -1369,6 +1369,19 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .pet2-cta:active{transform:scale(.97);}
 .pet2-hero-visual{margin-top:20px;min-height:148px;border-radius:var(--radius-xl);background:linear-gradient(140deg,#ECE9FF 0%,#F3ECFF 45%,#FDE9F5 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;background-size:cover;background-position:center;position:relative;}
 .pet2-hero-emoji{font-size:62px;opacity:.92;filter:drop-shadow(0 8px 20px rgba(0,0,0,.12));}
+/* 세부탭 공용 2.0 히어로(챌린지/책/제본) */
+.feat-hero{padding:6px 20px 4px;display:flex;flex-direction:column;}
+.feat-eyebrow{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.02em;}
+.feat-title{font-size:30px;font-weight:900;letter-spacing:-.03em;line-height:1.1;color:var(--text-1);margin-top:8px;}
+.feat-sub{font-size:14px;font-weight:600;color:var(--text-3);margin-top:10px;}
+.feat-hero-visual{margin-top:16px;min-height:120px;border-radius:var(--radius-xl);background:linear-gradient(140deg,#EAE7FF,#F3ECFF 55%,#FDE9F5);display:flex;align-items:center;justify-content:center;overflow:hidden;background-size:cover;background-position:center;}
+.feat-emoji{font-size:54px;opacity:.9;filter:drop-shadow(0 8px 18px rgba(0,0,0,.12));}
+@media (min-width:820px) and (min-aspect-ratio:1/1){
+  .feat-hero{flex-direction:row;align-items:stretch;gap:30px;padding:12px 30px 6px;}
+  .feat-hero-main{flex:1 1 60%;display:flex;flex-direction:column;justify-content:center;}
+  .feat-hero-visual{flex:1 1 40%;margin-top:0;min-height:186px;}
+  .feat-title{font-size:40px;}
+}
 @media (min-width:820px) and (min-aspect-ratio:1/1){
   .pet2-hero{flex-direction:row;align-items:stretch;gap:32px;padding:12px 30px 6px;}
   .pet2-hero-main{flex:1 1 58%;display:flex;flex-direction:column;justify-content:center;}
@@ -2929,7 +2942,7 @@ function prSteps(si){return`<div class="pet-steps pr-steps">${PR_STATUS.map((s,i
 function printCover(p){const si=Math.max(0,PR_STATUS.indexOf(p.status||'접수'));const grad=BOOK_COVERS[((p.title||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0)+3)%BOOK_COVERS.length];return`<div class="book-cover"${p.file?'':` style="background:${grad}"`}>${p.file?`<img src="${esc(p.file)}">`:`<div class="bc-title">${esc(p.title||'')}</div>`}<span class="book-badge pr-badge s${si}">${PR_STATUS[si]}</span></div>`}
 async function rPrint(){
   const admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야제본소</div>${admin?'<div style="width:34px"></div>':`<button id="pr-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 신청</button>`}</div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
+  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야제본소</div>${admin?'<div style="width:34px"></div>':`<button id="pr-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 신청</button>`}</div>${featHero('🖨️','옥야제본소','인쇄물을 가져오면 학생회가 제본해 드려요','linear-gradient(140deg,#DDE7FF,#E6E0FF 55%,#F0E4FF)')}<div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
   bindNav()
   document.getElementById('bk').onclick=pop
   const nb=document.getElementById('pr-new');if(nb)nb.onclick=()=>push(rPrintNew)
@@ -3486,10 +3499,18 @@ async function rDmChat(userId){
 
 const _cbPage=(title)=>{app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${title}</div><div style="width:34px"></div></div><div id="cb"><div class="loader" style="min-height:160px"><div class="spin"></div></div></div></div>`;document.getElementById('bk').onclick=pop}
 // ===== 챌린지 (전체화면 포스터 갤러리 → 공모전형 상세 → 인증 → 전원 지급) =====
+// 세부탭 2.0 공용 히어로(대형 타이포 + 이미지 슬롯). grad 지정 시 비주얼 배경 교체 가능
+function featHero(emoji,title,sub,grad){
+  return`<section class="feat-hero">
+    <div class="feat-hero-main"><div class="feat-eyebrow">OKYA</div><h1 class="feat-title">${title}</h1><p class="feat-sub">${sub}</p></div>
+    <div class="feat-hero-visual"${grad?` style="background:${grad}"`:''}><span class="feat-emoji">${emoji}</span></div>
+  </section>`
+}
 async function rChallengePage(){
   const admin=SESSION.role==='admin'
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지</div>${admin?`<button id="ch-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 발행</button>`:`<div style="width:34px"></div>`}</div>
+    ${featHero('🔥','챌린지','참여하고 인증하면 옥야머니를 받아요','linear-gradient(140deg,#FFE3D0,#FFD1C2 55%,#FFE0EC)')}
     <div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
   </div>${bnav()}`
   bindNav()
@@ -3606,6 +3627,7 @@ function bookCoverEl(b,big){const badge=b.status==='matched'?'<span class="book-
 async function rBookPage(){
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">책 교환</div><button id="bk-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 등록</button></div>
+    ${featHero('📚','책 교환','교재를 나누고 필요한 책과 교환해요','linear-gradient(140deg,#D6F5E6,#CFEFF0 55%,#D9ECFF)')}
     <div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
   </div>${bnav()}`
   bindNav()
