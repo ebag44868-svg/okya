@@ -42,6 +42,11 @@
   --radius-xl:28px;
   --radius-full:999px;
 
+  /* Spacing scale (Phase 1) — 페이지별 임의값 대신 이 스케일만 사용 */
+  --sp-1:4px;  --sp-2:8px;   --sp-3:12px;  --sp-4:16px;  --sp-5:20px;
+  --sp-6:24px; --sp-8:32px;  --sp-10:40px; --sp-12:48px; --sp-16:64px;
+  --page-x:16px;             /* 페이지 좌우 기본 여백 */
+
   /* Shadow scale (restrained, native) */
   --shadow-sm:0 1px 2px rgba(20,26,40,.05),0 1px 3px rgba(20,26,40,.03);
   --shadow-md:0 4px 16px rgba(20,26,40,.06),0 1px 4px rgba(20,26,40,.04);
@@ -458,6 +463,50 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .star-fg{width:26px;text-align:center;color:#F0A81E;}
 .mrate-avg{font-size:12px;font-weight:800;color:#E0930F;flex-shrink:0;min-width:56px;text-align:right;letter-spacing:-.01em;}
 .mrate-avg.none{color:var(--text-3);font-weight:600;}
+
+/* ── 급식 피드(재설계): 오늘 급식 우선 ── */
+.mfeed{padding-top:var(--sp-1);}
+.mday{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-1) var(--page-x) var(--sp-3);}
+.mday-arrow{width:40px;height:40px;flex:none;border-radius:50%;background:var(--surface-2);color:var(--text-2);font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;}
+.mday-arrow:active{background:var(--surface-3);}
+.mday-center{flex:1;text-align:center;min-width:0;}
+.mday-big{font-size:21px;font-weight:800;letter-spacing:-.02em;color:var(--text-1);line-height:1.15;}
+.mday-dow{font-size:14px;font-weight:600;color:var(--text-3);margin-left:5px;}
+.mday-rel{margin-top:5px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:22px;}
+.mrel-badge{font-size:12px;font-weight:800;color:var(--text-3);}
+.mrel-badge.today{color:#fff;background:var(--accent);padding:2px 11px;border-radius:var(--radius-full);}
+.mday-home{font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 11px;border-radius:var(--radius-full);}
+
+.mseg{display:flex;gap:6px;background:var(--surface-2);padding:4px;border-radius:14px;margin:0 var(--page-x);}
+.mseg-b{flex:1;padding:9px 0;border-radius:11px;font-size:14px;font-weight:700;color:var(--text-2);background:transparent;transition:background var(--dur-standard) var(--ease-out),color var(--dur-standard) var(--ease-out),box-shadow var(--dur-standard) var(--ease-out);}
+.mseg-b.on{background:var(--surface);color:var(--accent);box-shadow:var(--shadow-sm);}
+.mseg-b.dim{color:var(--text-3);opacity:.5;}
+
+@keyframes mheroIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.mhero{margin:var(--sp-4) var(--page-x) 0;animation:mheroIn .3s var(--ease-out) both;}
+.mmenu-wrap{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:18px 20px 20px;}
+.mmenu-head{display:flex;align-items:baseline;gap:8px;margin-bottom:14px;}
+.mmenu-slot{font-size:16px;font-weight:800;color:var(--accent);letter-spacing:-.01em;}
+.mmenu-time{font-size:12px;font-weight:600;color:var(--text-3);}
+.mmenu{list-style:none;display:flex;flex-direction:column;gap:11px;}
+.mmenu li{font-size:19px;font-weight:700;letter-spacing:-.01em;color:var(--text-1);line-height:1.2;animation:mheroIn .36s var(--ease-out) both;}
+.mmenu-wrap.mempty{text-align:center;padding:32px 20px;}
+.mempty-emoji{font-size:38px;line-height:1;}
+.mempty-t{font-size:17px;font-weight:800;color:var(--text-1);margin-top:12px;}
+.mempty-s{font-size:13px;color:var(--text-3);margin-top:5px;}
+.mjump{margin-top:18px;display:inline-block;background:var(--accent);color:#fff;font-size:13px;font-weight:700;padding:11px 20px;border-radius:var(--radius-full);box-shadow:var(--shadow-sm);}
+
+.mother{margin:var(--sp-3) var(--page-x) 0;background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;}
+.mother-row{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;text-align:left;background:transparent;}
+.mother-row+.mother-row{border-top:1px solid var(--divider);}
+.mother-row:active{background:var(--surface-2);}
+.mother-slot{font-size:13px;font-weight:800;color:var(--text-2);flex:none;width:30px;}
+.mother-menu{flex:1;font-size:13.5px;font-weight:500;color:var(--text-2);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;}
+.mother-chev{color:var(--text-3);font-size:18px;flex:none;}
+
+.mcal-open{display:flex;align-items:center;justify-content:center;gap:8px;margin:var(--sp-5) var(--page-x) var(--sp-1);width:calc(100% - var(--page-x)*2);padding:13px 0;border-radius:var(--radius-md);background:var(--surface-2);color:var(--text-2);font-size:14px;font-weight:700;}
+.mcal-open svg{width:17px;height:17px;stroke:var(--text-2);}
+.mcal-open:active{background:var(--surface-3);}
 
 /* list row */
 .p3 .lrow{display:flex;align-items:center;gap:12px;padding:11px 0;}
@@ -2156,24 +2205,56 @@ function rSchool(idx){
   schoolMeetSlide(document.getElementById('slide-3'))
   if(start)requestAnimationFrame(()=>{const s=document.getElementById('slide-'+start);if(s)deck.scrollLeft=s.offsetLeft})
 }
-// 급식 슬라이드: 달력 + 그 날 조·중·석 한 번에
+// 급식 슬라이드(재설계): "오늘 급식"을 1초 안에 확인 → 날짜 이동 → 달력은 보조 도구
+// 구조 = 날짜 네비 + 끼니 세그 + 큰 메뉴(히어로) + 나머지 끼니 미리보기 + 평가 + 달력 버튼
 function schoolFoodSlide(el){
   if(!el)return
-  const now=new Date();let vy=now.getFullYear(),vm=now.getMonth(),sel=now.getDate()
   const pad=n=>String(n).padStart(2,'0')
+  const keyOf=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
+  const DOWL=['일요일','월요일','화요일','수요일','목요일','금요일','토요일']
+  const SLOTS=['조식','중식','석식'],TIME={조식:'오전 8:00',중식:'오후 12:30',석식:'오후 6:00'}
+  const t0=new Date();t0.setHours(0,0,0,0)
+  // 급식이 실제로 존재하는 날짜(정렬) — 방학 등 빈 날 점프에 사용
+  const avail=Object.keys(MEALS).filter(k=>{const m=MEALS[k];return m&&SLOTS.some(s=>(m[s]||[]).length)}).sort()
+  let cur=new Date(t0),slot=defaultMealSlot()
   const draw=()=>{
-    const dim=new Date(vy,vm+1,0).getDate();if(sel>dim)sel=dim
-    const today=(vy===now.getFullYear()&&vm===now.getMonth())?now.getDate():-1
-    const avail={};for(let d=1;d<=dim;d++){if(mealsOf(`${vy}-${pad(vm+1)}-${pad(d)}`))avail[d]=1}
-    const dk=`${vy}-${pad(vm+1)}-${pad(sel)}`
-    const dw=['일','월','화','수','목','금','토'][new Date(vy,vm,sel).getDay()]
-    el.innerHTML=`<div class="sc-inner">
-      <div style="margin:6px 18px 4px">${calGrid(vy,vm,{today,sel,avail,nav:true,clickable:true})}</div>
-      <div class="pcard"><div class="sec" style="margin-bottom:10px">${vm+1}월 ${sel}일 (${dw}) 급식</div>${mealCardsHTML(mealsOf(dk))}</div>
+    const dk=keyOf(cur),m=mealsOf(dk)
+    const diff=Math.round((cur-t0)/86400000)
+    const rel=diff===0?'오늘':diff===1?'내일':diff===-1?'어제':diff>1?`D-${diff}`:diff<-1?`${-diff}일 전`:''
+    const have=SLOTS.filter(s=>m&&(m[s]||[]).length)
+    if(have.length&&!have.includes(slot))slot=have.includes(defaultMealSlot())?defaultMealSlot():have[0]
+    const items=(m&&(m[slot]||[]).filter(Boolean))||[]
+    const seg=SLOTS.map(s=>`<button class="mseg-b${s===slot?' on':''}${have.includes(s)?'':' dim'}" data-slot="${s}">${s}</button>`).join('')
+    let hero
+    if(items.length){
+      hero=`<div class="mmenu-wrap"><div class="mmenu-head"><span class="mmenu-slot">${slot}</span><span class="mmenu-time">${TIME[slot]}</span></div><ul class="mmenu">${items.map((x,i)=>`<li style="animation-delay:${i*40}ms">${esc(x)}</li>`).join('')}</ul></div>`
+    }else{
+      const next=avail.find(k=>k>=dk)||avail.filter(k=>k<dk).pop()
+      let jump=''
+      if(next&&next!==dk){const nd=new Date(next+'T00:00:00');jump=`<button class="mjump" data-jump="${next}">${nd.getMonth()+1}월 ${nd.getDate()}일 급식 보기 →</button>`}
+      hero=`<div class="mmenu-wrap mempty"><div class="mempty-emoji">${diff>0?'📅':'🍽️'}</div><div class="mempty-t">${diff===0?'오늘은 급식이 없어요':'급식 정보가 없어요'}</div><div class="mempty-s">방학이거나 급식이 없는 날이에요</div>${jump}</div>`
+    }
+    const others=have.filter(s=>s!==slot)
+    const otherHTML=others.length?`<div class="mother">${others.map(s=>{const it=(m[s]||[]).filter(Boolean);return`<button class="mother-row" data-slot="${s}"><span class="mother-slot">${s}</span><span class="mother-menu">${esc(it.slice(0,4).join(' · '))}${it.length>4?' …':''}</span><span class="mother-chev">›</span></button>`}).join('')}</div>`:''
+    el.innerHTML=`<div class="sc-inner mfeed">
+      <div class="mday">
+        <button class="mday-arrow" data-dnav="-1" aria-label="이전 날">‹</button>
+        <div class="mday-center">
+          <div class="mday-big">${cur.getMonth()+1}월 ${cur.getDate()}일 <span class="mday-dow">${DOWL[cur.getDay()]}</span></div>
+          <div class="mday-rel">${rel?`<span class="mrel-badge${diff===0?' today':''}">${rel}</span>`:''}${diff!==0?`<button class="mday-home" data-jump="${keyOf(t0)}">오늘로</button>`:''}</div>
+        </div>
+        <button class="mday-arrow" data-dnav="1" aria-label="다음 날">›</button>
+      </div>
+      <div class="mseg">${seg}</div>
+      <div class="mhero">${hero}</div>
+      ${otherHTML}
       <div id="meal-rate"></div>
+      <button class="mcal-open" id="m-calopen">${ICO_CAL} 달력에서 날짜 고르기</button>
     </div>`
-    el.querySelectorAll('[data-mcnav]').forEach(b=>b.onclick=()=>{vm+=(+b.dataset.mcnav);if(vm<0){vm=11;vy--}if(vm>11){vm=0;vy++}draw()})
-    el.querySelectorAll('[data-day]').forEach(c=>c.onclick=()=>{sel=+c.dataset.day;draw()})
+    el.querySelectorAll('[data-dnav]').forEach(b=>b.onclick=()=>{cur.setDate(cur.getDate()+(+b.dataset.dnav));draw()})
+    el.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{cur=new Date(b.dataset.jump+'T00:00:00');draw()})
+    el.querySelectorAll('.mseg-b[data-slot],.mother-row[data-slot]').forEach(b=>b.onclick=()=>{const s=b.dataset.slot;if(!have.includes(s))return;slot=s;draw()})
+    const co=el.querySelector('#m-calopen');if(co)co.onclick=()=>push(()=>renderMealCalendar())
     renderMealRate(dk)
   }
   draw()
