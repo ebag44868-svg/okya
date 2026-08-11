@@ -448,10 +448,16 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .mrate-rows{display:flex;flex-direction:column;gap:11px;}
 .mrate-row{display:flex;align-items:center;gap:10px;}
 .mrate-slot{width:32px;font-size:13px;font-weight:800;color:var(--text-2);flex-shrink:0;}
-.mrate-stars{display:flex;gap:1px;flex:1;}
-.mrate-star-btn{font-size:24px;line-height:1;color:#D6D9E0;padding:1px 2px;transition:transform var(--dur-micro) var(--ease-spring),color var(--dur-micro) ease;}
-.mrate-star-btn.on{color:#F0A81E;}
-.mrate-star-btn:not([disabled]):active{transform:scale(1.4);}
+.mrate-stars{display:inline-flex;gap:3px;flex:1;align-items:center;}
+.star-slot{position:relative;width:26px;height:28px;flex-shrink:0;}
+.star-bg,.star-clip,.star-fg{position:absolute;top:0;left:0;height:100%;font-size:25px;line-height:28px;pointer-events:none;}
+.star-bg{width:26px;text-align:center;color:#C9CDD6;}
+.star-clip{overflow:hidden;transition:width var(--dur-micro) var(--ease-out);}
+.star-fg{width:26px;text-align:center;color:#F0A81E;}
+.star-half,.star-full2{position:absolute;top:0;height:100%;width:50%;z-index:3;cursor:pointer;}
+.star-half{left:0;}
+.star-full2{right:0;}
+.mrate-stars.locked .star-half,.mrate-stars.locked .star-full2{pointer-events:none;cursor:default;}
 .mrate-avg{font-size:12px;font-weight:800;color:#E0930F;flex-shrink:0;min-width:56px;text-align:right;letter-spacing:-.01em;}
 .mrate-avg.none{color:var(--text-3);font-weight:600;}
 
@@ -2022,19 +2028,24 @@ async function renderMealRate(dateKey){
   try{const r=await wt(sb.from('okya_meal_ratings').select('*').like('date',dateKey+'#%'),5000);rows=r.data}catch{box.innerHTML='';return}
   if(rows===null){box.innerHTML='';return}
   const cur=document.getElementById('meal-rate');if(!cur)return
+  // score는 반개 단위 정수(1~10). 별 개수 = score/2
+  const starsHTML=(val,key,locked)=>[1,2,3,4,5].map(i=>{
+    const f=val>=i?1:(val>=i-0.5?0.5:0)
+    return`<span class="star-slot"><span class="star-bg">☆</span><span class="star-clip" style="width:${f*100}%"><span class="star-fg">★</span></span>${locked?'':`<span class="star-half" data-key="${key}" data-sc="${(i*2)-1}"></span><span class="star-full2" data-key="${key}" data-sc="${i*2}"></span>`}</span>`
+  }).join('')
   cur.innerHTML=`<div class="mrate"><div class="mrate-q">오늘 급식 어땠어?</div><div class="mrate-rows">${slots.map(k=>{
     const key=dateKey+'#'+k
     const rs=rows.filter(x=>x.date===key)
     const mine=rs.find(x=>x.uid===SESSION.id)
-    const avg=rs.length?rs.reduce((s,x)=>s+(x.score||0),0)/rs.length:0
-    const stars=[1,2,3,4,5].map(n=>{const on=mine?n<=mine.score:false;return`<button class="mrate-star-btn${on?' on':''}" data-key="${key}" data-score="${n}"${mine?' disabled':''}>${on?'★':'☆'}</button>`}).join('')
-    return`<div class="mrate-row"><span class="mrate-slot">${k}</span><span class="mrate-stars">${stars}</span><span class="mrate-avg${rs.length?'':' none'}">${rs.length?`★ ${avg.toFixed(1)}·${rs.length}`:'첫 평가'}</span></div>`
+    const avgHalf=rs.length?rs.reduce((s,x)=>s+(x.score||0),0)/rs.length:0
+    const myVal=mine?mine.score/2:0
+    return`<div class="mrate-row"><span class="mrate-slot">${k}</span><span class="mrate-stars${mine?' locked':''}">${starsHTML(myVal,key,!!mine)}</span><span class="mrate-avg${rs.length?'':' none'}">${rs.length?`★ ${(avgHalf/2).toFixed(1)}·${rs.length}`:'첫 평가'}</span></div>`
   }).join('')}</div></div>`
-  cur.querySelectorAll('.mrate-star-btn:not([disabled])').forEach(b=>b.onclick=async()=>{
-    const key=b.dataset.key,score=+b.dataset.score
-    cur.querySelectorAll(`[data-key="${key}"]`).forEach(x=>x.disabled=true)
+  cur.querySelectorAll('.star-half,.star-full2').forEach(z=>z.onclick=async()=>{
+    const key=z.dataset.key,score=+z.dataset.sc
+    const row=z.closest('.mrate-stars');if(row)row.classList.add('locked')
     const{error}=await wt(sb.from('okya_meal_ratings').insert({id:uid('mr'),date:key,uid:SESSION.id,score,at:nowISO()})).catch(e=>({error:e}))
-    if(error){toast('평가 실패 · okya_meal_ratings 테이블이 필요해요','error');cur.querySelectorAll(`[data-key="${key}"]`).forEach(x=>x.disabled=false);return}
+    if(error){toast('평가 실패 · okya_meal_ratings 테이블이 필요해요','error');if(row)row.classList.remove('locked');return}
     popMsg('평가 완료','⭐');renderMealRate(dateKey)
   })
 }
