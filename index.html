@@ -610,7 +610,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .txd-v{font-size:14px;color:var(--text-1);font-weight:600;text-align:right;word-break:break-all;}
 
 /* ── Phase 5: 급식 평점 ── */
-.mrate{margin:12px 18px 2px;background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:15px 16px;animation:slideUp .3s var(--ease-out) both;}
+.mrate{margin:16px var(--page-x) 2px;background:none;box-shadow:none;border-radius:0;padding:16px 0 4px;border-top:1px solid var(--divider);animation:slideUp .3s var(--ease-out) both;}
 .mrate-q{font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:13px;}
 .mrate-rows{display:flex;flex-direction:column;gap:11px;}
 .mrate-row{display:flex;align-items:center;gap:10px;}
@@ -646,20 +646,21 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 
 @keyframes mheroIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 .mhero{margin:var(--sp-4) var(--page-x) 0;animation:mheroIn .3s var(--ease-out) both;}
-.mmenu-wrap{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:18px 20px 20px;}
+.mmenu-wrap{background:none;box-shadow:none;border-radius:0;padding:4px 2px 8px;}
 .mmenu-head{display:flex;align-items:baseline;gap:8px;margin-bottom:14px;}
 .mmenu-slot{font-size:16px;font-weight:800;color:var(--accent);letter-spacing:-.01em;}
 .mmenu-time{font-size:12px;font-weight:600;color:var(--text-3);}
 .mmenu{list-style:none;display:flex;flex-direction:column;gap:11px;}
-.mmenu li{font-size:19px;font-weight:700;letter-spacing:-.01em;color:var(--text-1);line-height:1.2;animation:mheroIn .36s var(--ease-out) both;}
-.mmenu-wrap.mempty{text-align:center;padding:32px 20px;}
+.mmenu li{font-size:26px;font-weight:800;letter-spacing:-.02em;color:var(--text-1);line-height:1.18;animation:mheroIn .36s var(--ease-out) both;}
+@media (min-width:820px) and (min-aspect-ratio:1/1){.mmenu li{font-size:31px;} .mmenu-slot{font-size:18px;}}
+.mmenu-wrap.mempty{text-align:center;padding:36px 20px;}
 .mempty-emoji{font-size:38px;line-height:1;}
 .mempty-t{font-size:17px;font-weight:800;color:var(--text-1);margin-top:12px;}
 .mempty-s{font-size:13px;color:var(--text-3);margin-top:5px;}
 .mjump{margin-top:18px;display:inline-block;background:var(--accent);color:#fff;font-size:13px;font-weight:700;padding:11px 20px;border-radius:var(--radius-full);box-shadow:var(--shadow-sm);}
 
-.mother{margin:var(--sp-3) var(--page-x) 0;background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;}
-.mother-row{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;text-align:left;background:transparent;}
+.mother{margin:var(--sp-4) var(--page-x) 0;background:none;box-shadow:none;border-radius:0;overflow:hidden;border-top:1px solid var(--divider);}
+.mother-row{display:flex;align-items:center;gap:12px;width:100%;padding:15px 2px;text-align:left;background:transparent;}
 .mother-row+.mother-row{border-top:1px solid var(--divider);}
 .mother-row:active{background:var(--surface-2);}
 .mother-slot{font-size:13px;font-weight:800;color:var(--text-2);flex:none;width:30px;}
@@ -1491,6 +1492,26 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 /* 학사일정 2.0: pcard 박스 대신 플랫 섹션 + 큰 제목 */
 .sc2-sec{padding:10px 20px 6px;}
 .sc2-t{font-size:20px;font-weight:900;letter-spacing:-.02em;color:var(--text-1);margin-bottom:4px;}
+.sc2-note{font-size:13px;color:var(--text-3);font-weight:600;margin-top:2px;}
+/* 회의록: 유튜브 스타일(썸네일 → 로고+제목+날짜) */
+.yt-list{display:grid;grid-template-columns:1fr;gap:24px;padding:10px 20px 4px;}
+.yt-item{cursor:pointer;}
+.yt-thumb{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;}
+.yt-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.yt-thumb-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:46px;background:linear-gradient(145deg,#2a2a35,#3a3a48);}
+.yt-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:.92;transition:transform var(--dur-standard) var(--ease-spring);}
+.yt-play svg{width:24px;height:24px;margin-left:3px;}
+.yt-item:active .yt-play{transform:translate(-50%,-50%) scale(.9);}
+.yt-meta{display:flex;gap:11px;margin-top:12px;}
+.yt-logo{width:36px;height:36px;border-radius:50%;overflow:hidden;flex:none;background:var(--surface-2);}
+.yt-logo img{width:100%;height:100%;object-fit:cover;}
+.yt-info{flex:1;min-width:0;}
+.yt-title{font-size:15px;font-weight:700;color:var(--text-1);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.yt-sub{font-size:12.5px;color:var(--text-3);margin-top:3px;}
+.yt-del{flex:none;align-self:flex-start;font-size:12px;font-weight:700;color:var(--danger);background:var(--danger-tint);padding:5px 10px;border-radius:8px;}
+@media (min-width:820px) and (min-aspect-ratio:1/1){
+  .yt-list{grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:26px 20px;}
+}
 .bk.mini{width:30px;height:30px;background:none;}
 .cal-dows{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;}
 .cal-dow{text-align:center;font-size:10.5px;font-weight:700;padding:4px 0;color:var(--sub);}
@@ -2683,13 +2704,19 @@ async function schoolMeetSlide(el){
   el.innerHTML=`<div class="sc-inner"><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
   let ms=[]
   try{const r=await wt(sb.from('okya_meetings').select('*').order('at',{ascending:false}));ms=r.data||[]}catch{}
+  const ytId=u=>{const m=(u||'').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/);return m?m[1]:''}
   const play='<svg viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M8 5v14l11-7z"/></svg>'
-  const list=ms.length?ms.map(m=>`<div class="lrow" data-url="${esc(m.url)}" style="cursor:pointer"><div class="vthumb">${play}</div><div class="body"><div class="ti">${esc(m.title)}</div><div class="su">${fmtDate(m.at)} 게시</div></div>${admin?`<button class="pbtn out" data-mdel="${m.id}" style="width:auto;padding:7px 12px;font-size:12px">삭제</button>`:`<span style="color:#c9cdd8;display:flex">${I.chev}</span>`}</div>`).join(''):'<div class="empty">등록된 회의 영상이 없어요.</div>'
+  const list=ms.length?`<div class="yt-list">${ms.map(m=>{
+    const id=ytId(m.url),thumb=id?`https://img.youtube.com/vi/${id}/hqdefault.jpg`:''
+    return`<div class="yt-item" data-url="${esc(m.url)}"><div class="yt-thumb">${thumb?`<img src="${thumb}" loading="lazy" alt="">`:'<div class="yt-thumb-ph">📹</div>'}<span class="yt-play">${play}</span></div>
+      <div class="yt-meta"><div class="yt-logo"><img src="${LOGO}" alt=""></div><div class="yt-info"><div class="yt-title">${esc(m.title)}</div><div class="yt-sub">옥야 학생회 · ${fmtDate(m.at)}</div></div>${admin?`<button class="yt-del" data-mdel="${m.id}">삭제</button>`:''}</div>
+    </div>`}).join('')}</div>`:'<div class="empty" style="padding:44px 20px">등록된 회의 영상이 없어요.</div>'
   el.innerHTML=`<div class="sc-inner">
-    <div class="pcard"><div class="sec">대의원회 회의록</div><div class="pet-note" style="margin:-2px 0 10px">📹 학생회 회의 영상을 다시 볼 수 있어요.</div>${list}</div>
-    ${admin?`<div class="pcard"><div class="sec">영상 등록</div><div class="field"><label>제목</label><input id="sm-t" placeholder="예: 2학기 2차 대의원회"></div><div class="field"><label>유튜브 링크</label><input id="sm-u" placeholder="https://youtube.com/..."></div><button class="pbtn pri" id="sm-add">등록</button></div>`:''}
+    <div class="sc2-sec"><h2 class="sc2-t">대의원회 회의록</h2><div class="sc2-note">📹 학생회 회의 영상을 다시 볼 수 있어요</div></div>
+    ${list}
+    ${admin?`<div class="pcard" style="margin-top:18px"><div class="sec">영상 등록</div><div class="field"><label>제목</label><input id="sm-t" placeholder="예: 2학기 2차 대의원회"></div><div class="field"><label>유튜브 링크</label><input id="sm-u" placeholder="https://youtube.com/..."></div><button class="pbtn pri" id="sm-add">등록</button></div>`:''}
   </div>`
-  el.querySelectorAll('[data-url]').forEach(r=>r.onclick=()=>{const u=r.dataset.url;if(u)window.open(u,'_blank')})
+  el.querySelectorAll('[data-url]').forEach(r=>r.onclick=e=>{if(e.target.closest('.yt-del'))return;const u=r.dataset.url;if(u)window.open(u,'_blank')})
   if(admin){
     const add=el.querySelector('#sm-add');if(add)add.onclick=async()=>{const t=el.querySelector('#sm-t').value.trim(),u=el.querySelector('#sm-u').value.trim();if(!t||!u){toast('제목과 링크를 입력해줘');return}try{await wt(sb.from('okya_meetings').insert({id:uid('mt'),title:t,url:u,at:nowISO()}))}catch{toast('등록 실패');return}toast('등록 완료');schoolMeetSlide(el)}
     el.querySelectorAll('[data-mdel]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_meetings').delete().eq('id',b.dataset.mdel))}catch{};schoolMeetSlide(el)})
