@@ -2635,7 +2635,10 @@ function rBookNew(){
     const btn=document.getElementById('badd');btn.disabled=true;btn.textContent='등록 중...'
     let photo=null
     if(photoFile){toast('사진 업로드 중...');photo=await uploadImg(photoFile,'book');if(!photo){btn.disabled=false;btn.textContent='등록하기';return}}
-    try{await wt(sb.from('okya_books').insert({id:uid('b'),title,grade:document.getElementById('bg').value,kind,want,photo,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}))}catch{toast('등록 실패 · okya_books에 photo/want 컬럼이 필요해요');btn.disabled=false;btn.textContent='등록하기';return}
+    const row={id:uid('b'),title,grade:document.getElementById('bg').value,kind,want,photo,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}
+    let{error}=await wt(sb.from('okya_books').insert(row)).catch(e=>({error:e}))
+    if(error&&/want/i.test(error.message||'')){delete row.want;({error}=await wt(sb.from('okya_books').insert(row)).catch(e=>({error:e})))}
+    if(error){toast('등록 실패 · '+(error.message||'okya_books 컬럼 확인'));btn.disabled=false;btn.textContent='등록하기';return}
     notifyStudents('book',`새 ${kind} 책`,`'${title}' 책이 올라왔어요`)
     popMsg('책이 등록됐어요','📚');pop()
   }
