@@ -1028,6 +1028,29 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .book-kind.give{background:rgba(47,180,166,.14);color:#2FB4A6;}
 .book-kind.grade{background:var(--soft);color:var(--sub);}
 .book-want{margin-top:10px;padding:10px 13px;background:var(--soft);border-radius:12px;font-size:13px;color:var(--ink2);}
+/* 책 교환: 마켓 카드 리스트 */
+.bmk-list{padding:4px 16px 12px;}
+.bmk-add{width:100%;margin:4px 0 8px;padding:13px;border-radius:var(--radius-md);background:var(--accent-soft);color:var(--accent);font-size:14px;font-weight:800;transition:transform var(--dur-micro) var(--ease-spring);}
+.bmk-add:active{transform:scale(.98);}
+.bmk-card{display:flex;align-items:center;gap:13px;padding:13px 4px;cursor:pointer;border-bottom:1px solid var(--divider);transition:background var(--dur-micro) ease;animation:petrise .4s var(--ease) both;}
+.bmk-card:active{background:var(--surface-2);}
+.bmk-card:last-child{border-bottom:none;}
+.bmk-thumb{position:relative;width:74px;height:74px;border-radius:14px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(20,26,40,.13);}
+.bmk-thumb img{width:100%;height:100%;object-fit:cover;}
+.bmk-thumb span{padding:8px;font-size:11.5px;font-weight:800;color:#fff;text-align:center;line-height:1.3;letter-spacing:-.2px;text-shadow:0 1px 3px rgba(0,0,0,.28);}
+.bmk-info{flex:1;min-width:0;}
+.bmk-title{font-size:15px;font-weight:800;color:var(--text-1);line-height:1.32;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.bmk-sub{font-size:12px;color:var(--text-3);margin-top:3px;}
+.bmk-tags{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.bmk-want{font-size:11.5px;color:var(--text-2);font-weight:600;}
+.bmk-want b{color:var(--accent);font-weight:800;}
+.bmk-chev{flex-shrink:0;color:var(--text-3);display:flex;opacity:.6;}
+.bmk-chev svg{width:18px;height:18px;}
+/* 청원: 학생회 답변 */
+.pet-answer{border-left:3px solid var(--accent);animation:petrise .4s var(--ease) both;}
+.pet-ans-head{font-size:13px;font-weight:800;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.pet-ans-body{font-size:14px;line-height:1.62;color:var(--text-1);white-space:pre-wrap;}
+.pet-answer textarea{width:100%;font-family:inherit;}
 .book-want b{color:var(--ink);}
 .bc-item{padding:11px 0;border-bottom:1px solid var(--line);}
 .bc-head{display:flex;gap:7px;align-items:center;margin-bottom:4px;}
@@ -3037,7 +3060,11 @@ async function rPetitionDetail(pid){
   const phase=p.phase||'청원진행',curIdx=PET_PHASES.indexOf(phase)
   const pct=Math.min(100,Math.round(agrees/PET_GOAL*100))
   const stepper=`<div class="pet-steps">${PET_PHASES.map((s,i)=>`<div class="pet-step${i<=curIdx?' done':''}${i===curIdx?' cur':''}"><div class="pet-step-dot">${i<curIdx?'✓':i+1}</div><div class="pet-step-l">${s}</div></div>`).join('<div class="pet-step-line"></div>')}</div>`
-  const adminPanel=admin?`<div class="pcard"><div class="sec">학생회 · 진행단계 변경</div><div class="pet-phasebtns">${PET_PHASES.map(ph=>`<button class="pet-chip${ph===phase?' on':''}" data-phase="${ph}">${ph}</button>`).join('')}</div></div>`:''
+  const adminPanel=admin?`<div class="pcard"><div class="sec">학생회 · 진행단계 변경</div><div class="pet-phasebtns">${PET_PHASES.map(ph=>`<button class="pet-chip${ph===phase?' on':''}" data-phase="${ph}">${ph}</button>`).join('')}</div>
+      <div class="sec" style="margin-top:18px">학생회 답변</div>
+      <textarea id="pd-answer" rows="3" placeholder="이 청원에 대한 학생회 답변을 남겨주세요" style="resize:none">${esc(p.answer||'')}</textarea>
+      <button class="minibtn soft" id="pd-answer-save" style="margin-top:9px">답변 저장</button></div>`:''
+  const answerCard=p.answer?`<div class="pcard pet-answer"><div class="pet-ans-head">💬 학생회 답변</div><div class="pet-ans-body">${esc(p.answer)}</div></div>`:''
   cb.innerHTML=`<div class="chal-detail">
     <div class="pet-eyebrow">동의진행 청원</div>
     <div class="pcard pet-sheet">
@@ -3051,6 +3078,7 @@ async function rPetitionDetail(pid){
       <div class="pet-row col"><div class="k">청원의 취지</div><div class="v pet-body">${esc(p.purpose||'-')}</div></div>
       <div class="pet-row col"><div class="k">청원의 내용</div><div class="v pet-body">${esc(p.content||p.txt||'-')}</div></div>
     </div>
+    ${answerCard}
     ${adminPanel}
     <div class="pet-cta"><button class="pbtn pri pet-agree-btn${mine?' agreed':''}" id="pd-agree">${mine?'✓ 동의 완료':left<0?'동의 기간 마감':'동의하기'}</button></div>
     <div style="height:10px"></div>
@@ -3066,6 +3094,13 @@ async function rPetitionDetail(pid){
   if(admin){
     document.getElementById('pd-del').onclick=async()=>{try{await wt(sb.from('okya_petitions').delete().eq('id',pid))}catch{};toast('청원 삭제');pop()}
     document.querySelectorAll('[data-phase]').forEach(b=>b.onclick=async()=>{try{await wt(sb.from('okya_petitions').update({phase:b.dataset.phase}).eq('id',pid))}catch{};rPetitionDetail(pid)})
+    document.getElementById('pd-answer-save').onclick=async()=>{
+      const val=document.getElementById('pd-answer').value.trim()
+      const{error}=await wt(sb.from('okya_petitions').update({answer:val}).eq('id',pid)).catch(e=>({error:e}))
+      if(error){toast('저장 실패 · okya_petitions에 answer 열이 필요해요','error');return}
+      if(val)notifyStudents('petition','청원 답변 등록',`'${p.title||p.txt||'청원'}'에 학생회 답변이 달렸어요`)
+      popMsg('답변 저장됨','💬');rPetitionDetail(pid)
+    }
     let rstep=0
     const rb=document.getElementById('pd-reveal')
     rb.onclick=()=>{
@@ -3215,10 +3250,19 @@ async function iBook(){
     if(b.status==='matched')return false
     return (b.applicants||[]).length===0
   })
-  const help=`<div class="book-help">📚 <b>이용 방법</b> · ＋ 로 책을 등록하고, 표지를 눌러 <b>나눔/교환 신청</b>하세요. 신청하면 그 책은 다른 사람 화면에서 내려가고, <b>취소하면 다시 올라와요.</b> 댓글은 <b>책 주인과 작성자만</b> 볼 수 있어요.</div>`
-  const addTile=`<div class="book-item book-add" id="book-add"><div class="book-cover book-addcover"><span>＋</span></div><div class="book-label"><div class="bl-title">새 책 등록</div></div></div>`
-  const items=visible.map(b=>`<div class="book-item" data-open="${b.id}">${bookCoverEl(b)}<div class="book-label"><div class="bl-title">${esc(b.title)}</div><div class="bl-meta">${esc(b.grade||'')} · ${esc(b.owner_name||'')}</div></div></div>`).join('')
-  cb.innerHTML=`${help}<div class="book-shelf">${addTile}${items}</div><div style="height:16px"></div>`
+  const help=`<div class="book-help">📚 <b>이용 방법</b> · ＋ 로 책을 등록하고, 카드를 눌러 <b>나눔/교환 신청</b>하세요. 신청하면 그 책은 다른 사람 화면에서 내려가고, <b>취소하면 다시 올라와요.</b> 댓글은 <b>책 주인과 작성자만</b> 볼 수 있어요.</div>`
+  const addTile=`<button class="bmk-add" id="book-add">＋ 책 등록하기</button>`
+  const items=visible.map(b=>{
+    const st=b.status==='matched'?`<span class="book-kind grade">확정</span>`:''
+    const want=b.kind==='교환'&&b.want?`<span class="bmk-want">🔁 <b>${esc(b.want)}</b></span>`:''
+    return`<div class="bmk-card" data-open="${b.id}">
+      <div class="bmk-thumb" style="${b.photo?'':'background:'+bookCover(b)}">${b.photo?`<img src="${esc(b.photo)}">`:`<span>${esc((b.title||'책').slice(0,8))}</span>`}</div>
+      <div class="bmk-info"><div class="bmk-title">${esc(b.title)}</div><div class="bmk-sub">${esc(b.grade||'')} · ${esc(b.owner_name||'')} · ${timeago(b.at)}</div><div class="bmk-tags"><span class="book-kind ${b.kind==='나눔'?'give':'swap'}">${esc(b.kind||'교환')}</span>${st}${want}</div></div>
+      <span class="bmk-chev">${I.chev}</span>
+    </div>`
+  }).join('')
+  const listBody=visible.length?items:emptyHTML({icon:'📚',title:'아직 등록된 책이 없어요',desc:'필요 없는 교재를 나눔하거나 교환해보세요.'})
+  cb.innerHTML=`${help}<div class="bmk-list">${addTile}${listBody}</div><div style="height:16px"></div>`
   document.getElementById('book-add').onclick=()=>push(rBookNew)
   cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rBookDetail(el.dataset.open)))
 }
