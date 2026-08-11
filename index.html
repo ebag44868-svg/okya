@@ -482,6 +482,9 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 
 /* pushed-screen header (뒤로가기) */
 .screen.no-nav.p3{padding-bottom:0;}
+/* 송금 플로우: 모바일=풀스크린(내비 숨김), 데스크톱=좌측 레일 붙은 일반 화면으로 통일 */
+.screen.mflow{padding-bottom:0;}
+.screen.mflow+.bnav{display:none;}
 .p3 .phdr{display:flex;align-items:center;gap:8px;padding:calc(12px + env(safe-area-inset-top)) 16px 10px;}
 .p3 .phdr .bk{width:34px;height:34px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;flex:none;color:#3a3f4b;}
 .p3 .phdr .bk svg{width:20px;height:20px;}
@@ -895,6 +898,14 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
   /* 확인 바텀시트 → 중앙 다이얼로그 */
   .p3sheet-ov{align-items:center;}
   .p3sheet{max-width:430px;border-radius:26px;}
+  /* 송금 플로우: 데스크톱에서 좌측 레일 노출 + 콘텐츠 정렬(플로팅 박스 대신) */
+  .screen.mflow+.bnav{display:flex;}
+  .screen.mflow .kpwrap{width:100%;max-width:760px;margin:0 auto;padding:10px 30px 26px;}
+  .screen.mflow .kp-amt{font-size:52px;}
+  .screen.mflow .keypad{max-width:520px;margin:0 auto;gap:16px 60px;}
+  .screen.mflow #tf-list{width:100%;max-width:720px;margin:0 auto;}
+  .screen.mflow .phdr+div,.screen.mflow .phdr~div:last-child{width:100%;max-width:720px;margin:0 auto;}
+  .screen.mflow .succ{width:100%;max-width:520px;margin:0 auto;padding:48px 32px;}
 }
 
 /* ===== 레일 아코디언 (세로에선 숨김) + 커뮤 배너 캐러셀 ===== */
@@ -1975,7 +1986,7 @@ async function fTransfer(mode){
   const others=USERS.filter(u=>u.id!==SESSION.id&&!((mode==='송금'||isRecall)&&u.role==='admin'))
   let rtxs=null
   if(isRecall){
-    app().innerHTML=`<div class="screen no-nav p3"><div class="loader" style="min-height:300px"><div class="spin"></div></div></div>`
+    app().innerHTML=`<div class="screen p3 mflow"><div class="loader" style="min-height:300px"><div class="spin"></div></div></div>`
     rtxs=await getAllTx()
   }
   let sel=null
@@ -1989,12 +2000,13 @@ async function fTransfer(mode){
       return`<div class="lrow tf-user${on?' on':''}" data-uid="${u.id}"><div class="chip ti-blue" style="border-radius:50%;${on?'background:var(--grad);color:#fff':''}">${esc(u.name.charAt(0))}</div><div class="body"><div class="ti">${esc(u.name)}</div><div class="su">${sub}</div></div><span style="color:${on?'var(--primary)':'#c9cdd8'};display:flex">${on?ICO_CHECK_SM:I.chev}</span></div>`
     }).join('')
   }
-  app().innerHTML=`<div class="screen no-nav fade-in p3" style="display:flex;flex-direction:column">
+  app().innerHTML=`<div class="screen fade-in p3 mflow" style="display:flex;flex-direction:column">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${title}</div><button id="tf-cancel" style="font-size:13px;font-weight:600;color:var(--sub);background:none">취소</button></div>
     <div style="padding:2px 18px 0"><div style="display:flex;align-items:center;gap:9px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:12px 15px"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--sub);fill:none;stroke-width:2;stroke-linecap:round;flex:none"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="tf-q" placeholder="이름으로 검색" style="flex:1;background:none;border:none;outline:none;font-size:14px;padding:0" autocomplete="off" autocorrect="off"></div></div>
     <div class="pcard" id="tf-list" style="flex:1;overflow:auto;min-height:0">${buildList()}</div>
     <div style="padding:8px 18px calc(14px + env(safe-area-inset-bottom))"><button class="pbtn pri" id="tf-next" disabled style="opacity:.4">다음</button></div>
-  </div>`
+  </div>${bnav()}`
+  bindNav()
   const syncNext=()=>{const b=document.getElementById('tf-next');b.disabled=!sel;b.style.opacity=sel?'1':'.4'}
   const bind=()=>document.querySelectorAll('.tf-user').forEach(el=>el.onclick=()=>{
     sel=el.dataset.uid
@@ -2010,7 +2022,7 @@ async function fTransfer(mode){
 
 async function fTransferAmt(mode,toUser){
   // 단계 2: 금액 입력 (preview 4) — 흰 배경, 숫자만 키패드
-  app().innerHTML=`<div class="screen no-nav p3"><div class="loader" style="min-height:300px"><div class="spin"></div></div></div>`
+  app().innerHTML=`<div class="screen p3 mflow"><div class="loader" style="min-height:300px"><div class="spin"></div></div></div>`
   const txs=await getAllTx()
   const myBal=balOf(SESSION.id,txs)
   const isRecall=mode==='회수'
@@ -2025,7 +2037,7 @@ async function fTransferAmt(mode,toUser){
     const nb=document.getElementById('kp-next');if(nb)nb.disabled=!(n>0&&(!limited||n<=availBal))
     const bw=document.getElementById('kp-warn');if(bw)bw.style.display=(limited&&n>availBal)?'block':'none'
   }
-  app().innerHTML=`<div class="screen no-nav fade-in p3" style="display:flex;flex-direction:column">
+  app().innerHTML=`<div class="screen fade-in p3 mflow" style="display:flex;flex-direction:column">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${title}</div><button id="tf-cancel" style="font-size:13px;font-weight:600;color:var(--sub);background:none">취소</button></div>
     <div class="kpwrap">
       <div class="kpto"><div class="av">${esc(toUser.name.charAt(0))}</div><div><div class="n">${esc(toUser.name)}</div><div class="b">${mode==='발행'?'발행 대상':(isRecall?'회수 대상':'창녕옥야고등학교')}</div></div></div>
@@ -2039,7 +2051,8 @@ async function fTransferAmt(mode,toUser){
       <div class="keypad">${['1','2','3','4','5','6','7','8','9','00','0','del'].map(k=>`<div class="key" data-k="${k}">${k==='del'?ICO_DEL:k}</div>`).join('')}</div>
       <button class="kpnext" id="kp-next" disabled>다음</button>
     </div>
-  </div>`
+  </div>${bnav()}`
+  bindNav()
   document.getElementById('bk').onclick=pop
   document.getElementById('tf-cancel').onclick=()=>{STACK.length=0;routeTab()}
   document.querySelectorAll('.kpquick [data-q]').forEach(el=>el.onclick=()=>{
@@ -2095,7 +2108,7 @@ function fTransferConfirm(mode,toUser,amount,reason,myBal){
       const verb=mode==='발행'?'에게 발행했어요':(mode==='회수'?'에게서 회수했어요':'에게 보냈어요')
       const remain=mode==='송금'?`남은 잔액 ${fmt(Math.max(0,(myBal||0)-amount))}옥 · `:''
       const tm=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})
-      app().innerHTML=`<div class="screen no-nav fade-in p3">
+      app().innerHTML=`<div class="screen fade-in p3 mflow">
         <div class="succ">
           <svg class="ring2" viewBox="0 0 100 100" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><circle class="bgc" cx="50" cy="50" r="42"/><circle class="arc" cx="50" cy="50" r="42" transform="rotate(-90 50 50)"/><path class="chk" d="M33 51l12 12 22-24"/></svg>
           <h2>${fmt(amount)}옥을<br>${esc(toUser.name)}님${verb}</h2>
@@ -2105,7 +2118,8 @@ function fTransferConfirm(mode,toUser,amount,reason,myBal){
             <button class="pbtn pri" id="tf-hist">내역 보기</button>
           </div>
         </div>
-      </div>`
+      </div>${bnav()}`
+      bindNav()
       document.getElementById('tf-home').onclick=()=>{TAB='home';rHome()}
       document.getElementById('tf-hist').onclick=()=>{TAB='money';STACK=[];push(()=>rHistory())}
     }else{
