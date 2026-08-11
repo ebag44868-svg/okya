@@ -2122,10 +2122,10 @@ async function commBannerItems(){
     const evs=ev.sort((a,b)=>(a.at<b.at?1:-1))
     const pes=pe.filter(p=>p.status==='approved').sort((a,b)=>petAgrees(b)-petAgrees(a))
     const bks=bk.filter(b=>b.status!=='matched'&&(b.applicants||[]).length===0).sort((a,b)=>(a.at<b.at?1:-1))
-    if(pes[0])items.push({type:'petition',kind:'petition',id:pes[0].id,tag:'주목 청원',title:pes[0].title,sub:pes[0].purpose||'',meta:`익명 · 동의 ${fmt(petAgrees(pes[0]))} · ${timeago(petStart(pes[0]))}`})
+    if(pes[0])items.push({type:'petition',kind:'petition',id:pes[0].id,tag:'주목 청원',title:pes[0].title||pes[0].txt||'제목 없음',sub:pes[0].purpose||'',meta:`익명 · 동의 ${fmt(petAgrees(pes[0]))} · ${timeago(petStart(pes[0]))}`})
     evs.slice(0,2).forEach(e=>items.push({type:'challenge',kind:'challenge',id:e.id,tag:'챌린지',title:e.title,sub:`인증하면 ${fmt(e.reward||0)}옥`,img:e.poster}))
     bks.slice(0,2).forEach(b=>items.push({type:'book',kind:'book',id:b.id,tag:b.kind==='나눔'?'책 나눔':'책 교환',title:b.title,sub:b.kind==='교환'&&b.want?`↔ ${b.want}`:`${b.grade||''} · ${b.owner_name||''}`,img:b.photo}))
-    if(pes[1])items.push({type:'petition',kind:'petition',id:pes[1].id,tag:'청원',title:pes[1].title,sub:pes[1].purpose||'',meta:`익명 · 동의 ${fmt(petAgrees(pes[1]))}`})
+    if(pes[1])items.push({type:'petition',kind:'petition',id:pes[1].id,tag:'청원',title:pes[1].title||pes[1].txt||'제목 없음',sub:pes[1].purpose||'',meta:`익명 · 동의 ${fmt(petAgrees(pes[1]))}`})
   }catch{}
   return items
 }
