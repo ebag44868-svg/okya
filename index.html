@@ -405,7 +405,31 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .p3 .srow+.srow{border-top:1px solid var(--line);}
 .p3 .srow .l .t{font-size:14px;font-weight:700;color:var(--ink);}
 .p3 .srow .l .d{font-size:12px;color:var(--sub);margin-top:2px;}
-.p3 .dday{background:var(--primary-tint);color:var(--primary);font-size:12px;font-weight:800;padding:4px 10px;border-radius:9px;}
+.p3 .dday{color:var(--accent);font-size:15px;font-weight:900;letter-spacing:-.03em;font-variant-numeric:tabular-nums;padding:2px 4px;}
+
+/* ── Phase 3: 오늘의 옥야 (contextual dashboard) ── */
+.today-okya{margin:2px 18px 16px;background:var(--surface);border-radius:var(--radius-xl);box-shadow:var(--shadow-md);padding:15px 17px 13px;animation:cardRise .5s var(--ease-out) both;}
+.today-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:11px;}
+.today-eyebrow{font-size:13.5px;font-weight:800;color:var(--text-1);letter-spacing:-.01em;}
+.today-date{font-size:12px;font-weight:600;color:var(--text-3);}
+.today-hl{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:16px;background:var(--surface-2);transition:transform var(--dur-micro) var(--ease-spring);}
+.today-okya[data-act]{cursor:pointer;}
+.today-okya[data-act]:active .today-hl{transform:scale(.985);}
+.today-hl-ic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;background:var(--surface);box-shadow:var(--shadow-sm);flex:none;}
+.today-hl-tx{flex:1;min-width:0;}
+.today-hl-t{font-size:15.5px;font-weight:800;color:var(--text-1);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.today-hl-s{font-size:12.5px;font-weight:600;color:var(--text-2);margin-top:1px;}
+.today-hl-go{color:var(--text-3);display:flex;flex:none;}.today-hl-go svg{width:18px;height:18px;}
+.today-hl.tone-att{background:linear-gradient(135deg,rgba(47,191,113,.13),rgba(47,191,113,.05));}
+.today-hl.tone-att .today-hl-ic{color:#2FBF71;}
+.today-hl.tone-exam{background:var(--accent-soft);}
+.today-hl.tone-exam .today-hl-ic,.today-hl.tone-notif .today-hl-ic{color:var(--accent);}
+.today-strip{display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:11px;border-top:1px solid var(--divider);}
+.ts-item{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.ts-k{font-size:11px;font-weight:700;color:var(--text-3);}
+.ts-v{font-size:13px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ts-dd{color:var(--accent);font-weight:800;font-variant-numeric:tabular-nums;margin-left:2px;}
+.ts-div{width:1px;height:26px;background:var(--divider);flex:none;}
 
 /* list row */
 .p3 .lrow{display:flex;align-items:center;gap:12px;padding:11px 0;}
@@ -1516,6 +1540,36 @@ function routeTab(){({home:rHome,money:rMoney,school:rSchool,comm:rComm,search:r
 function push(fn){STACK.push(fn);closeSheet(true);fn();const s=app().querySelector('.screen');if(s){s.classList.remove('fade-in');s.classList.add('pushin')}}
 function pop(){STACK.pop();if(STACK.length)STACK[STACK.length-1]();else routeTab();const s=app().querySelector('.fade-in');if(s){s.classList.remove('fade-in');s.classList.add('slide-back')}}
 
+// ── Phase 3: 오늘의 옥야 — 오늘 가장 중요한 정보를 동적으로 우선 노출 ──
+function todaySummaryHTML(txs,admin){
+  const d=new Date(),w=['일','월','화','수','목','금','토'][d.getDay()]
+  const dateLine=`${d.getMonth()+1}월 ${d.getDate()}일 · ${w}요일`
+  const todayS=todayKey()
+  const upcoming=SCHEDULE.filter(s=>s.date>=todayS).sort((a,b)=>a.date<b.date?-1:1)
+  const ddOf=s=>Math.max(0,Math.ceil((new Date(s.date)-new Date(todayS))/86400000))
+  const examRe=/시험|고사|수능|평가|모의|창심/
+  const exam=upcoming.find(s=>examRe.test(s.label)&&ddOf(s)<=14)
+  const attNeed=!admin&&!attDoneToday(txs)
+  const unread=unreadCount()
+  let hl
+  if(exam)hl={ic:'📝',t:exam.label,s:`D-${ddOf(exam)} · ${fmtDate(exam.date)}`,tone:'exam'}
+  else if(attNeed)hl={ic:'✓',t:'오늘 출석 체크',s:'지금 누르고 +20옥 받기',tone:'att',act:'att'}
+  else if(unread)hl={ic:'🔔',t:`새 알림 ${unread}개`,s:'확인해보세요',tone:'notif',act:'bell'}
+  else if(upcoming[0])hl={ic:'📅',t:upcoming[0].label,s:`D-${ddOf(upcoming[0])} · ${fmtDate(upcoming[0].date)}`,tone:'notif'}
+  else hl={ic:'🌤️',t:cheer(),s:'',tone:'default'}
+  const meal=((mealsOf(todayS)||{})[defaultMealSlot()]||[]).filter(Boolean)
+  const mealTxt=meal.length?meal.slice(0,2).join(' · '):'정보 없음'
+  const next=upcoming[0]
+  const strip=[
+    `<div class="ts-item"><span class="ts-k">오늘 ${defaultMealSlot()}</span><span class="ts-v">${esc(mealTxt)}</span></div>`,
+    next?`<div class="ts-item"><span class="ts-k">다음 일정</span><span class="ts-v">${esc(next.label)}<b class="ts-dd">D-${ddOf(next)}</b></span></div>`:''
+  ].filter(Boolean).join('<span class="ts-div"></span>')
+  return`<div class="today-okya"${hl.act?` data-act="${hl.act}"`:''}>
+    <div class="today-head"><span class="today-eyebrow">오늘의 옥야</span><span class="today-date">${dateLine}</span></div>
+    <div class="today-hl tone-${hl.tone}"><span class="today-hl-ic">${hl.ic}</span><div class="today-hl-tx"><div class="today-hl-t">${esc(hl.t)}</div>${hl.s?`<div class="today-hl-s">${esc(hl.s)}</div>`:''}</div>${hl.act?`<span class="today-hl-go">${I.chev}</span>`:''}</div>
+    <div class="today-strip">${strip}</div>
+  </div>`
+}
 async function rHome(){
   TAB='home'
   const headerHTML=`
@@ -1541,7 +1595,7 @@ async function rHome(){
   }).join('')
 
   app().innerHTML=`<div class="screen fade-in p3 home-scope">
-    <div class="home-top">${headerHTML}</div>
+    <div class="home-top">${headerHTML}${todaySummaryHTML(txs,admin)}</div>
     <div class="home-cols">
      <div class="home-col">
       <!-- 잔액 카드 -->
@@ -1587,6 +1641,7 @@ async function rHome(){
   if(admin)document.getElementById('ha-recall').onclick=()=>{TAB='money';push(()=>fTransfer('회수'))}
   document.getElementById('ha-hist').onclick=()=>{TAB='money';rMoney()}
   const attBtn=document.getElementById('att-btn');if(attBtn)attBtn.onclick=doAttendance
+  const tk=document.querySelector('.today-okya[data-act]');if(tk)tk.onclick=()=>{const a=tk.dataset.act;if(a==='att')doAttendance();else if(a==='bell')document.querySelector('[data-bell]')?.click()}
   const mcBtn=document.getElementById('meal-cal');if(mcBtn)mcBtn.onclick=()=>push(()=>renderMealCalendar())
   renderHomeMeal(defaultMealSlot())
   ;(()=>{
