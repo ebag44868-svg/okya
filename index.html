@@ -616,6 +616,33 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .my-act-c{flex:1;background:var(--surface-2);border-radius:var(--radius-md);padding:12px 8px;text-align:center;}
 .my-act-c .v{font-size:19px;font-weight:900;color:var(--text-1);}
 .my-act-c .k{font-size:11.5px;color:var(--text-3);margin-top:2px;font-weight:600;}
+/* 글로벌 검색 */
+.gs-screen{background:var(--bg);min-height:100dvh;}
+.gs-bar{display:flex;align-items:center;gap:8px;padding:10px 14px 8px;position:sticky;top:0;background:var(--bg);z-index:5;}
+.gs-inputwrap{flex:1;display:flex;align-items:center;gap:9px;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:11px 14px;transition:border-color var(--dur-micro) ease,box-shadow var(--dur-micro) ease;}
+.gs-inputwrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(123,108,255,.14);}
+.gs-inputwrap svg{width:18px;height:18px;stroke:var(--text-3);fill:none;stroke-width:2;stroke-linecap:round;flex:none;}
+.gs-inputwrap input{flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--text-1);padding:0;}
+.gs-clear{width:20px;height:20px;border-radius:50%;background:var(--text-3);color:#fff;font-size:11px;flex:none;display:flex;align-items:center;justify-content:center;}
+.gs-body{padding:6px 16px 40px;}
+.gs-recent-head{display:flex;align-items:center;justify-content:space-between;margin:12px 4px;}
+.gs-recent-head span{font-size:13px;font-weight:800;color:var(--text-1);}
+.gs-recent-head button{font-size:12px;color:var(--text-3);background:none;font-weight:600;}
+.gs-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.gs-chip{padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:999px;font-size:13px;font-weight:600;color:var(--text-2);transition:transform var(--dur-micro) var(--ease-spring);}
+.gs-chip:active{transform:scale(.95);}
+.gs-group{margin-top:18px;animation:fadeUp .3s var(--ease) both;}
+.gs-gt{font-size:12px;font-weight:800;color:var(--text-3);margin:0 4px 6px;letter-spacing:.02em;}
+.gs-gt span{color:var(--accent);}
+.gs-row{display:flex;align-items:center;gap:12px;padding:12px 6px;border-bottom:1px solid var(--divider);cursor:pointer;transition:background var(--dur-micro) ease;}
+.gs-row:active{background:var(--surface-2);}
+.gs-row:last-child{border-bottom:none;}
+.gs-ic{width:38px;height:38px;border-radius:11px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none;}
+.gs-info{flex:1;min-width:0;}
+.gs-rt{font-size:14.5px;font-weight:700;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gs-rs{font-size:12px;color:var(--text-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gs-chev{flex:none;color:var(--text-3);display:flex;opacity:.5;}
+.gs-chev svg{width:16px;height:16px;}
 .p3 .palgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:13px 6px;}
 .p3 .palitem{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
 .p3 .palitem .c{width:38px;height:38px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.12);}
@@ -1643,7 +1670,10 @@ async function rHome(){
   const headerHTML=`
     <div class="topbar">
       <div class="t brand"><img src="${LOGO}" style="width:26px;height:26px;border-radius:8px;object-fit:cover">okya</div>
-      <button data-bell>${I.bell}</button>
+      <div style="display:flex;align-items:center;gap:2px">
+        <button id="home-search" aria-label="검색"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+        <button data-bell>${I.bell}</button>
+      </div>
     </div>
     <div class="greet"><small>${cheer()}</small><div class="nm">${esc(SESSION.name)}님</div></div>`
 
@@ -1710,6 +1740,7 @@ async function rHome(){
   document.getElementById('ha-hist').onclick=()=>{TAB='money';rMoney()}
   const attBtn=document.getElementById('att-btn');if(attBtn)attBtn.onclick=doAttendance
   const tk=document.querySelector('.today-okya[data-act]');if(tk)tk.onclick=()=>{const a=tk.dataset.act;if(a==='att')doAttendance();else if(a==='bell')document.querySelector('[data-bell]')?.click()}
+  document.getElementById('home-search').onclick=()=>push(()=>rGlobalSearch())
   const mcBtn=document.getElementById('meal-cal');if(mcBtn)mcBtn.onclick=()=>push(()=>renderMealCalendar())
   renderHomeMeal(defaultMealSlot())
   ;(()=>{
@@ -2795,6 +2826,63 @@ async function rSearch(){
   histList.querySelectorAll('[data-uid]').forEach(el=>{el.onclick=()=>push(()=>rDmChat(el.dataset.uid))})
 }
 
+// ── 글로벌 검색(전체화면) ──
+function getRecentSearch(){try{return JSON.parse(localStorage.getItem('okya-recent-search')||'[]')}catch{return[]}}
+function pushRecentSearch(q){if(!q)return;try{let r=getRecentSearch().filter(x=>x!==q);r.unshift(q);localStorage.setItem('okya-recent-search',JSON.stringify(r.slice(0,8)))}catch{}}
+async function rGlobalSearch(){
+  app().innerHTML=`<div class="screen no-nav fade-in p3 gs-screen">
+    <div class="gs-bar">
+      <button class="bk" id="bk">${I.back}</button>
+      <div class="gs-inputwrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="gs-inp" placeholder="급식·일정·청원·책·사람 검색" autocomplete="off" autocorrect="off"><button id="gs-clear" class="gs-clear" style="display:none">✕</button></div>
+    </div>
+    <div id="gs-body" class="gs-body"></div>
+  </div>`
+  document.getElementById('bk').onclick=pop
+  const inp=document.getElementById('gs-inp'),body=document.getElementById('gs-body'),clr=document.getElementById('gs-clear')
+  // DB 소스 로드(메모리 소스는 즉시)
+  let books=[],petis=[],meetings=[],prints=[]
+  const[a,b,c,d]=await Promise.allSettled([wt(sb.from('okya_books').select('*')),wt(sb.from('okya_petitions').select('*')),wt(sb.from('okya_meetings').select('*')),wt(sb.from('okya_prints').select('*'))])
+  books=a.status==='fulfilled'?(a.value.data||[]):[];petis=b.status==='fulfilled'?(b.value.data||[]):[];meetings=c.status==='fulfilled'?(c.value.data||[]):[];prints=d.status==='fulfilled'?(d.value.data||[]):[]
+  if(!document.getElementById('gs-body'))return
+  const navDetail=fn=>{pop();push(fn)},navTab=t=>{STACK.length=0;TAB=t;routeTab()}
+  const hit=(t,q)=>(t||'').toLowerCase().includes(q)
+  const recentView=()=>{
+    const r=getRecentSearch()
+    body.innerHTML=r.length
+      ?`<div class="gs-recent-head"><span>최근 검색</span><button id="gs-rclear">전체 삭제</button></div><div class="gs-chips">${r.map(q=>`<button class="gs-chip" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`
+      :emptyHTML({icon:'🔎',title:'무엇이든 검색해보세요',desc:'급식 · 학사일정 · 공지 · 회의록 · 청원 · 책 · 제본 · 사람'})
+    body.querySelectorAll('[data-q]').forEach(el=>el.onclick=()=>{inp.value=el.dataset.q;clr.style.display='';runSearch(el.dataset.q)})
+    const rc=document.getElementById('gs-rclear');if(rc)rc.onclick=()=>{localStorage.removeItem('okya-recent-search');recentView()}
+  }
+  const runSearch=raw=>{
+    const q=(raw||'').trim().toLowerCase()
+    if(!q){recentView();return}
+    const groups=[]
+    const us=USERS.filter(u=>u.id!==SESSION.id&&hit(u.name,q)).slice(0,6)
+    if(us.length)groups.push({t:'사람',items:us.map(u=>({ic:'👤',title:u.name,sub:u.role==='admin'?'학생회':'학생',act:()=>navDetail(()=>rDmChat(u.id))}))})
+    const bs=books.filter(x=>hit(x.title,q)||hit(x.want,q)).slice(0,6)
+    if(bs.length)groups.push({t:'책 교환',items:bs.map(x=>({ic:'📚',title:x.title,sub:`${x.kind||'교환'} · ${x.owner_name||''}`,act:()=>navDetail(()=>rBookDetail(x.id))}))})
+    const ps=petis.filter(p=>p.status==='approved'&&(hit(p.title,q)||hit(p.txt,q)||hit(p.content,q)||hit(p.purpose,q))).slice(0,6)
+    if(ps.length)groups.push({t:'청원',items:ps.map(p=>({ic:'📝',title:p.title||p.txt||'청원',sub:p.category||'',act:()=>navDetail(()=>rPetitionDetail(p.id))}))})
+    const ms=meetings.filter(m=>hit(m.title,q)).slice(0,6)
+    if(ms.length)groups.push({t:'회의록',items:ms.map(m=>({ic:'🎬',title:m.title,sub:fmtDate(m.at),act:()=>navTab('school')}))})
+    const ns=NOTICES.filter(n=>hit(n.title,q)||hit(n.cat,q)).slice(0,6)
+    if(ns.length)groups.push({t:'공지',items:ns.map(n=>({ic:'📢',title:n.title,sub:n.cat,act:()=>navTab('home')}))})
+    const scs=SCHEDULE.filter(s=>hit(s.label,q)).slice(0,6)
+    if(scs.length)groups.push({t:'학사일정',items:scs.map(s=>({ic:'📅',title:s.label,sub:fmtDate(s.date),act:()=>navTab('school')}))})
+    const meals=[];Object.keys(MEALS).forEach(dk=>{const m=MEALS[dk]||{};['조식','중식','석식'].forEach(sl=>{if((m[sl]||[]).some(x=>hit(x,q)))meals.push({dk,sl,items:(m[sl]||[]).filter(x=>hit(x,q))})})})
+    if(meals.length)groups.push({t:'급식',items:meals.slice(0,6).map(x=>({ic:'🍚',title:`${x.dk} ${x.sl}`,sub:x.items.join(' · '),act:()=>navTab('school')}))})
+    const prs=prints.filter(p=>hit(p.title,q)).slice(0,6)
+    if(prs.length)groups.push({t:'제본소',items:prs.map(p=>({ic:'📄',title:p.title,sub:p.at?fmtDate(p.at):'',act:()=>navDetail(rPrint)}))})
+    if(!groups.length){body.innerHTML=emptyHTML({icon:'🫥',title:'검색 결과가 없어요',desc:`'${esc(raw.trim())}'에 대한 결과를 찾지 못했어요`});return}
+    body.innerHTML=groups.map((g,gi)=>`<div class="gs-group"><div class="gs-gt">${g.t} <span>${g.items.length}</span></div>${g.items.map((it,ii)=>`<div class="gs-row" data-gi="${gi}" data-ii="${ii}"><span class="gs-ic">${it.ic}</span><div class="gs-info"><div class="gs-rt">${esc(it.title)}</div>${it.sub?`<div class="gs-rs">${esc(it.sub)}</div>`:''}</div><span class="gs-chev">${I.chev}</span></div>`).join('')}</div>`).join('')
+    body.querySelectorAll('.gs-row').forEach(el=>el.onclick=()=>{pushRecentSearch(inp.value.trim());const it=groups[+el.dataset.gi].items[+el.dataset.ii];if(it&&it.act)it.act()})
+  }
+  inp.oninput=()=>{clr.style.display=inp.value?'':'none';runSearch(inp.value)}
+  clr.onclick=()=>{inp.value='';clr.style.display='none';inp.focus();recentView()}
+  recentView()
+  setTimeout(()=>inp.focus(),80)
+}
 function rUserProfile(userId){
   const user=USERS.find(u=>u.id===userId)
   if(!user){toast('사용자를 찾을 수 없어요');return}
