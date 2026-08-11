@@ -1052,7 +1052,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
   .p3 .money-stack{display:flex;flex-direction:column;gap:16px;width:100%;max-width:860px;margin:6px auto 0;}
   .p3 .money-stack>*{margin:0!important;}
   /* 푸시 상세 페이지: 넓은 화면에서 콘텐츠 폭 제한(가독성) + 중앙 정렬 */
-  .screen.p3>.phdr,.screen.p3>#cb,.screen.p3>.chal-detail,.screen.p3>.pw-steps,.screen.p3>.vspace{max-width:940px;margin-left:auto;margin-right:auto;width:100%;}
+  .screen.p3>.phdr,.screen.p3>#cb,.screen.p3>.chal-detail,.screen.p3>.pw-steps,.screen.p3>.vspace,.screen.p3>.pet2-hero{max-width:940px;margin-left:auto;margin-right:auto;width:100%;}
 }
 
 /* 가로 — 송금/내역 등 푸시 화면을 중앙 모달 카드로 */
@@ -1266,6 +1266,22 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .pet-hv::after{content:"";position:absolute;right:-34px;top:-34px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 32% 32%,rgba(123,108,255,.16),transparent 70%);}
 .pet-hv .vspace-t{font-size:21px;color:var(--accent-d);}
 .pet-hv .vspace-s{font-size:13px;color:var(--accent);opacity:.85;}
+
+/* 청원 2.0 히어로: 홈과 통일된 언어(대형 타이포 + 이미지 슬롯 + CTA) */
+.pet2-hero{padding:6px 20px 4px;display:flex;flex-direction:column;}
+.pet2-eyebrow{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.02em;}
+.pet2-title{font-size:32px;font-weight:900;letter-spacing:-.03em;line-height:1.12;color:var(--text-1);margin-top:10px;}
+.pet2-sub{font-size:14.5px;font-weight:600;color:var(--text-3);margin-top:12px;}
+.pet2-cta{align-self:flex-start;margin-top:20px;background:var(--accent);color:#fff;font-size:15px;font-weight:800;padding:13px 22px;border-radius:var(--radius-full);box-shadow:0 8px 22px rgba(123,108,255,.28);transition:transform var(--dur-micro) var(--ease-spring);}
+.pet2-cta:active{transform:scale(.97);}
+.pet2-hero-visual{margin-top:20px;min-height:148px;border-radius:var(--radius-xl);background:linear-gradient(140deg,#ECE9FF 0%,#F3ECFF 45%,#FDE9F5 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;background-size:cover;background-position:center;position:relative;}
+.pet2-hero-emoji{font-size:62px;opacity:.92;filter:drop-shadow(0 8px 20px rgba(0,0,0,.12));}
+@media (min-width:820px) and (min-aspect-ratio:1/1){
+  .pet2-hero{flex-direction:row;align-items:stretch;gap:32px;padding:12px 30px 6px;}
+  .pet2-hero-main{flex:1 1 58%;display:flex;flex-direction:column;justify-content:center;}
+  .pet2-hero-visual{flex:1 1 42%;margin-top:0;min-height:230px;}
+  .pet2-title{font-size:44px;}
+}
 @keyframes petrise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 /* 작성 폼 분야 선택 */
 .pet-catsel{display:flex;flex-wrap:wrap;gap:8px;}
@@ -3529,14 +3545,22 @@ function petStart(p){return p.approved_at||p.at}
 function petDeadline(p){const d=new Date(petStart(p));d.setDate(d.getDate()+30);return d}
 function petDaysLeft(p){return Math.ceil((petDeadline(p)-new Date())/86400000)}
 async function rPetitionPage(){
-  app().innerHTML=`<div class="screen fade-in p3">
-    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">청원</div><button id="pt-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 청원</button></div>
-    <div class="vspace pet-hv"><div class="vspace-body"><div class="vspace-t">학교에 목소리를 더하다</div><div class="vspace-s">함께 동의하고, 함께 바꾸는 옥야</div></div></div>
+  app().innerHTML=`<div class="screen fade-in p3 pet2">
+    <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">청원</div><div style="width:34px"></div></div>
+    <section class="pet2-hero">
+      <div class="pet2-hero-main">
+        <div class="pet2-eyebrow">OKYA 청원</div>
+        <h1 class="pet2-title">학교를 바꾸는<br>학생들의 목소리</h1>
+        <p class="pet2-sub">모두의 동의가 모여 학교를 움직여요</p>
+        <button class="pet2-cta" id="pet-new2">＋ 청원 작성하기</button>
+      </div>
+      <div class="pet2-hero-visual" data-slot="PetitionGraphicSlot"><span class="pet2-hero-emoji">📢</span></div>
+    </section>
     <div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
   </div>${bnav()}`
   bindNav()
   document.getElementById('bk').onclick=pop
-  document.getElementById('pt-new').onclick=()=>push(rPetitionNew)
+  document.getElementById('pet-new2').onclick=()=>push(rPetitionNew)
   await iPetition()
 }
 // 청원 작성 위저드: ①기본 정보 → ②청원 작성 → ③미리보기·제출 (단계별 검증)
