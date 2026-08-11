@@ -114,6 +114,8 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 @media (prefers-reduced-motion:reduce){
   *{scroll-behavior:auto!important;}
   button:active,.pressable:active{transform:none;}
+  /* 장식적 등장 애니메이션 억제(피드백 모션은 JS에서 별도 가드) */
+  .mhero,.mhero .mmenu li,.pet-item,.pet-hero,.cfeed-row,.mother,.srow{animation:none!important;}
 }
 
 /* ── Layout ── */
