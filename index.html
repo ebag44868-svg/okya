@@ -45,7 +45,7 @@
   /* Spacing scale (Phase 1) — 페이지별 임의값 대신 이 스케일만 사용 */
   --sp-1:4px;  --sp-2:8px;   --sp-3:12px;  --sp-4:16px;  --sp-5:20px;
   --sp-6:24px; --sp-8:32px;  --sp-10:40px; --sp-12:48px; --sp-16:64px;
-  --page-x:16px;             /* 페이지 좌우 기본 여백 */
+  --page-x:20px;             /* 페이지 좌우 기본 여백(홈과 통일) */
 
   /* Shadow scale (restrained, native) */
   /* Shadow scale — Apple식 아주 옅고 넓게 확산(박스 경계 최소화) */
@@ -436,10 +436,10 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .h2-sec-flush{padding-left:0;padding-right:0;}
 .h2-grid{display:flex;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .h2-grid::-webkit-scrollbar{display:none;}
-.h2-sc{flex:0 0 auto;width:130px;aspect-ratio:1;position:relative;overflow:hidden;background-size:cover;background-position:center;display:block;scroll-snap-align:start;}
+.h2-sc{flex:0 0 auto;width:min(76vw,300px);aspect-ratio:1;position:relative;overflow:hidden;background-size:cover;background-position:center;display:block;scroll-snap-align:start;}
 .h2-sc::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.4),transparent 58%);}
-.h2-sc-emoji{position:absolute;top:12px;right:13px;font-size:29px;z-index:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,.25));}
-.h2-sc-l{position:absolute;left:14px;bottom:13px;z-index:1;font-size:14px;font-weight:800;color:#fff;letter-spacing:-.01em;text-shadow:0 1px 5px rgba(0,0,0,.32);}
+.h2-sc-emoji{position:absolute;top:18px;right:20px;font-size:50px;z-index:1;filter:drop-shadow(0 3px 12px rgba(0,0,0,.28));}
+.h2-sc-l{position:absolute;left:20px;bottom:18px;z-index:1;font-size:20px;font-weight:800;color:#fff;letter-spacing:-.02em;text-shadow:0 1px 6px rgba(0,0,0,.34);}
 .h2-sc:active{filter:brightness(.93);}
 .sc-0{background:linear-gradient(145deg,#6C5CE7,#A29BFE);}
 .sc-1{background:linear-gradient(145deg,#E84393,#FD79A8);}
@@ -491,7 +491,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
   .h2-menu{margin-top:auto;}
   .h2-sec{padding:36px 30px 2px;}
   .h2-slide{flex-basis:46%;max-width:560px;}
-  .h2-sc{width:172px;}
+  .h2-sc{width:360px;}
   .h2-today-cols{flex-direction:row;align-items:stretch;}
   .h2-today-cols>*{flex:1;}
 }
@@ -1052,7 +1052,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
   .p3 .money-stack{display:flex;flex-direction:column;gap:16px;width:100%;max-width:860px;margin:6px auto 0;}
   .p3 .money-stack>*{margin:0!important;}
   /* 푸시 상세 페이지: 넓은 화면에서 콘텐츠 폭 제한(가독성) + 중앙 정렬 */
-  .screen.p3>.phdr,.screen.p3>#cb,.screen.p3>.chal-detail,.screen.p3>.pw-steps,.screen.p3>.vspace,.screen.p3>.pet2-hero{max-width:940px;margin-left:auto;margin-right:auto;width:100%;}
+  .screen.p3>.phdr,.screen.p3>#cb,.screen.p3>.chal-detail,.screen.p3>.pw-steps,.screen.p3>.vspace,.screen.p3>.pet2-hero{max-width:1180px;margin-left:auto;margin-right:auto;width:100%;}
 }
 
 /* 가로 — 송금/내역 등 푸시 화면을 중앙 모달 카드로 */
@@ -1132,6 +1132,29 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .cbimg-ph svg{width:30px;height:30px;stroke:#c2c8d4;}
 .cbcap-t{font-size:16px;font-weight:800;color:var(--ink);}
 .cbcap-s{font-size:12.5px;color:var(--sub);margin-top:3px;}
+
+/* ── 커뮤니티 2.0: 리드 + 메인 배너 압도적 강조 + 이미지/내용 꽉 채움 ── */
+.comm2-lead{padding:2px 20px 14px;}
+.comm2-lead-t{font-size:25px;font-weight:900;letter-spacing:-.03em;color:var(--text-1);line-height:1.1;}
+.comm2-lead-s{font-size:13.5px;font-weight:600;color:var(--text-3);margin-top:5px;}
+/* 배너 사이즈 확대 */
+.cbtrack{height:678px;}
+.cbcard{width:min(520px,95%);height:648px;}
+/* 이미지/책 카드: 프레임 제거 → 카드 전체에 꽉 채우고 텍스트는 오버레이 */
+.cb-img{padding:0;}
+.cb-img .cbimg{position:absolute;inset:0;width:100%;max-width:none;aspect-ratio:auto;margin:0;border:none;border-radius:24px;background:linear-gradient(150deg,var(--primary-tint),#EBF0FF);}
+.cb-img .cbimg img{width:100%;height:100%;object-fit:cover;}
+.cb-img .cbimg-ph{display:none;}
+.cb-img .cbtag{position:absolute;top:18px;left:18px;z-index:2;background:rgba(255,255,255,.92);color:var(--primary);box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.cb-img .cbcap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:28px 24px 24px;background:linear-gradient(to top,rgba(10,12,24,.76),rgba(10,12,24,.14) 62%,transparent);}
+.cb-img .cbcap-t{color:#fff;font-size:23px;font-weight:900;letter-spacing:-.02em;line-height:1.2;}
+.cb-img .cbcap-s{color:rgba(255,255,255,.9);font-size:14px;margin-top:5px;}
+.cb-bookph{border-radius:24px;}
+@media (min-width:820px) and (min-aspect-ratio:1/1){
+  .cbtrack{height:800px;}
+  .cbcard{width:min(700px,62%);height:768px;}
+  .cb-img .cbcap-t{font-size:28px;}
+}
 .cbdots{display:flex;gap:6px;justify-content:center;margin-top:8px;}
 .cbdots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:width .25s var(--ease),background .25s;}
 .cbdots i.on{width:20px;border-radius:4px;background:var(--primary);}
@@ -2964,8 +2987,8 @@ async function rComm(){
     {id:'binding',  ic:'binding', tint:'sky', title:'옥야제본소',desc:'제본 신청'},
   ]
   app().innerHTML=`<div class="screen fade-in p3">
-    <div class="topbar"><div class="t">커뮤</div><div style="width:34px"></div></div>
-    <div class="sec" style="margin:2px 18px 10px">최근 소식</div>
+    <div class="topbar"><div class="t">커뮤니티</div><div style="width:34px"></div></div>
+    <div class="comm2-lead"><div class="comm2-lead-t">옥야의 오늘 이야기</div><div class="comm2-lead-s">지금 학교에서 일어나는 소식</div></div>
     <div class="cbanner">
       <div class="cbtrack" id="cbtrack"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
       <div class="cbdots" id="cbdots"></div>
