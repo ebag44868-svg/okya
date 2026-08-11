@@ -442,6 +442,16 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .txd-k{font-size:13px;color:var(--text-3);font-weight:600;flex:none;}
 .txd-v{font-size:14px;color:var(--text-1);font-weight:600;text-align:right;word-break:break-all;}
 
+/* ── Phase 5: 급식 평점 ── */
+.mrate{margin:12px 18px 2px;background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:15px 16px;text-align:center;animation:slideUp .3s var(--ease-out) both;}
+.mrate-q{font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:11px;}
+.mrate-emos{display:flex;justify-content:center;gap:9px;}
+.mrate-emo{width:52px;height:52px;border-radius:16px;background:var(--surface-2);font-size:26px;display:flex;align-items:center;justify-content:center;transition:transform var(--dur-micro) var(--ease-spring),background var(--dur-micro) ease;}
+.mrate-emo:active{transform:scale(1.2);background:var(--accent-soft);}
+.mrate-emo:disabled{opacity:.4;}
+.mrate-sub{font-size:12px;color:var(--text-3);margin-top:11px;font-weight:600;}
+.mrate-star{font-size:25px;font-weight:900;color:#E0930F;letter-spacing:-.02em;}
+
 /* list row */
 .p3 .lrow{display:flex;align-items:center;gap:12px;padding:11px 0;}
 .p3 .lrow+.lrow{border-top:1px solid var(--line);}
@@ -1989,11 +1999,33 @@ function schoolFoodSlide(el){
     el.innerHTML=`<div class="sc-inner">
       <div style="margin:6px 18px 4px">${calGrid(vy,vm,{today,sel,avail,nav:true,clickable:true})}</div>
       <div class="pcard"><div class="sec" style="margin-bottom:10px">${vm+1}월 ${sel}일 (${dw}) 급식</div>${mealCardsHTML(mealsOf(dk))}</div>
+      <div id="meal-rate"></div>
     </div>`
     el.querySelectorAll('[data-mcnav]').forEach(b=>b.onclick=()=>{vm+=(+b.dataset.mcnav);if(vm<0){vm=11;vy--}if(vm>11){vm=0;vy++}draw()})
     el.querySelectorAll('[data-day]').forEach(c=>c.onclick=()=>{sel=+c.dataset.day;draw()})
+    renderMealRate(dk)
   }
   draw()
+}
+// 급식 평점: 오늘/지난 급식을 이모지로 평가 → 평균 ★. 하루 1회, 테이블 없으면 조용히 숨김
+const MEAL_EMOJI=[['😍',5],['🙂',4],['😐',3],['😕',2]]
+async function renderMealRate(dateKey){
+  const box=document.getElementById('meal-rate');if(!box)return
+  if(!mealsOf(dateKey)||dateKey>todayKey()){box.innerHTML='';return}
+  let rows=null
+  try{const r=await wt(sb.from('okya_meal_ratings').select('*').eq('date',dateKey),5000);rows=r.data||[]}catch{box.innerHTML='';return}
+  if(rows===null){box.innerHTML='';return}
+  const cur=document.getElementById('meal-rate');if(!cur)return
+  const mine=rows.find(x=>x.uid===SESSION.id)
+  const avg=rows.length?rows.reduce((s,x)=>s+(x.score||0),0)/rows.length:0
+  if(mine){cur.innerHTML=`<div class="mrate"><div class="mrate-star">★ ${avg.toFixed(1)}</div><div class="mrate-sub">${rows.length}명 평가 · 내 평가 완료</div></div>`;return}
+  cur.innerHTML=`<div class="mrate"><div class="mrate-q">이 급식은 어땠나요?</div><div class="mrate-emos">${MEAL_EMOJI.map(([e,s])=>`<button class="mrate-emo" data-score="${s}">${e}</button>`).join('')}</div>${rows.length?`<div class="mrate-sub">현재 ★ ${avg.toFixed(1)} · ${rows.length}명</div>`:''}</div>`
+  cur.querySelectorAll('[data-score]').forEach(b=>b.onclick=async()=>{
+    cur.querySelectorAll('[data-score]').forEach(x=>x.disabled=true)
+    const{error}=await wt(sb.from('okya_meal_ratings').insert({id:uid('mr'),date:dateKey,uid:SESSION.id,score:+b.dataset.score,at:nowISO()})).catch(e=>({error:e}))
+    if(error){toast('평가 실패 · okya_meal_ratings 테이블이 필요해요','error');cur.querySelectorAll('[data-score]').forEach(x=>x.disabled=false);return}
+    popMsg('평가 완료','⭐');renderMealRate(dateKey)
+  })
 }
 // 학사일정 고정 일정(전국 공통 일정 위주 · 학교 세부일정은 확인 후 보정)
 const SCHOOL_FIXED=[
