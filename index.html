@@ -448,16 +448,14 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .mrate-rows{display:flex;flex-direction:column;gap:11px;}
 .mrate-row{display:flex;align-items:center;gap:10px;}
 .mrate-slot{width:32px;font-size:13px;font-weight:800;color:var(--text-2);flex-shrink:0;}
-.mrate-stars{display:inline-flex;gap:3px;flex:1;align-items:center;}
-.star-slot{position:relative;width:26px;height:28px;flex-shrink:0;}
+.mrate-q .mrate-hint{font-size:11px;font-weight:600;color:var(--text-3);margin-left:6px;}
+.mrate-stars{display:inline-flex;gap:3px;flex:1;align-items:center;touch-action:none;cursor:pointer;user-select:none;-webkit-user-select:none;}
+.star-slot{position:relative;width:26px;height:28px;flex-shrink:0;pointer-events:none;}
 .star-bg,.star-clip,.star-fg{position:absolute;top:0;left:0;height:100%;font-size:25px;line-height:28px;pointer-events:none;}
 .star-bg{width:26px;text-align:center;color:#C9CDD6;}
 .star-clip{overflow:hidden;transition:width var(--dur-micro) var(--ease-out);}
+.mrate-stars.dragging .star-clip{transition:none;}
 .star-fg{width:26px;text-align:center;color:#F0A81E;}
-.star-half,.star-full2{position:absolute;top:0;height:100%;width:50%;z-index:3;cursor:pointer;}
-.star-half{left:0;}
-.star-full2{right:0;}
-.mrate-stars.locked .star-half,.mrate-stars.locked .star-full2{pointer-events:none;cursor:default;}
 .mrate-avg{font-size:12px;font-weight:800;color:#E0930F;flex-shrink:0;min-width:56px;text-align:right;letter-spacing:-.01em;}
 .mrate-avg.none{color:var(--text-3);font-weight:600;}
 
@@ -2028,25 +2026,40 @@ async function renderMealRate(dateKey){
   try{const r=await wt(sb.from('okya_meal_ratings').select('*').like('date',dateKey+'#%'),5000);rows=r.data}catch{box.innerHTML='';return}
   if(rows===null){box.innerHTML='';return}
   const cur=document.getElementById('meal-rate');if(!cur)return
-  // score는 반개 단위 정수(1~10). 별 개수 = score/2
-  const starsHTML=(val,key,locked)=>[1,2,3,4,5].map(i=>{
+  // score는 반개 단위 정수(1~10). 별 개수 = score/2. 슬롯별 사용자당 1행(고정 id)이라 밀 때마다 덮어씀(재평가)
+  const starsHTML=val=>[1,2,3,4,5].map(i=>{
     const f=val>=i?1:(val>=i-0.5?0.5:0)
-    return`<span class="star-slot"><span class="star-bg">☆</span><span class="star-clip" style="width:${f*100}%"><span class="star-fg">★</span></span>${locked?'':`<span class="star-half" data-key="${key}" data-sc="${(i*2)-1}"></span><span class="star-full2" data-key="${key}" data-sc="${i*2}"></span>`}</span>`
+    return`<span class="star-slot"><span class="star-bg">☆</span><span class="star-clip" style="width:${f*100}%"><span class="star-fg">★</span></span></span>`
   }).join('')
-  cur.innerHTML=`<div class="mrate"><div class="mrate-q">오늘 급식 어땠어?</div><div class="mrate-rows">${slots.map(k=>{
+  cur.innerHTML=`<div class="mrate"><div class="mrate-q">오늘 급식 어땠어?<span class="mrate-hint">별 위를 밀어서 평가</span></div><div class="mrate-rows">${slots.map(k=>{
     const key=dateKey+'#'+k
     const rs=rows.filter(x=>x.date===key)
     const mine=rs.find(x=>x.uid===SESSION.id)
     const avgHalf=rs.length?rs.reduce((s,x)=>s+(x.score||0),0)/rs.length:0
     const myVal=mine?mine.score/2:0
-    return`<div class="mrate-row"><span class="mrate-slot">${k}</span><span class="mrate-stars${mine?' locked':''}">${starsHTML(myVal,key,!!mine)}</span><span class="mrate-avg${rs.length?'':' none'}">${rs.length?`★ ${(avgHalf/2).toFixed(1)}·${rs.length}`:'첫 평가'}</span></div>`
+    return`<div class="mrate-row"><span class="mrate-slot">${k}</span><span class="mrate-stars" data-key="${key}">${starsHTML(myVal)}</span><span class="mrate-avg${rs.length?'':' none'}" data-avg="${key}">${rs.length?`★ ${(avgHalf/2).toFixed(1)}·${rs.length}`:'첫 평가'}</span></div>`
   }).join('')}</div></div>`
-  cur.querySelectorAll('.star-half,.star-full2').forEach(z=>z.onclick=async()=>{
-    const key=z.dataset.key,score=+z.dataset.sc
-    const row=z.closest('.mrate-stars');if(row)row.classList.add('locked')
-    const{error}=await wt(sb.from('okya_meal_ratings').insert({id:uid('mr'),date:key,uid:SESSION.id,score,at:nowISO()})).catch(e=>({error:e}))
-    if(error){toast('평가 실패 · okya_meal_ratings 테이블이 필요해요','error');if(row)row.classList.remove('locked');return}
-    popMsg('평가 완료','⭐');renderMealRate(dateKey)
+  // 별 위 드래그(포인터) → 반개 단위 실시간 채움, 손 떼면 저장
+  const paint=(el,val)=>el.querySelectorAll('.star-slot').forEach((s,idx)=>{const i=idx+1,f=val>=i?1:(val>=i-0.5?0.5:0);const c=s.querySelector('.star-clip');if(c)c.style.width=(f*100)+'%'})
+  cur.querySelectorAll('.mrate-stars').forEach(el=>{
+    const key=el.dataset.key
+    const valFromX=cx=>{const r=el.getBoundingClientRect();return Math.max(0.5,Math.min(5,Math.ceil((cx-r.left)/r.width*10)/2))}
+    let dragging=false,pending=0
+    const move=e=>{pending=valFromX(e.clientX);paint(el,pending)}
+    el.addEventListener('pointerdown',e=>{e.preventDefault();dragging=true;el.classList.add('dragging');try{el.setPointerCapture(e.pointerId)}catch{}move(e)})
+    el.addEventListener('pointermove',e=>{if(dragging)move(e)})
+    const end=async e=>{
+      if(!dragging)return
+      dragging=false;el.classList.remove('dragging');try{el.releasePointerCapture(e.pointerId)}catch{}
+      const score=Math.round(pending*2)
+      // 내 기존 평가(랜덤 id 포함) 제거 후 재삽입 → 슬롯당 1행 보장, 재평가 가능
+      await wt(sb.from('okya_meal_ratings').delete().eq('date',key).eq('uid',SESSION.id)).catch(()=>{})
+      const{error}=await wt(sb.from('okya_meal_ratings').insert({id:'mr_'+key+'_'+SESSION.id,date:key,uid:SESSION.id,score,at:nowISO()})).catch(er=>({error:er}))
+      if(error){toast('평가 저장 실패 · 다시 시도해줘','error');return}
+      popMsg('평가 완료','⭐');renderMealRate(dateKey)
+    }
+    el.addEventListener('pointerup',end)
+    el.addEventListener('pointercancel',end)
   })
 }
 // 학사일정 고정 일정(전국 공통 일정 위주 · 학교 세부일정은 확인 후 보정)
