@@ -431,6 +431,17 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .ts-dd{color:var(--accent);font-weight:800;font-variant-numeric:tabular-nums;margin-left:2px;}
 .ts-div{width:1px;height:26px;background:var(--divider);flex:none;}
 
+/* ── Phase 4: 거래 상세 시트 ── */
+.lrow-tap{cursor:pointer;border-radius:12px;transition:background var(--dur-micro) ease;margin:0 -8px;padding-left:8px;padding-right:8px;}
+.lrow-tap:active{background:var(--surface-2);}
+.txd-amt{text-align:center;font-size:36px;padding:8px 0 18px;}
+.txd-amt.pos{color:#2FBF71;}
+.txd-amt.neg{color:var(--text-1);}
+.txd-rows{border-top:1px solid var(--divider);}
+.txd-row{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--divider);}
+.txd-k{font-size:13px;color:var(--text-3);font-weight:600;flex:none;}
+.txd-v{font-size:14px;color:var(--text-1);font-weight:600;text-align:right;word-break:break-all;}
+
 /* list row */
 .p3 .lrow{display:flex;align-items:center;gap:12px;padding:11px 0;}
 .p3 .lrow+.lrow{border-top:1px solid var(--line);}
@@ -1677,7 +1688,7 @@ function txRow(t,admin,bal){
   const title=admin?(t.type==='회수'?nameOf(t.from):nameOf(t.to)):(t.reason||t.type)
   const sub=admin?(t.type+' · '+fmtDate(t.at)):((t.to===SESSION.id?nameOf(t.from):'→ '+nameOf(t.to))+' · '+fmtDate(t.at))
   const balHTML=(!admin&&bal!=null)?`<div class="trbal">잔액 ${fmt(bal)}옥</div>`:''
-  return`<div class="lrow"><div class="chip ti-${tint}">${icon}</div><div class="body"><div class="ti">${esc(title)}</div><div class="su">${esc(sub)}</div></div><div class="tramt"><div class="tr ${inc?'pos':'neg'}">${inc?'+':'−'}${fmt(t.amount)}옥</div>${balHTML}</div></div>`
+  return`<div class="lrow lrow-tap" data-txid="${t.id}"><div class="chip ti-${tint}">${icon}</div><div class="body"><div class="ti">${esc(title)}</div><div class="su">${esc(sub)}</div></div><div class="tramt"><div class="tr ${inc?'pos':'neg'}">${inc?'+':'−'}${fmt(t.amount)}옥</div>${balHTML}</div></div>`
 }
 function fmtFull(iso){if(!iso)return'';const d=new Date(iso);const w=['일','월','화','수','목','금','토'][d.getDay()];return`${d.getMonth()+1}월 ${d.getDate()}일 ${w}요일`}
 
@@ -1702,7 +1713,7 @@ async function rMoney(){
     <div class="money-stack">
       <div class="balance">
         <div class="lbl">${admin?'학생회 총 발행량':'총 잔액'}</div>
-        <div class="amt">${fmt(admin?issued:bal)}<small>옥</small></div>
+        <div class="amt"><span id="mbalnum">0</span><small>옥</small></div>
         ${admin?'':`<div style="display:flex;gap:16px;font-size:12px;opacity:.92;margin-top:6px"><span>이번 달 <b style="font-weight:800">+${fmt(gotM)}</b> 받음</span><span><b style="font-weight:800">-${fmt(useM)}</b> 사용</span></div>`}
         <div class="bbtns" style="margin-top:14px">
           <button class="bbtn" id="m-act">${I.send}${admin?'발행':'송금'}</button>
@@ -1722,6 +1733,21 @@ async function rMoney(){
   if(admin)document.getElementById('m-recall').onclick=()=>push(()=>fTransfer('회수'))
   document.getElementById('m-hist').onclick=()=>push(()=>rHistory())
   document.getElementById('m-all').onclick=()=>push(()=>rHistory())
+  countUp(document.getElementById('mbalnum'),admin?issued:bal)
+  wireTxRows(list)
+}
+// 거래 행 탭 → 상세 바텀시트
+function wireTxRows(list){document.querySelectorAll('.lrow-tap[data-txid]').forEach(el=>el.onclick=()=>{const t=(list||[]).find(x=>x.id===el.dataset.txid);if(t)txDetailSheet(t)})}
+function txDetailSheet(t){
+  const admin=SESSION.role==='admin'
+  const inc=admin?(t.type!=='회수'):(t.to===SESSION.id)
+  const other=t.to===SESSION.id?nameOf(t.from):nameOf(t.to)
+  const d=new Date(t.at),w=['일','월','화','수','목','금','토'][d.getDay()]
+  const dstr=`${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()} (${w}) ${d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`
+  const rows=[['종류',t.type],[t.type==='회수'?'회수 대상':(t.to===SESSION.id?'보낸 사람':'받는 사람'),other],t.reason?['메모',t.reason]:null,['일시',dstr],['거래번호',t.id]].filter(Boolean)
+  openSheet({title:'거래 상세',body:`
+    <div class="txd-amt ${inc?'pos':'neg'}"><span class="t-num">${inc?'+':'−'}${fmt(t.amount)}<span class="unit">옥</span></span></div>
+    <div class="txd-rows">${rows.map(([k,v])=>`<div class="txd-row"><span class="txd-k">${esc(k)}</span><span class="txd-v">${esc(v)}</span></div>`).join('')}</div>`})
 }
 
 // 내역 화면 (preview 6): 필터 태그 + 날짜별 그룹
@@ -1747,6 +1773,7 @@ async function rHistory(){
     fl.forEach(t=>{const d=(t.at||'').slice(0,10);(groups[d]=groups[d]||[]).push(t)})
     const keys=Object.keys(groups).sort().reverse()
     document.getElementById('hist-body').innerHTML=keys.length?keys.map(d=>`<div class="datehd">${fmtFull(d)}</div><div class="pcard" style="margin-top:2px">${groups[d].map(t=>txRow(t,admin,rbal[t.id])).join('')}</div>`).join(''):'<div class="empty">내역이 없어요.</div>'
+    wireTxRows(fl)
   }
   document.querySelectorAll('#hist-tags [data-f]').forEach(el=>el.onclick=()=>{cur=el.dataset.f;document.querySelectorAll('#hist-tags [data-f]').forEach(x=>x.className='tag '+(x.dataset.f===cur?'b':'off'));render()})
   render()
@@ -1891,7 +1918,7 @@ function fTransferConfirm(mode,toUser,amount,reason,myBal){
   ov.querySelector('#tf-cc').onclick=closeSheet
   ov.querySelector('#tf-ok').onclick=async()=>{
     const btn=ov.querySelector('#tf-ok')
-    btn.disabled=true;btn.textContent='처리 중...'
+    btn.disabled=true;btn.textContent=mode==='발행'?'발행 중…':(mode==='회수'?'회수 중…':'보내는 중…')
     const ok=await addTx(mode==='회수'
       ?{from:toUser.id,to:'u_council',amount,type:'회수',reason}
       :{from:mode==='발행'?'u_council':SESSION.id,to:toUser.id,amount,type:mode==='발행'?'발행':'송금',reason})
