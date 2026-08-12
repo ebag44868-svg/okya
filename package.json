@@ -4,6 +4,7 @@
   "private": true,
   "description": "옥야앱 (OKSS) — 창녕옥야고 학생회 앱. 빌드 스텝 없는 정적 SPA(단일 진입 index.html + css/ + js/). Supabase 백엔드.",
   "scripts": {
+    "dev": "python -m http.server 5173",
     "start": "python -m http.server 5173",
     "serve": "npx serve ."
   },
