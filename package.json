@@ -10,7 +10,8 @@
     "copy": "node scripts/copy-web.cjs",
     "sync": "node scripts/copy-web.cjs && cap sync",
     "cap:android": "cap open android",
-    "cap:ios": "cap open ios"
+    "cap:ios": "cap open ios",
+    "run:android": "cap run android"
   },
   "keywords": [
     "okss",
