@@ -1252,7 +1252,8 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 }
 
 /* ===== 챌린지: 포스터 갤러리 + 공모전형 상세(전체화면) ===== */
-.chal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:4px 18px 10px;}
+.chal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:8px 20px 10px;justify-content:start;}
+@media (min-width:820px) and (min-aspect-ratio:1/1){.chal-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));}}
 .chal-card{cursor:pointer;}
 .chal-card:active{transform:scale(.98);}
 .chal-poster{aspect-ratio:3/4;border-radius:16px;overflow:hidden;background:var(--soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;box-shadow:var(--sh);transition:transform .18s var(--ease),box-shadow .18s;}
@@ -1369,21 +1370,25 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .pet2-cta:active{transform:scale(.97);}
 .pet2-hero-visual{margin-top:20px;min-height:148px;border-radius:var(--radius-xl);background:linear-gradient(140deg,#ECE9FF 0%,#F3ECFF 45%,#FDE9F5 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;background-size:cover;background-position:center;position:relative;}
 .pet2-hero-emoji{font-size:62px;opacity:.92;filter:drop-shadow(0 8px 20px rgba(0,0,0,.12));}
-/* 세부탭 공용 2.0 히어로(챌린지/책/제본) */
-.feat-hero{padding:6px 20px 4px;display:flex;flex-direction:column;}
-.feat-eyebrow{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.02em;}
-.feat-title{font-size:30px;font-weight:900;letter-spacing:-.03em;line-height:1.1;color:var(--text-1);margin-top:8px;}
-.feat-sub{font-size:14px;font-weight:600;color:var(--text-3);margin-top:10px;}
-.feat-hero-visual{margin-top:16px;min-height:120px;border-radius:var(--radius-xl);background:linear-gradient(140deg,#EAE7FF,#F3ECFF 55%,#FDE9F5);display:flex;align-items:center;justify-content:center;overflow:hidden;background-size:cover;background-position:center;}
-.feat-emoji{font-size:54px;opacity:.9;filter:drop-shadow(0 8px 18px rgba(0,0,0,.12));}
-/* 세부탭 폼 2.0: 무거운 카드 → 플랫 필드 그룹(입력 인풋은 그대로) */
-.form2>.pcard{background:none;box-shadow:none;border-radius:0;padding:6px 20px 4px;margin:0;}
-.form2>.pcard+.pcard{border-top:1px solid var(--divider);margin-top:10px;padding-top:16px;}
+/* 세부탭 색상 토큰(이미지 대신 색으로 구별) */
+.tone-chal{--tone:#EA5A2B;--tone-d:#D2481E;--tone-soft:#FFF2EC;--tone-grad:linear-gradient(120deg,#FF7A45 0%,#FF5C7A 100%);}
+.tone-book{--tone:#0E9E86;--tone-d:#0B8271;--tone-soft:#E7F7F2;--tone-grad:linear-gradient(120deg,#16C79A 0%,#12A6B8 100%);}
+.tone-print{--tone:#5B6CFF;--tone-d:#4A55E0;--tone-soft:#EEF0FF;--tone-grad:linear-gradient(120deg,#6C7BFF 0%,#9B6CFF 100%);}
+/* 세부탭 헤더: 제목행 전체를 탭 색 밴드로 */
+.feat-hero{margin:6px 0 0;padding:24px 20px 22px;background:var(--tone-grad,var(--grad));color:#fff;}
+.feat-title{font-size:28px;font-weight:900;letter-spacing:-.03em;line-height:1.14;color:#fff;}
+.feat-sub{font-size:14px;font-weight:600;color:rgba(255,255,255,.92);margin-top:8px;}
+/* 세부탭 폼: 동계열 옅은 그룹 배경 */
+.form2>.pcard{background:var(--tone-soft,var(--surface-2));box-shadow:none;border-radius:var(--radius-lg);padding:16px 16px 6px;margin:14px 20px 0;}
+.form2>.pcard+.pcard{margin-top:12px;padding-top:16px;border-top:none;}
 @media (min-width:820px) and (min-aspect-ratio:1/1){
-  .feat-hero{flex-direction:row;align-items:stretch;gap:30px;padding:12px 30px 6px;}
-  .feat-hero-main{flex:1 1 60%;display:flex;flex-direction:column;justify-content:center;}
-  .feat-hero-visual{flex:1 1 40%;margin-top:0;min-height:186px;}
-  .feat-title{font-size:40px;}
+  .feat-hero{padding:32px 30px 28px;}
+  .feat-title{font-size:38px;}
+}
+/* 상세/폼 2.0: 버튼·입력이 가로로 늘어나지 않게 → 버튼 느낌 + 왼쪽 읽기 컬럼 */
+.chal-detail .pbtn{max-width:420px;}
+@media (min-width:820px) and (min-aspect-ratio:1/1){
+  .chal-detail{max-width:720px;margin-right:auto;}
 }
 @media (min-width:820px) and (min-aspect-ratio:1/1){
   .pet2-hero{flex-direction:row;align-items:stretch;gap:32px;padding:12px 30px 6px;}
@@ -1459,7 +1464,8 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .book-help b{color:var(--primary);font-weight:800;}
 .p3 .upload.book-up.has{padding:16px;border-style:solid;border-color:var(--line);background:var(--soft);}
 .p3 .upload.book-up.has img{width:auto;max-width:150px;max-height:206px;aspect-ratio:3/4.1;object-fit:cover;margin:0 auto;border-radius:6px;box-shadow:0 5px 14px rgba(0,0,0,.16);}
-.book-shelf{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 16px;padding:10px 18px 10px;}
+.book-shelf{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 16px;padding:12px 20px 10px;justify-content:start;}
+@media (min-width:820px) and (min-aspect-ratio:1/1){.book-shelf{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));}}
 .book-item{cursor:pointer;animation:petrise .45s var(--ease) both;}
 .book-item:active{transform:scale(.97);}
 .book-cover{position:relative;aspect-ratio:3/4.1;border-radius:3px 9px 9px 3px;overflow:hidden;background:var(--soft);box-shadow:0 6px 16px rgba(20,26,40,.18),0 1px 3px rgba(0,0,0,.1);border:1px solid rgba(0,0,0,.05);transition:transform .22s var(--ease),box-shadow .22s;}
@@ -2945,7 +2951,7 @@ function prSteps(si){return`<div class="pet-steps pr-steps">${PR_STATUS.map((s,i
 function printCover(p){const si=Math.max(0,PR_STATUS.indexOf(p.status||'접수'));const grad=BOOK_COVERS[((p.title||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0)+3)%BOOK_COVERS.length];return`<div class="book-cover"${p.file?'':` style="background:${grad}"`}>${p.file?`<img src="${esc(p.file)}">`:`<div class="bc-title">${esc(p.title||'')}</div>`}<span class="book-badge pr-badge s${si}">${PR_STATUS[si]}</span></div>`}
 async function rPrint(){
   const admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야제본소</div>${admin?'<div style="width:34px"></div>':`<button id="pr-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 신청</button>`}</div>${featHero('🖨️','옥야제본소','인쇄물을 가져오면 학생회가 제본해 드려요','linear-gradient(140deg,#DDE7FF,#E6E0FF 55%,#F0E4FF)')}<div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
+  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야제본소</div>${admin?'<div style="width:34px"></div>':`<button id="pr-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 신청</button>`}</div>${featHero('🖨️','옥야제본소','인쇄물을 가져오면 학생회가 제본해 드려요','print')}<div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
   bindNav()
   document.getElementById('bk').onclick=pop
   const nb=document.getElementById('pr-new');if(nb)nb.onclick=()=>push(rPrintNew)
@@ -3005,7 +3011,7 @@ function rPrintNew(){
   let file=null,bind='spring'
   const calc=()=>{const copies=parseInt((document.getElementById('pr-copies')||{}).value,10)||1;const c=printCost(copies,bind);const el=document.getElementById('pr-cost');if(el)el.textContent=fmt(c)+'옥';return c}
   app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">제본 신청</div><div style="width:34px"></div></div>
-    <div class="chal-detail form2">
+    <div class="chal-detail form2 tone-print">
       <div class="pcard">
         <div class="field"><label>제목</label><input id="pr-title" placeholder="예: 미적분 오답노트"></div>
         <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>장수 (선택)</label><input id="pr-pages" type="number" inputmode="numeric" placeholder="24"></div><div class="field" style="flex:1"><label>부수</label><input id="pr-copies" type="number" inputmode="numeric" value="1"></div></div>
@@ -3502,18 +3508,15 @@ async function rDmChat(userId){
 
 const _cbPage=(title)=>{app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${title}</div><div style="width:34px"></div></div><div id="cb"><div class="loader" style="min-height:160px"><div class="spin"></div></div></div></div>`;document.getElementById('bk').onclick=pop}
 // ===== 챌린지 (전체화면 포스터 갤러리 → 공모전형 상세 → 인증 → 전원 지급) =====
-// 세부탭 2.0 공용 히어로(대형 타이포 + 이미지 슬롯). grad 지정 시 비주얼 배경 교체 가능
-function featHero(emoji,title,sub,grad){
-  return`<section class="feat-hero">
-    <div class="feat-hero-main"><div class="feat-eyebrow">OKYA</div><h1 class="feat-title">${title}</h1><p class="feat-sub">${sub}</p></div>
-    <div class="feat-hero-visual"${grad?` style="background:${grad}"`:''}><span class="feat-emoji">${emoji}</span></div>
-  </section>`
+// 세부탭 2.0 공용 헤더: 이미지 대신 탭별 색 밴드(제목행 전체를 색으로)
+function featHero(emoji,title,sub,tone){
+  return`<section class="feat-hero tone-${tone||'chal'}"><h1 class="feat-title">${emoji} ${title}</h1><p class="feat-sub">${sub}</p></section>`
 }
 async function rChallengePage(){
   const admin=SESSION.role==='admin'
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지</div>${admin?`<button id="ch-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 발행</button>`:`<div style="width:34px"></div>`}</div>
-    ${featHero('🔥','챌린지','참여하고 인증하면 옥야머니를 받아요','linear-gradient(140deg,#FFE3D0,#FFD1C2 55%,#FFE0EC)')}
+    ${featHero('🔥','챌린지','참여하고 인증하면 옥야머니를 받아요','chal')}
     <div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
   </div>${bnav()}`
   bindNav()
@@ -3534,7 +3537,7 @@ function rChallengeNew(){
   let posterFile=null
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">새 챌린지</div><div style="width:34px"></div></div>
-    <div class="chal-detail form2">
+    <div class="chal-detail form2 tone-chal">
       <div class="pcard">
         <div class="field"><label>포스터(팜플렛)</label>
           <label for="cnf" class="upload" id="cnfl">${I.image}<span>포스터 이미지 추가</span></label>
@@ -3630,7 +3633,7 @@ function bookCoverEl(b,big){const badge=b.status==='matched'?'<span class="book-
 async function rBookPage(){
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">책 교환</div><button id="bk-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 등록</button></div>
-    ${featHero('📚','책 교환','교재를 나누고 필요한 책과 교환해요','linear-gradient(140deg,#D6F5E6,#CFEFF0 55%,#D9ECFF)')}
+    ${featHero('📚','책 교환','교재를 나누고 필요한 책과 교환해요','book')}
     <div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
   </div>${bnav()}`
   bindNav()
@@ -3642,7 +3645,7 @@ function rBookNew(){
   let photoFile=null
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">책 등록</div><div style="width:34px"></div></div>
-    <div class="chal-detail form2">
+    <div class="chal-detail form2 tone-book">
       <div class="pcard">
         <div class="field"><label>교재명</label><input id="bt" placeholder="예: 통합사회1 (비상)"></div>
         <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>학년</label><select id="bg"><option>1학년</option><option>2학년</option><option>3학년</option></select></div><div class="field" style="flex:1"><label>구분</label><select id="bk2"><option>나눔</option><option>교환</option></select></div></div>
@@ -3927,7 +3930,7 @@ async function rVerify(eid){
   if(!e){toast('챌린지를 찾을 수 없어요');return}
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지 인증</div><div style="width:34px"></div></div>
-    <div class="chal-detail form2">
+    <div class="chal-detail form2 tone-chal">
     <div class="pcard"><div style="display:flex;gap:10px;align-items:center"><div class="chip ti-org">${I.star}</div><div style="flex:1"><div class="ti">${esc(e.title)}</div><div class="su">보상 ${fmt(e.reward)}옥 · ${fmtDate(e.deadline)}</div></div></div></div>
     <div class="pcard">
       <div class="field"><label>참여 학생 이름</label><input id="vn" placeholder="예: 박은찬, 김옥야"></div>
