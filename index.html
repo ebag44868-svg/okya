@@ -1056,6 +1056,30 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .p3 [data-day]{transition:transform .13s var(--ease),background .2s,color .2s;}
 .p3 [data-day]:active{transform:scale(.88);}
 
+/* ===== 오버레이 시스템 (알림=우측상단 / 내역=중앙 카드, 뒤 화면 유지) ===== */
+.ov-backdrop{position:fixed;inset:0;background:rgba(20,22,30,.14);opacity:0;transition:opacity .22s var(--ease-out);z-index:200;}
+.ov-backdrop.in{opacity:1;}
+.ov-panel{position:fixed;background:var(--card);border-radius:20px;box-shadow:0 18px 60px rgba(0,0,0,.22),0 4px 14px rgba(0,0,0,.10);border:1px solid var(--line);opacity:0;transition:opacity .24s var(--ease-out),transform .28s var(--ease-out);z-index:201;display:flex;flex-direction:column;overflow:hidden;}
+.ov-panel.in{opacity:1;}
+.ov-tr{top:60px;right:16px;width:min(360px,calc(100vw - 24px));max-height:min(560px,calc(100dvh - 90px));transform-origin:top right;transform:translateY(-10px) scale(.97);}
+.ov-tr.in{transform:none;}
+.ov-center{top:50%;left:50%;width:min(460px,calc(100vw - 28px));max-height:min(640px,calc(100dvh - 80px));transform-origin:center;transform:translate(-50%,-50%) scale(.96);}
+.ov-center.in{transform:translate(-50%,-50%);}
+.ov-head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 16px 12px 18px;border-bottom:1px solid var(--line);}
+.ov-head .ov-t{font-size:16px;font-weight:800;color:var(--ink);}
+.ov-head .ov-x{width:30px;height:30px;border-radius:9px;background:var(--soft);border:none;cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center;font-size:15px;flex:none;transition:background .15s,transform .12s var(--ease);}
+.ov-head .ov-x:active{transform:scale(.9);}
+.ov-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 0 10px;min-height:0;}
+.ov-cats{flex:none;display:flex;flex-wrap:wrap;gap:7px;padding:11px 16px;border-bottom:1px solid var(--line);}
+.ov-cat{border:1.5px solid var(--line);background:var(--card);color:var(--ink2);font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:20px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s,color .15s,border-color .15s,transform .12s var(--ease);}
+.ov-cat:active{transform:scale(.94);}
+.ov-cat.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+.ov-datebar{flex:none;display:flex;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid var(--line);background:var(--soft);}
+.ov-datebar input[type=date]{flex:1;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--ink);border:1.5px solid var(--line);border-radius:11px;padding:7px 11px;background:var(--card);}
+.ov-datebar .ov-dclear{font-size:12px;font-weight:700;color:var(--primary);background:none;border:none;cursor:pointer;white-space:nowrap;}
+@media (prefers-reduced-motion:reduce){.ov-backdrop,.ov-panel{transition:none!important;}.ov-tr{transform:none!important;}.ov-center{transform:translate(-50%,-50%)!important;}}
+@media (min-width:820px) and (min-aspect-ratio:1/1){.ov-tr{top:20px;right:26px;}}
+
 /* ===== 알림 벨 배지 & 알림센터 ===== */
 [data-bell]{position:relative;}
 .nbadge{position:absolute;top:-6px;right:-9px;min-width:13px;height:13px;padding:0 3px;border-radius:99px;background:#FF4D4F;color:#fff;font-size:8.5px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1.5px var(--card);animation:badgePop .4s var(--ease) both;z-index:5;}
@@ -1821,7 +1845,7 @@ function updateAppBadge(){try{const c=unreadCount();if('setAppBadge'in navigator
 async function markNotifsRead(){const uns=NOTIFS.filter(n=>!n.read);if(!uns.length){updateAppBadge();return}uns.forEach(n=>n.read=true);updateAppBadge();try{await wt(sb.from('okya_notifications').update({read:true}).eq('user_id',SESSION.id).eq('read',false),5000)}catch{}}
 // 벨 버튼([data-bell])에 클릭·배지 반영
 function wireBell(){updateAppBadge();document.querySelectorAll('[data-bell]').forEach(b=>{
-  b.onclick=()=>push(()=>rNotifications())
+  b.onclick=()=>{if(OK_OV)closeOverlay();else openNotifOverlay()}
   const old=b.querySelector('.nbadge');if(old)old.remove()
   const c=unreadCount();if(c>0){const s=document.createElement('span');s.className='nbadge';s.textContent=c>9?'9+':c;b.appendChild(s)}
 })}
@@ -2399,8 +2423,8 @@ async function rMoney(){
   bindNav()
   document.getElementById('m-act').onclick=()=>push(()=>fTransfer(admin?'발행':'송금'))
   if(admin)document.getElementById('m-recall').onclick=()=>push(()=>fTransfer('회수'))
-  document.getElementById('m-hist').onclick=()=>push(()=>rHistory())
-  document.getElementById('m-all').onclick=()=>push(()=>rHistory())
+  document.getElementById('m-hist').onclick=()=>openHistoryOverlay()
+  document.getElementById('m-all').onclick=()=>openHistoryOverlay()
   countUp(document.getElementById('mbalnum'),admin?issued:bal)
   wireTxRows(first.l)
   document.querySelectorAll('#m2-cats [data-cat]').forEach(b=>b.onclick=()=>{
@@ -2423,33 +2447,80 @@ function txDetailSheet(t){
     <div class="txd-rows">${rows.map(([k,v])=>`<div class="txd-row"><span class="txd-k">${esc(k)}</span><span class="txd-v">${esc(v)}</span></div>`).join('')}</div>`})
 }
 
-// 내역 화면 (preview 6): 필터 태그 + 날짜별 그룹
-async function rHistory(){
+// ── 오버레이 시스템: 뒤 화면 유지 + 한 번에 하나만 (알림=우측상단 / 내역=중앙) ──
+let OK_OV=null
+function openOverlay({variant,title,bodyHTML}){
+  closeOverlay()
+  const bd=document.createElement('div');bd.className='ov-backdrop'
+  const pn=document.createElement('div');pn.className='ov-panel '+(variant==='center'?'ov-center':'ov-tr')
+  pn.innerHTML=`<div class="ov-head"><span class="ov-t">${esc(title)}</span><button class="ov-x" aria-label="닫기">✕</button></div>${bodyHTML||''}`
+  document.body.appendChild(bd);document.body.appendChild(pn)
+  bd.onclick=closeOverlay
+  pn.querySelector('.ov-x').onclick=closeOverlay
+  const onKey=e=>{if(e.key==='Escape')closeOverlay()}
+  document.addEventListener('keydown',onKey)
+  OK_OV={bd,pn,onKey}
+  requestAnimationFrame(()=>{bd.classList.add('in');pn.classList.add('in')})
+  return pn
+}
+function closeOverlay(){
+  if(!OK_OV)return
+  const{bd,pn,onKey}=OK_OV;OK_OV=null
+  document.removeEventListener('keydown',onKey)
+  bd.classList.remove('in');pn.classList.remove('in')
+  setTimeout(()=>{bd.remove();pn.remove()},260)
+}
+// KST(UTC+9) 기준 날짜 키 — 이른 새벽 거래가 하루 밀리지 않도록
+const kstDateKey=iso=>iso?new Date(new Date(iso).getTime()+324e5).toISOString().slice(0,10):''
+const kstToday=()=>new Date(Date.now()+324e5).toISOString().slice(0,10)
+// 거래 내역 → 중앙 카드 오버레이 (필터 전체/받기/송금/출석 + 날짜, 내부 스크롤)
+async function openHistoryOverlay(){
   const admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">내역</div><div style="width:34px"></div></div><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>`
-  document.getElementById('bk').onclick=pop
+  const pn=openOverlay({variant:'center',title:admin?'발행 내역':'거래 내역',bodyHTML:'<div class="ov-body" id="ovh-load"><div class="loader" style="min-height:180px"><div class="spin"></div></div></div>'})
   const txs=await getAllTx()
+  if(!OK_OV||OK_OV.pn!==pn)return
   const data=admin?txs.filter(t=>t.type==='발행'||t.type==='회수'):txs.filter(t=>t.to===SESSION.id||t.from===SESSION.id)
   const rbal=admin?{}:runningBal(data,balOf(SESSION.id,txs))
   const filters=admin?['전체','발행','회수']:['전체','받기','송금','출석']
-  let cur='전체'
-  const match=t=>cur==='전체'?true:cur==='발행'?t.type==='발행':cur==='회수'?t.type==='회수':cur==='받기'?t.to===SESSION.id:cur==='송금'?(t.type==='송금'&&t.from===SESSION.id):cur==='출석'?t.type==='출석':true
-  app().innerHTML=`<div class="screen no-nav fade-in p3">
-    <div class="phdr"><button class="bk" id="bk2">${I.back}</button><div class="ttl">내역</div><div style="width:34px"></div></div>
-    <div class="m2-cats" id="hist-tags" style="padding:10px 20px 6px">${filters.map((f,i)=>`<button class="m2-cat${i===0?' on':''}" data-f="${f}">${f}</button>`).join('')}</div>
-    <div id="hist-body"></div>
-    <div style="height:12px"></div>
-  </div>`
-  document.getElementById('bk2').onclick=pop
+  let cur='전체',dateSel=''
+  const matchCat=t=>cur==='전체'?true:cur==='발행'?t.type==='발행':cur==='회수'?t.type==='회수':cur==='받기'?t.to===SESSION.id:cur==='송금'?(t.type==='송금'&&t.from===SESSION.id):cur==='출석'?t.type==='출석':true
+  const load=pn.querySelector('#ovh-load');if(load)load.remove()
+  pn.querySelector('.ov-head').insertAdjacentHTML('afterend',`
+    <div class="ov-cats" id="ovh-cats">${filters.map((f,i)=>`<button class="ov-cat${i===0?' on':''}" data-f="${f}">${f}</button>`).join('')}<button class="ov-cat" id="ovh-datebtn">날짜</button></div>
+    <div class="ov-datebar" id="ovh-datebar" style="display:none"><input type="date" id="ovh-date" max="${kstToday()}"><button class="ov-dclear" id="ovh-dclear">전체 날짜</button></div>
+    <div class="ov-body" id="ovh-body"></div>`)
+  const body=pn.querySelector('#ovh-body'),datebar=pn.querySelector('#ovh-datebar'),dateInput=pn.querySelector('#ovh-date')
+  const setCats=()=>pn.querySelectorAll('#ovh-cats [data-f]').forEach(x=>x.classList.toggle('on',!dateSel&&x.dataset.f===cur))
+  const setDateBtn=()=>pn.querySelector('#ovh-datebtn').classList.toggle('on',!!dateSel)
   const render=()=>{
-    const fl=data.filter(match),groups={}
-    fl.forEach(t=>{const d=(t.at||'').slice(0,10);(groups[d]=groups[d]||[]).push(t)})
+    const fl=data.filter(t=>matchCat(t)&&(!dateSel||kstDateKey(t.at)===dateSel)),groups={}
+    fl.forEach(t=>{const d=kstDateKey(t.at);(groups[d]=groups[d]||[]).push(t)})
     const keys=Object.keys(groups).sort().reverse()
-    document.getElementById('hist-body').innerHTML=keys.length?keys.map(d=>`<div class="hist2-datehd">${fmtFull(d)}</div><div class="hist2-group">${groups[d].map(t=>txRow(t,admin,rbal[t.id])).join('')}</div>`).join(''):'<div class="empty" style="padding:40px 20px">내역이 없어요.</div>'
+    body.innerHTML=keys.length?keys.map(d=>`<div class="hist2-datehd">${fmtFull(d)}</div><div class="hist2-group">${groups[d].map(t=>txRow(t,admin,rbal[t.id])).join('')}</div>`).join(''):`<div class="empty" style="padding:40px 20px">${dateSel?'그 날의 내역이 없어요.':'내역이 없어요.'}</div>`
     wireTxRows(fl)
   }
-  document.querySelectorAll('#hist-tags [data-f]').forEach(el=>el.onclick=()=>{cur=el.dataset.f;document.querySelectorAll('#hist-tags [data-f]').forEach(x=>x.classList.toggle('on',x.dataset.f===cur));render()})
+  pn.querySelectorAll('#ovh-cats [data-f]').forEach(el=>el.onclick=()=>{cur=el.dataset.f;setCats();render()})
+  pn.querySelector('#ovh-datebtn').onclick=()=>{const open=datebar.style.display==='none';datebar.style.display=open?'flex':'none';if(open&&!dateInput.value){dateInput.value=kstToday()}}
+  dateInput.onchange=()=>{dateSel=dateInput.value;setCats();setDateBtn();render()}
+  pn.querySelector('#ovh-dclear').onclick=()=>{dateSel='';dateInput.value='';datebar.style.display='none';setCats();setDateBtn();render()}
   render()
+}
+function rHistory(){openHistoryOverlay()}
+// 알림 → 우측 상단 오버레이 (Home 뒤에 유지)
+async function openNotifOverlay(){
+  const pn=openOverlay({variant:'tr',title:'알림',bodyHTML:'<div class="ov-body" id="ntov-body"><div class="loader" style="min-height:120px"><div class="spin"></div></div></div>'})
+  await loadNotifs()
+  if(!OK_OV||OK_OV.pn!==pn)return
+  const body=pn.querySelector('#ntov-body')
+  const rowHTML=n=>{const m=NT_META[n.type]||{ic:'bell',tint:'gray'};return`<div class="lrow ntrow${n.read?'':' unread'}" data-nid="${n.id}"><div class="chip ti-${m.tint}">${I[m.ic]||I.bell}</div><div class="body"><div class="ti">${esc(n.title)}</div><div class="su">${esc(n.body)}${n.body?' · ':''}${timeago(n.at)}</div></div>${n.read?`<span class="ntchev">${I.chev}</span>`:'<span class="ntdot"></span>'}</div>`}
+  if(!NOTIFS.length)body.innerHTML=emptyHTML({icon:'🔔',title:'아직 알림이 없어요',desc:'새 소식이 오면 여기에서 알려줄게요.'})
+  else{
+    const order=['오늘','어제','이번 주','이전'],groups={}
+    NOTIFS.forEach(n=>{(groups[notifBucket(n.at)]=groups[notifBucket(n.at)]||[]).push(n)})
+    body.innerHTML=order.filter(k=>groups[k]).map(k=>`<div class="hist2-datehd">${k}</div><div class="hist2-group">${groups[k].map(rowHTML).join('')}</div>`).join('')
+    body.querySelectorAll('[data-nid]').forEach(el=>el.onclick=()=>{const n=NOTIFS.find(x=>x.id===el.dataset.nid);if(n)openNotif(n)})
+  }
+  markNotifsRead()
 }
 
 // 알림 센터
@@ -2458,14 +2529,16 @@ const NT_META={money:{ic:'money',tint:'green'},dm:{ic:'send',tint:'blue'},petiti
 function notifBucket(at){const d=new Date(at).getTime(),now=new Date(),s=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime(),D=86400000;return d>=s?'오늘':d>=s-D?'어제':d>=s-7*D?'이번 주':'이전'}
 // 알림 클릭 → 해당 기능/상세로 딥링크. link 필드에 id가 있으면 상세로, 없으면 목록으로
 function openNotif(n){
-  const lk=(n.link||'').trim(),go=fn=>{pop();push(fn)}
+  const lk=(n.link||'').trim()
+  const leave=()=>{if(OK_OV)closeOverlay();else pop()}
+  const go=fn=>{leave();push(fn)}
   switch(n.type){
-    case'dm':if(lk){go(()=>rDmChat(lk))}else{pop();TAB='search';routeTab()}break
+    case'dm':if(lk){go(()=>rDmChat(lk))}else{leave();TAB='search';routeTab()}break
     case'petition':go(lk?()=>rPetitionDetail(lk):rPetitionPage);break
     case'book':go(lk?()=>rBookDetail(lk):rBookPage);break
     case'challenge':go(rChallengePage);break
     case'binding':case'print':go(rPrint);break
-    case'money':go(rHistory);break
+    case'money':leave();openHistoryOverlay();break
     default:break
   }
 }
@@ -2635,7 +2708,7 @@ function fTransferConfirm(mode,toUser,amount,reason,myBal){
       </div>${bnav()}`
       bindNav()
       document.getElementById('tf-home').onclick=()=>{TAB='money';STACK=[];rMoney()}
-      document.getElementById('tf-hist').onclick=()=>{TAB='money';STACK=[];push(()=>rHistory())}
+      document.getElementById('tf-hist').onclick=()=>{TAB='money';STACK=[];rMoney();openHistoryOverlay()}
     }else{
       toast('처리 중 오류가 발생했어요')
     }
