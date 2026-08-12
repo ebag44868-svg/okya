@@ -6,8 +6,26 @@
   "scripts": {
     "dev": "python -m http.server 5173",
     "start": "python -m http.server 5173",
-    "serve": "npx serve ."
+    "serve": "npx serve .",
+    "copy": "node scripts/copy-web.cjs",
+    "sync": "node scripts/copy-web.cjs && cap sync",
+    "cap:android": "cap open android",
+    "cap:ios": "cap open ios"
   },
-  "keywords": ["okss", "okya", "school", "spa", "supabase"],
-  "license": "UNLICENSED"
+  "keywords": [
+    "okss",
+    "okya",
+    "school",
+    "spa",
+    "supabase"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/ios": "^8.5.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.0"
+  }
 }
