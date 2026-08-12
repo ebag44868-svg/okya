@@ -481,6 +481,39 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .home2 .h2-sec:nth-of-type(2){animation-delay:.06s;}
 .home2 .h2-sec:nth-of-type(3){animation-delay:.12s;}
 .home2 .h2-sec:nth-of-type(4){animation-delay:.18s;}
+
+/* ===================== OKSS Motion System ===================== */
+/* Ambient: hero visual이 아주 느리게 숨쉬듯 살아있음 (Level 6, transform-only) */
+@keyframes okFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.02)}}
+@keyframes okGlow{0%,100%{opacity:.22;transform:translate(-50%,-50%) scale(1)}50%{opacity:.44;transform:translate(-50%,-50%) scale(1.13)}}
+.h2-hero-visual{position:relative;overflow:hidden;}
+.h2-hero-visual::after{content:"";position:absolute;left:50%;top:50%;width:70%;height:70%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.6),rgba(255,255,255,0) 66%);transform:translate(-50%,-50%);animation:okGlow 11s var(--ease-inout) infinite;pointer-events:none;z-index:0;}
+.h2-visual-emoji{position:relative;z-index:1;animation:okFloat 7s var(--ease-inout) infinite;will-change:transform;}
+
+/* 바로가기 auto-carousel: 포커스 타일 강조 / 나머지 은은하게 (Level 6 소개형) */
+.h2-grid{scroll-behavior:smooth;}
+.h2-grid.ok-focusmode{padding-top:5px;padding-bottom:5px;}
+.h2-grid.ok-focusmode .h2-sc{opacity:.8;transform:scale(.98);transition:opacity var(--dur-standard) var(--ease-out),transform var(--dur-standard) var(--ease-out);transform-origin:center;}
+.h2-grid.ok-focusmode .h2-sc.is-focus{opacity:1;transform:scale(1.02);}
+
+/* Scroll reveal: 스크롤로 등장하는 콘텐츠 (Level 4, IntersectionObserver 구동) */
+.ok-reveal{opacity:0;transform:translateY(13px);transition:opacity .55s var(--ease-out),transform .55s var(--ease-out);will-change:opacity,transform;}
+.ok-reveal.in{opacity:1;transform:none;}
+.ok-reveal-img{opacity:0;transform:scale(1.02);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out);}
+.ok-reveal-img.in{opacity:1;transform:none;}
+
+/* Local content transition: 콘텐츠 영역만 부드럽게 교체 (Level 2) */
+.ok-swap{animation:okSwapIn var(--dur-standard) var(--ease-out) both;}
+@keyframes okSwapIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Reduced motion: autoplay/parallax/ambient 최소화, fade 중심 (Phase 22) */
+@media (prefers-reduced-motion:reduce){
+  .h2-visual-emoji,.h2-hero-visual::after{animation:none!important;}
+  .ok-reveal,.ok-reveal-img{transition:none!important;opacity:1!important;transform:none!important;}
+  .h2-grid.ok-focusmode .h2-sc{opacity:1!important;transform:none!important;transition:none!important;}
+  .h2-grid.ok-focusmode{padding-top:0;padding-bottom:0;}
+  .home2 .h2-hero,.home2 .h2-sec,.money2 .m2-hero,.money2 .m2-sec{animation:none!important;}
+}
 /* landscape tablet: hero split · today 가로 */
 @media (min-width:820px) and (min-aspect-ratio:1/1){
   .h2-hero{flex-direction:row;align-items:stretch;gap:34px;padding:16px 30px 8px;}
@@ -1969,6 +2002,48 @@ function animateGauge(bar,pctEl,target,dur=1400,delay=280){
     if(p<1)requestAnimationFrame(tk)
   })(performance.now())
 }
+
+// ===================== OKSS Motion System (JS) =====================
+const OK_REDUCE=()=>matchMedia('(prefers-reduced-motion:reduce)').matches
+// 스크롤 등장 리빌: 한 개의 영속 옵저버로 .ok-reveal 요소를 뷰포트 진입 시 노출
+let _okRevealIO=null
+function okRevealObserve(scope){
+  if(OK_REDUCE())return
+  if(!_okRevealIO){
+    _okRevealIO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');_okRevealIO.unobserve(e.target)}})},{threshold:.12,rootMargin:'0px 0px -6% 0px'})
+  }
+  ;(scope||document).querySelectorAll('.ok-reveal:not(.in),.ok-reveal-img:not(.in)').forEach(el=>_okRevealIO.observe(el))
+}
+// 홈 바로가기 auto-carousel: 포커스가 한 칸씩 자동 이동, interaction 시 pause·재개, 오프스크린/백그라운드/reduced-motion 대응
+let OK_HOME=null
+function initShortcutCarousel(){
+  if(OK_HOME&&OK_HOME.destroy)OK_HOME.destroy()
+  const rail=document.getElementById('h2-grid');if(!rail)return
+  const tiles=[...rail.querySelectorAll('.h2-sc')];if(tiles.length<2)return
+  rail.classList.add('ok-focusmode')
+  let idx=0,timer=null,paused=false,resumeT=null,raf=null,onScreen=true,dead=false
+  const reduce=OK_REDUCE()
+  const focusUpdate=()=>{
+    const c=rail.scrollLeft+rail.clientWidth/2
+    let best=0,bd=1e9
+    tiles.forEach((t,i)=>{const tc=t.offsetLeft+t.offsetWidth/2,dd=Math.abs(tc-c);if(dd<bd){bd=dd;best=i}})
+    tiles.forEach((t,i)=>t.classList.toggle('is-focus',i===best));idx=best
+  }
+  const go=i=>{idx=(i%tiles.length+tiles.length)%tiles.length;const t=tiles[idx];rail.scrollTo({left:Math.max(0,t.offsetLeft-(rail.clientWidth-t.offsetWidth)/2),behavior:'smooth'})}
+  const tick=()=>{if(paused||!onScreen||document.hidden)return;go(idx+1)}
+  const start=()=>{if(reduce||dead||timer)return;timer=setInterval(tick,4200)}
+  const stop=()=>{clearInterval(timer);timer=null}
+  const pause=()=>{paused=true;clearTimeout(resumeT);resumeT=setTimeout(()=>{paused=false},5200)}
+  rail.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=null;focusUpdate()})},{passive:true})
+  ;['pointerdown','wheel','touchstart'].forEach(ev=>rail.addEventListener(ev,pause,{passive:true}))
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{onScreen=e.isIntersecting;onScreen?start():stop()})},{threshold:.35})
+  io.observe(rail)
+  const onVis=()=>{if(document.hidden)stop();else if(onScreen)start()}
+  document.addEventListener('visibilitychange',onVis)
+  focusUpdate()
+  OK_HOME={destroy(){dead=true;stop();clearTimeout(resumeT);io.disconnect();document.removeEventListener('visibilitychange',onVis)}}
+}
+
 // 달력 그리드 (모듈 스코프라 인라인 onclick 대신 data-속성 사용)
 function calGrid(y,mo,o){o=o||{}
   const first=new Date(y,mo,1).getDay(),days=new Date(y,mo+1,0).getDate(),wd=['일','월','화','수','목','금','토']
@@ -2260,6 +2335,8 @@ async function rHome(){
   countUp(document.getElementById('balnum'),admin?issued:bal)
   animateGauge(document.getElementById('progbar'),document.getElementById('progpct'),yearPct())
   wireBell()
+  initShortcutCarousel()          // 바로가기 자동 소개 carousel (Phase 7·8)
+  okRevealObserve(app())          // 스크롤 등장 리빌 (Phase 17)
 }
 
 // 거래 1건 → preview .lrow. bal 지정 시(학생) 거래 직후 잔액 표시
