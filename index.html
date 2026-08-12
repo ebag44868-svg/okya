@@ -410,6 +410,20 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .h2-hero-visual{margin-top:20px;min-height:190px;border-radius:var(--radius-xl);display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;overflow:hidden;}
 .meal-visual{background:linear-gradient(140deg,#FFE6D2 0%,#FFD3C0 42%,#F1E0FF 100%);}
 .h2-visual-emoji{font-size:74px;opacity:.9;filter:drop-shadow(0 10px 22px rgba(0,0,0,.13));}
+/* 오늘의 옥야 카드 (hero 오른쪽) */
+.okya-card{flex-direction:column;align-items:stretch;justify-content:space-between;padding:20px;text-align:left;gap:8px;cursor:pointer;transition:transform var(--dur-micro) var(--ease-spring);}
+.okya-card:active{transform:scale(.985);}
+.okc-att{background:linear-gradient(150deg,#EEF0FF,#E5E2FF);}
+.okc-eyebrow{font-size:12.5px;font-weight:800;color:var(--accent);letter-spacing:.02em;position:relative;z-index:1;}
+.okc-emoji{font-size:50px;line-height:1;filter:drop-shadow(0 8px 18px rgba(0,0,0,.14));animation:okFloat 7s var(--ease-inout) infinite;position:relative;z-index:1;align-self:flex-start;}
+.okc-body{position:relative;z-index:1;}
+.okc-label{font-size:12.5px;font-weight:700;color:var(--text-2);}
+.okc-title{font-size:22px;font-weight:900;letter-spacing:-.02em;color:var(--text-1);line-height:1.15;margin-top:2px;}
+.okc-desc{font-size:13.5px;font-weight:600;color:var(--text-2);margin-top:4px;}
+.okc-btn{align-self:flex-start;position:relative;z-index:1;background:var(--text-1);color:#fff;font-size:13.5px;font-weight:800;padding:10px 18px;border-radius:var(--radius-full);display:inline-flex;align-items:center;gap:6px;}
+.okc-btn-light{background:rgba(255,255,255,.92);color:var(--text-1);box-shadow:var(--shadow-sm);}
+.okc-btn>span{transition:transform var(--dur-standard) var(--ease-out);}
+.okya-card:active .okc-btn>span{transform:translateX(3px);}
 /* Section */
 .h2-sec{padding:28px 20px 2px;}
 .h2-sec-head{margin-bottom:15px;}
@@ -508,7 +522,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 
 /* Reduced motion: autoplay/parallax/ambient 최소화, fade 중심 (Phase 22) */
 @media (prefers-reduced-motion:reduce){
-  .h2-visual-emoji,.h2-hero-visual::after{animation:none!important;}
+  .h2-visual-emoji,.h2-hero-visual::after,.okc-emoji,.arc-tile-emoji,.lot-hero-emoji,.dash-ov-emoji{animation:none!important;}
   .ok-reveal,.ok-reveal-img{transition:none!important;opacity:1!important;transform:none!important;}
   .h2-grid.ok-focusmode .h2-sc{opacity:1!important;transform:none!important;transition:none!important;}
   .h2-grid.ok-focusmode{padding-top:0;padding-bottom:0;}
@@ -2386,6 +2400,31 @@ function renderHeroMeal(slot){
   ul.innerHTML=items.length?items.map((x,i)=>`<li style="animation-delay:${i*45}ms">${esc(x)}</li>`).join(''):`<li class="h2-menu-empty">오늘 ${slot} 정보가 없어요</li>`
   seg.querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>renderHeroMeal(b.dataset.slot))
 }
+// [Phase 11] 홈 "오늘의 옥야" 카드(급식 hero 오른쪽) — 출석 우선, 완료 시 오늘의 추천 게임.
+function okyaCardHTML(txs,admin){
+  const attNeed=!admin&&!attDoneToday(txs)
+  if(attNeed){
+    return`<div class="h2-hero-visual okya-card okc-att" id="okya-card" data-okya="att" role="button" tabindex="0">
+      <div class="okc-eyebrow">오늘의 옥야</div>
+      <div class="okc-emoji">✓</div>
+      <div class="okc-body"><div class="okc-title">오늘 출석 체크</div><div class="okc-desc">아직 출석하지 않았어요</div></div>
+      <span class="okc-btn">출석하고 +20옥</span>
+    </div>`
+  }
+  const g=arcGame(arcDailyGameKey())||ARCADE_GAMES[0]
+  return`<div class="h2-hero-visual okya-card okc-game" id="okya-card" data-okya="game" role="button" tabindex="0" style="background:${g.grad}">
+    <div class="okc-eyebrow">오늘의 옥야</div>
+    <div class="okc-emoji">${g.emoji}</div>
+    <div class="okc-body"><div class="okc-label">오늘의 추천 게임</div><div class="okc-title">${esc(g.name)}</div></div>
+    <span class="okc-btn okc-btn-light">플레이 <span>→</span></span>
+  </div>`
+}
+// 홈 오늘의 옥야 클릭(Phase 12): 출석하기 or 추천 게임으로 바로 이동
+function goOkyaCard(mode){
+  if(mode==='att'){doAttendance();return}
+  const g=arcGame(arcDailyGameKey())||ARCADE_GAMES[0]
+  TAB='arcade';STACK=[];rArcade();push(g.route)
+}
 async function rHome(){
   TAB='home'
   const topbar=`<div class="h2-top">
@@ -2424,7 +2463,7 @@ async function rHome(){
         <ul class="h2-menu" id="hero-menu"></ul>
         <button class="h2-cta" data-goto="school-food">급식 자세히 보기 <span>→</span></button>
       </div>
-      <div class="h2-hero-visual meal-visual" data-slot="MealGraphicSlot"><div class="h2-visual-emoji">🍱</div></div>
+      ${okyaCardHTML(txs,admin)}
     </section>
 
     <section class="h2-sec h2-sec-flush">
@@ -2472,6 +2511,7 @@ async function rHome(){
   })
 
   const attBtn=document.getElementById('att-btn');if(attBtn)attBtn.onclick=doAttendance
+  const okc=document.getElementById('okya-card');if(okc){okc.onclick=()=>goOkyaCard(okc.dataset.okya);okc.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();goOkyaCard(okc.dataset.okya)}}}
   document.getElementById('home-search').onclick=()=>push(()=>rGlobalSearch())
   const brand=document.querySelector('.h2-top .brand');if(brand){brand.style.cursor='pointer';brand.onclick=()=>eggTap('logo',5,()=>{brand.classList.remove('egg-wobble');void brand.offsetWidth;brand.classList.add('egg-wobble');confettiBurst();popMsg('옥야 파이팅!','🎉')})}
   countUp(document.getElementById('balnum'),admin?issued:bal)
