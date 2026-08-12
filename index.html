@@ -1147,7 +1147,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 @media (min-width:820px) and (min-aspect-ratio:1/1){
   #app{max-width:none;}
   /* 하단 탭 → 좌측 세로 레일 */
-  .bnav{position:fixed;left:0;top:0;bottom:0;width:214px;height:100dvh;max-width:none;transform:none;flex-direction:column;align-items:stretch;border-radius:0;padding:20px 13px 16px;gap:3px;background:var(--card);border:none;border-right:1px solid var(--line);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;}
+  .bnav{position:fixed;left:0;top:0;bottom:0;width:214px;height:100dvh;max-width:none;transform:none;flex-direction:column;align-items:stretch;border-radius:0;padding:20px 13px 16px;gap:3px;background:var(--card);border:none;border-right:1px solid var(--line);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;transition:width .28s var(--ease),padding .28s var(--ease);}
   .bnav::before{content:"okya";display:flex;align-items:center;font-size:20px;font-weight:800;color:var(--primary);letter-spacing:-.5px;padding:6px 12px 20px;}
   .bnav-item{flex:none;flex-direction:row;justify-content:flex-start;gap:13px;padding:12px 13px;border-radius:14px;font-size:15px;font-weight:700;}
   .bnav-item span{font-size:15px;}
@@ -1155,7 +1155,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
   .bnav-item.active{background:var(--primary-tint);}
   .bnav-item[data-tab="my"]{margin-top:auto;}
   /* 레일 접기 버튼(우측 상단) */
-  .rail-burger{display:flex;align-items:center;justify-content:center;position:absolute;top:14px;right:12px;width:34px;height:34px;border-radius:10px;background:none;border:none;cursor:pointer;color:var(--sub);transition:background .15s,color .15s;z-index:2;}
+  .bnav .rail-burger{display:flex;align-items:center;justify-content:center;position:absolute;top:14px;right:12px;width:34px;height:34px;border-radius:10px;background:none;border:none;cursor:pointer;color:var(--sub);transition:background .15s,color .15s;z-index:2;}
   .rail-burger:hover{background:var(--soft);color:var(--ink);}
   .bnav::before{padding-right:44px;}
   /* 접힌 레일: 아이콘만 */
