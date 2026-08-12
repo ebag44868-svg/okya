@@ -832,13 +832,6 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .p3 .upload{display:block;border:1.6px dashed #cfd4e0;border-radius:14px;padding:20px;text-align:center;color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;}
 .p3 .upload svg{width:26px;height:26px;margin:0 auto 6px;color:#b6bcc8;display:block;}
 .p3 .upload span{display:block;}
-/* 사진 소스 선택: 팝업 없이 인라인 2버튼(앨범/촬영) */
-.p3 .upload-pick{display:flex;gap:10px;margin-top:2px;}
-.p3 .upload-pick .up-opt{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px 0;border:1.6px dashed #cfd4e0;border-radius:14px;background:var(--soft);color:var(--sub);font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:transform .12s var(--ease),border-color .15s,background .15s,color .15s;}
-.p3 .upload-pick .up-opt:active{transform:scale(.96);}
-.p3 .upload-pick .up-opt svg{width:24px;height:24px;color:#b6bcc8;}
-.p3 .upload-preview:not(:empty){margin-top:12px;text-align:center;}
-.p3 .upload-preview img{max-width:150px;max-height:206px;aspect-ratio:3/4.1;object-fit:cover;margin:0 auto;border-radius:6px;box-shadow:0 5px 14px rgba(0,0,0,.16);display:block;}
 .p3 .upload.has{padding:0;border-style:solid;border-color:var(--line);overflow:hidden;}
 .p3 .upload.has img{width:100%;display:block;max-height:220px;object-fit:cover;}
 /* 책 썸네일 */
@@ -1834,21 +1827,6 @@ const nameOf=id=>(USERS.find(u=>u.id===id)||{name:'학생회'}).name
 const photoOf=id=>{const u=id===(SESSION&&SESSION.id)?SESSION:USERS.find(u=>u.id===id);return u&&u.photo||null}
 // 공통 아바타: 프로필 사진 있으면 원형 이미지, 없으면 이니셜 (메시지·송금·프로필 등에서 재사용)
 function avatarHTML(id,size=34){const p=photoOf(id),nm=nameOf(id)||'?';const s=size+'px';return p?`<img src="${esc(p)}" style="width:${s};height:${s};border-radius:50%;object-fit:cover;flex:none">`:`<div style="width:${s};height:${s};border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.4)}px;font-weight:700;color:var(--primary);flex:none">${esc(nm.charAt(0))}</div>`}
-// 사진 소스 선택: OS 네이티브 팝업 대신 인라인 2버튼(앨범/촬영). 촬영은 카메라 직행
-function photoPickHTML(base,label){return`<label>${label}</label>
-  <div class="upload-pick">
-    <label class="up-opt" for="${base}-gal">${I.image}<span>앨범</span></label>
-    <label class="up-opt" for="${base}-cam">${I.camera}<span>촬영</span></label>
-  </div>
-  <input id="${base}-gal" type="file" accept="image/*" style="display:none">
-  <input id="${base}-cam" type="file" accept="image/*" capture="environment" style="display:none">
-  <div class="upload-preview" id="${base}-prev"></div>`}
-function wirePhotoPick(base,onFile){
-  const prev=document.getElementById(base+'-prev')
-  const h=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(prev)prev.innerHTML=`<img src="${URL.createObjectURL(f)}">`;onFile(f)}
-  const g=document.getElementById(base+'-gal'),c=document.getElementById(base+'-cam')
-  if(g)g.onchange=h;if(c)c.onchange=h
-}
 
 // ── 알림 (okya_notifications). 테이블 없으면 조용히 무시(앱 흐름 방해 X) ──
 let NOTIFS=[]
@@ -3205,7 +3183,7 @@ function rPrintNew(){
         <div class="field"><label>제목</label><input id="pr-title" placeholder="예: 미적분 오답노트"></div>
         <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>장수 (선택)</label><input id="pr-pages" type="number" inputmode="numeric" placeholder="24"></div><div class="field" style="flex:1"><label>부수</label><input id="pr-copies" type="number" inputmode="numeric" value="1"></div></div>
         <div class="field"><label>제본 방식</label><div class="pet-catsel" id="pr-bind">${BIND_OPTS.map((o,i)=>`<button type="button" class="pet-chip${i===0?' on':''}" data-bind="${o[0]}">${o[1]} · ${o[2]}옥</button>`).join('')}</div></div>
-        <div class="field" style="margin-bottom:0">${photoPickHTML('prf','자료 사진 (선택)')}</div>
+        <div class="field" style="margin-bottom:0"><label>자료 사진 (선택)</label><label for="pr-file" class="upload" id="pr-fl">${I.image}<span>표지·자료 사진 추가</span></label><input id="pr-file" type="file" accept="image/*" style="display:none"></div>
       </div>
       <div class="pcard" style="display:flex;align-items:center;justify-content:space-between"><div class="sec" style="margin:0">예상 비용</div><div class="pet-agree-big" id="pr-cost">0옥</div></div>
       <div style="padding:0 18px"><button class="pbtn pri pr-subbtn" id="pr-sub">＋ 제본 신청하기</button><p style="font-size:12px;color:var(--sub);margin:14px 2px 0;text-align:center">인쇄물은 직접 가져오시고, 제본만 신청하는 화면이에요.<br>신청 시 예상 비용만큼 옥야머니가 사용돼요.</p></div>
@@ -3216,7 +3194,7 @@ function rPrintNew(){
   document.querySelectorAll('#pr-bind .pet-chip').forEach(b=>b.onclick=()=>{bind=b.dataset.bind;document.querySelectorAll('#pr-bind .pet-chip').forEach(x=>x.classList.toggle('on',x===b));calc()})
   document.getElementById('pr-copies').oninput=calc
   calc()
-  wirePhotoPick('prf',f=>{file=f})
+  document.getElementById('pr-file').onchange=e=>{const f=e.target.files[0];if(f){file=f;const l=document.getElementById('pr-fl');l.classList.add('has');l.innerHTML=`<img src="${URL.createObjectURL(f)}">`}}
   document.getElementById('pr-sub').onclick=async()=>{
     const title=document.getElementById('pr-title').value.trim();if(!title){toast('제목을 입력해줘');return}
     const pages=parseInt(document.getElementById('pr-pages').value,10)||0
@@ -3861,14 +3839,14 @@ function rBookNew(){
         <div class="field"><label>교재명</label><input id="bt" placeholder="예: 통합사회1 (비상)"></div>
         <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>학년</label><select id="bg"><option>1학년</option><option>2학년</option><option>3학년</option></select></div><div class="field" style="flex:1"><label>구분</label><select id="bk2"><option>나눔</option><option>교환</option></select></div></div>
         <div class="field" id="want-field" style="display:none"><label>받고 싶은 책</label><input id="bwant" placeholder="예: 통합사회2 (미래엔)"><p style="font-size:11.5px;color:var(--sub);margin:6px 2px 0">교환으로 받고 싶은 교재를 적어주세요.</p></div>
-        <div class="field" style="margin-bottom:0">${photoPickHTML('bf','책 표지 사진 (선택)')}</div>
+        <div class="field" style="margin-bottom:0"><label>책 표지 사진 (선택)</label><label for="bf" class="upload book-up" id="bfl">${I.image}<span>사진 추가하기</span></label><input id="bf" type="file" accept="image/*" style="display:none"></div>
       </div>
       <div style="padding:0 18px"><button class="pbtn pri" id="badd" style="margin:4px auto 0;max-width:240px">등록하기</button><p style="font-size:12px;color:var(--sub);margin:12px 2px 0;text-align:center">사진이 없으면 표지가 자동 생성돼요.</p></div>
     </div>
   </div>${bnav()}`
   bindNav()
   document.getElementById('bk').onclick=pop
-  wirePhotoPick('bf',f=>{photoFile=f})
+  document.getElementById('bf').onchange=e2=>{const f=e2.target.files[0];if(f){photoFile=f;const l=document.getElementById('bfl');l.classList.add('has');l.innerHTML=`<img src="${URL.createObjectURL(f)}">`}}
   document.getElementById('bk2').onchange=e2=>{document.getElementById('want-field').style.display=e2.target.value==='교환'?'':'none'}
   document.getElementById('badd').onclick=async()=>{
     const title=document.getElementById('bt').value.trim();if(!title){toast('교재명을 입력해줘');return}
