@@ -1,0 +1,197 @@
+/* ===================================================================
+   preview-okya3 디자인 시스템 (.p3 스코프 — 변환된 화면만 사용)
+   =================================================================== */
+.screen.p3{background:var(--card);padding-bottom:calc(92px + env(safe-area-inset-bottom));}
+.p3 .icn{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;}
+.p3 .icn.sm{width:18px;height:18px;}
+
+/* topbar / greet (투명, 회색 배경 위) */
+.p3 .topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 18px 8px;}
+.p3 .topbar .t{font-size:20px;font-weight:900;letter-spacing:-.4px;display:flex;align-items:center;gap:8px;color:var(--ink);}
+.p3 .topbar .t.brand{color:var(--primary);font-size:20px;}
+.p3 .topbar button{width:34px;height:34px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;color:#3a3f4b;flex:none;}
+.p3 .topbar button svg{width:21px;height:21px;}
+.p3 .greet{padding:2px 18px 14px;}
+.p3 .greet small{color:var(--sub);font-size:13px;font-weight:500;}
+.p3 .greet .nm{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-top:3px;color:var(--ink);}
+
+/* balance */
+.p3 .balance{margin:6px 18px 0;background:radial-gradient(130% 120% at 12% 0%,rgba(255,255,255,.22),rgba(255,255,255,0) 46%),var(--grad);border-radius:24px;padding:20px 20px 16px;color:#fff;box-shadow:var(--sh-blue);position:relative;overflow:hidden;}
+.p3 .balance::after{content:"";position:absolute;top:-60%;left:0;width:55%;height:220%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.30),transparent);transform:rotate(18deg) translateX(-320%);animation:balSweep 1.35s var(--ease) .4s 1;pointer-events:none;}
+@keyframes balSweep{to{transform:rotate(18deg) translateX(420%);}}
+.p3 .balance>*{position:relative;z-index:1;}
+.p3 .balance .lbl{font-size:13px;opacity:.92;font-weight:600;}
+.p3 .balance .amt{font-size:32px;font-weight:800;letter-spacing:-1px;margin:4px 0 14px;}
+.p3 .balance .amt small{font-size:16px;font-weight:700;opacity:.9;margin-left:3px;}
+/* 홈 잔액 카드: 주인공 아님 → 글로우/크기 축소(브랜드 컬러는 유지) */
+.p3 .balance.compact{padding:16px 18px 14px;border-radius:20px;box-shadow:var(--shadow-md);}
+.p3 .balance.compact .amt{font-size:26px;margin:3px 0 12px;}
+.p3 .balance[data-goto]{cursor:pointer;}
+/* 홈 정보흐름 블록: 카드 대신 플랫 섹션 + 헤더 click-through */
+.hblock{padding:16px var(--page-x) 18px;}
+.home-col>.hblock+.hblock{border-top:1px solid var(--divider);}
+.hblock-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;}
+.hblock-t{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--text-1);}
+.hblock-more{display:flex;align-items:center;gap:1px;font-size:12.5px;font-weight:700;color:var(--text-3);white-space:nowrap;}
+.hblock-more svg{width:15px;height:15px;stroke:var(--text-3);}
+.hblock-head[role=button]{cursor:pointer;transition:opacity var(--dur-micro) var(--ease-out);}
+.hblock-tap{cursor:pointer;border-radius:var(--radius-md);transition:opacity var(--dur-micro) var(--ease-out);}
+.hblock-head[role=button]:active,.hblock-tap:active{opacity:.6;}
+
+/* ===================== 옥야 2.0 홈 (landscape-first) ===================== */
+.home2{background:var(--bg);}
+.h2-wrap{width:100%;max-width:none;margin:0 auto;padding-bottom:24px;}
+.h2-top{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 20px 4px;}
+.h2-top .brand{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:800;color:var(--accent);letter-spacing:-.5px;}
+.h2-top>div>button{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text-2);}
+.h2-top>div>button svg{width:22px;height:22px;}
+/* Hero */
+.h2-hero{padding:10px 20px 6px;display:flex;flex-direction:column;}
+.h2-eyebrow{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.01em;}
+.h2-title{font-size:33px;font-weight:900;letter-spacing:-.03em;color:var(--text-1);line-height:1.05;margin-top:9px;}
+.h2-slotseg{display:inline-flex;gap:6px;margin-top:16px;background:var(--surface-2);padding:4px;border-radius:14px;align-self:flex-start;}
+.h2-slotbtn{padding:8px 16px;border-radius:11px;font-size:14px;font-weight:800;color:var(--text-2);transition:background var(--dur-standard) var(--ease-out),color var(--dur-standard);}
+.h2-slotbtn.on{background:var(--surface);color:var(--accent);box-shadow:var(--shadow-sm);}
+.h2-menu{list-style:none;margin:28px 0 0;display:flex;flex-direction:column;gap:11px;}
+.h2-menu li{font-size:25px;font-weight:800;letter-spacing:-.02em;color:var(--text-1);line-height:1.12;animation:mheroIn .5s var(--ease-out) both;}
+.h2-menu li.h2-menu-empty{font-size:17px;font-weight:600;color:var(--text-3);}
+.h2-cta{align-self:flex-start;margin-top:22px;display:inline-flex;align-items:center;gap:8px;background:var(--text-1);color:#fff;font-size:15px;font-weight:800;padding:13px 22px;border-radius:var(--radius-full);transition:transform var(--dur-micro) var(--ease-spring);}
+.h2-cta span{transition:transform var(--dur-standard) var(--ease-out);}
+.h2-cta:active{transform:scale(.97);}
+.h2-cta:active span{transform:translateX(4px);}
+.h2-hero-visual{margin-top:20px;min-height:190px;border-radius:var(--radius-xl);display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;overflow:hidden;}
+.meal-visual{background:linear-gradient(140deg,#FFE6D2 0%,#FFD3C0 42%,#F1E0FF 100%);}
+.h2-visual-emoji{font-size:74px;opacity:.9;filter:drop-shadow(0 10px 22px rgba(0,0,0,.13));}
+/* 오늘의 옥야 카드 (hero 오른쪽) */
+.okya-card{flex-direction:column;align-items:stretch;justify-content:space-between;padding:20px;text-align:left;gap:8px;cursor:pointer;transition:transform var(--dur-micro) var(--ease-spring);}
+.okya-card:active{transform:scale(.985);}
+.okc-att{background:linear-gradient(150deg,#EEF0FF,#E5E2FF);}
+.okc-eyebrow{font-size:12.5px;font-weight:800;color:var(--accent);letter-spacing:.02em;position:relative;z-index:1;}
+.okc-emoji{font-size:50px;line-height:1;filter:drop-shadow(0 8px 18px rgba(0,0,0,.14));animation:okFloat 7s var(--ease-inout) infinite;position:relative;z-index:1;align-self:flex-start;}
+.okc-body{position:relative;z-index:1;}
+.okc-label{font-size:12.5px;font-weight:700;color:var(--text-2);}
+.okc-title{font-size:22px;font-weight:900;letter-spacing:-.02em;color:var(--text-1);line-height:1.15;margin-top:2px;}
+.okc-desc{font-size:13.5px;font-weight:600;color:var(--text-2);margin-top:4px;}
+.okc-btn{align-self:flex-start;position:relative;z-index:1;background:var(--text-1);color:#fff;font-size:13.5px;font-weight:800;padding:10px 18px;border-radius:var(--radius-full);display:inline-flex;align-items:center;gap:6px;}
+.okc-btn-light{background:rgba(255,255,255,.92);color:var(--text-1);box-shadow:var(--shadow-sm);}
+.okc-btn>span{transition:transform var(--dur-standard) var(--ease-out);}
+.okya-card:active .okc-btn>span{transform:translateX(3px);}
+/* Section */
+.h2-sec{padding:28px 20px 2px;}
+.h2-sec-head{margin-bottom:15px;}
+.h2-sec-t{font-size:21px;font-weight:900;letter-spacing:-.025em;color:var(--text-1);}
+.h2-sec-s{display:block;font-size:13.5px;font-weight:600;color:var(--text-3);margin-top:4px;}
+/* School gallery */
+.h2-gallery{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 0 4px;}
+.h2-gallery::-webkit-scrollbar{display:none;}
+.h2-slide{flex:0 0 80%;max-width:540px;aspect-ratio:16/10;scroll-snap-align:start;border-radius:var(--radius-xl);position:relative;display:flex;align-items:flex-end;overflow:hidden;}
+.gal-0{background:linear-gradient(135deg,#C9D6FF,#E3C9FF);}
+.gal-1{background:linear-gradient(135deg,#FFE0C2,#FFC9D6);}
+.gal-2{background:linear-gradient(135deg,#C2F0E0,#C9E0FF);}
+.gal-3{background:linear-gradient(135deg,#FFF0C2,#FFD3B0);}
+.gal-4{background:linear-gradient(135deg,#D9C9FF,#FFC9E8);}
+.h2-slide-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(18,18,28,.44),transparent 56%);}
+.h2-slide-cap{position:relative;z-index:1;padding:20px 22px;color:#fff;}
+.h2-slide-n{font-size:12px;font-weight:800;opacity:.92;letter-spacing:.04em;}
+.h2-slide-t{font-size:22px;font-weight:900;letter-spacing:-.02em;margin-top:5px;}
+.h2-slide-s{font-size:13px;font-weight:600;opacity:.92;margin-top:2px;}
+.h2-dots{display:flex;gap:7px;justify-content:center;margin-top:14px;}
+.h2-dot{width:7px;height:7px;border-radius:50%;background:var(--surface-3);transition:width var(--dur-standard) var(--ease-out),background var(--dur-standard);}
+.h2-dot.on{width:22px;border-radius:4px;background:var(--accent);}
+/* 바로가기 타일: 각진 정사각형, 여백 없이 붙여서 가로 슬라이드(이미지 꽉 채움 슬롯) */
+.h2-sec-flush{padding-left:0;padding-right:0;}
+.h2-grid{display:flex;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.h2-grid::-webkit-scrollbar{display:none;}
+.h2-sc{flex:0 0 auto;width:min(76vw,300px);aspect-ratio:1;position:relative;overflow:hidden;background-size:cover;background-position:center;display:block;scroll-snap-align:start;}
+.h2-sc::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.4),transparent 58%);}
+.h2-sc-emoji{position:absolute;top:18px;right:20px;font-size:50px;z-index:1;filter:drop-shadow(0 3px 12px rgba(0,0,0,.28));}
+.h2-sc-l{position:absolute;left:20px;bottom:18px;z-index:1;font-size:20px;font-weight:800;color:#fff;letter-spacing:-.02em;text-shadow:0 1px 6px rgba(0,0,0,.34);}
+.h2-sc:active{filter:brightness(.93);}
+.sc-0{background:linear-gradient(145deg,#6C5CE7,#A29BFE);}
+.sc-1{background:linear-gradient(145deg,#E84393,#FD79A8);}
+.sc-2{background:linear-gradient(145deg,#E17055,#FDA085);}
+.sc-3{background:linear-gradient(145deg,#00B894,#55EFC4);}
+.sc-4{background:linear-gradient(145deg,#0984E3,#74B9FF);}
+.sc-5{background:linear-gradient(145deg,#6D5DFC,#9B8CFF);}
+.sc-6{background:linear-gradient(145deg,#00CEC9,#81ECEC);}
+.sc-7{background:linear-gradient(145deg,#C86DFD,#F78FD6);}
+/* Feature rail(구) */
+.h2-rail{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px;}
+.h2-rail::-webkit-scrollbar{display:none;}
+.h2-feat{flex:0 0 auto;width:106px;height:114px;border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;transition:transform var(--dur-micro) var(--ease-spring);}
+.h2-feat:active{transform:scale(.95);}
+.h2-feat-ic{font-size:31px;line-height:1;}
+.h2-feat-l{font-size:13px;font-weight:800;color:var(--text-1);}
+/* Today */
+.h2-today{display:flex;flex-direction:column;gap:14px;}
+.h2-att.pcard{margin:0!important;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);}
+.h2-today-cols{display:flex;flex-direction:column;gap:14px;}
+.h2-surf{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:18px;text-align:left;width:100%;display:block;}
+.h2-surf-lbl{font-size:13px;font-weight:700;color:var(--text-3);}
+.h2-money{cursor:pointer;transition:transform var(--dur-micro) var(--ease-spring);}
+.h2-money:active{transform:scale(.99);}
+.h2-bignum{font-size:38px;font-weight:900;letter-spacing:-.03em;color:var(--text-1);margin:6px 0 12px;font-variant-numeric:tabular-nums;}
+.h2-bignum small{font-size:18px;font-weight:800;color:var(--text-3);margin-left:4px;}
+.h2-prog{height:7px;border-radius:var(--radius-full);background:var(--surface-3);overflow:hidden;}
+.h2-prog i{display:block;height:100%;border-radius:var(--radius-full);background:linear-gradient(90deg,var(--accent),var(--accent-d));}
+.h2-prog-lbl{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--text-3);margin-top:8px;}
+.h2-updates{cursor:pointer;}
+.h2-up-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;}
+.h2-up-row+.h2-up-row{border-top:1px solid var(--divider);}
+.h2-up-t{font-size:14.5px;font-weight:700;color:var(--text-1);}
+.h2-up-d{font-size:12px;color:var(--text-3);margin-top:2px;}
+.h2-up-dd{font-size:13px;font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums;}
+.h2-empty{font-size:13.5px;color:var(--text-3);padding:10px 0;}
+/* entrance (절제된 fade+rise, section stagger) */
+.home2 .h2-hero,.home2 .h2-sec{animation:p3rise2 .7s var(--ease-out) both;}
+.home2 .h2-sec:nth-of-type(2){animation-delay:.06s;}
+.home2 .h2-sec:nth-of-type(3){animation-delay:.12s;}
+.home2 .h2-sec:nth-of-type(4){animation-delay:.18s;}
+
+/* ===================== OKSS Motion System ===================== */
+/* Ambient: hero visual이 아주 느리게 숨쉬듯 살아있음 (Level 6, transform-only) */
+@keyframes okFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.035)}}
+@keyframes okGlow{0%,100%{opacity:.3;transform:translate(-50%,-50%) scale(1)}50%{opacity:.58;transform:translate(-50%,-50%) scale(1.18)}}
+.h2-hero-visual{position:relative;overflow:hidden;}
+.h2-hero-visual::after{content:"";position:absolute;left:50%;top:50%;width:70%;height:70%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.6),rgba(255,255,255,0) 66%);transform:translate(-50%,-50%);animation:okGlow 11s var(--ease-inout) infinite;pointer-events:none;z-index:0;}
+.h2-visual-emoji{position:relative;z-index:1;animation:okFloat 7s var(--ease-inout) infinite;will-change:transform;}
+
+/* 바로가기 auto-carousel: 포커스 타일 강조 / 나머지 은은하게 (Level 6 소개형) */
+.h2-grid{scroll-behavior:smooth;}
+.h2-grid.ok-focusmode{padding-top:5px;padding-bottom:5px;}
+.h2-grid.ok-focusmode .h2-sc{opacity:.68;transform:scale(.95);transition:opacity var(--dur-standard) var(--ease-out),transform var(--dur-standard) var(--ease-out);transform-origin:center;}
+.h2-grid.ok-focusmode .h2-sc.is-focus{opacity:1;transform:scale(1.055);}
+
+/* Scroll reveal: 스크롤로 등장하는 콘텐츠 (Level 4, IntersectionObserver 구동) */
+.ok-reveal{opacity:0;transform:translateY(13px);transition:opacity .55s var(--ease-out),transform .55s var(--ease-out);will-change:opacity,transform;}
+.ok-reveal.in{opacity:1;transform:none;}
+.ok-reveal-img{opacity:0;transform:scale(1.02);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out);}
+.ok-reveal-img.in{opacity:1;transform:none;}
+
+/* Local content transition: 콘텐츠 영역만 부드럽게 교체 (Level 2) */
+.ok-swap{animation:okSwapIn var(--dur-standard) var(--ease-out) both;}
+@keyframes okSwapIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Reduced motion: autoplay/parallax/ambient 최소화, fade 중심 (Phase 22) */
+@media (prefers-reduced-motion:reduce){
+  .h2-visual-emoji,.h2-hero-visual::after,.okc-emoji,.arc-tile-emoji,.lot-hero-emoji,.dash-ov-emoji{animation:none!important;}
+  .ok-reveal,.ok-reveal-img{transition:none!important;opacity:1!important;transform:none!important;}
+  .h2-grid.ok-focusmode .h2-sc{opacity:1!important;transform:none!important;transition:none!important;}
+  .h2-grid.ok-focusmode{padding-top:0;padding-bottom:0;}
+  .home2 .h2-hero,.home2 .h2-sec,.money2 .m2-hero,.money2 .m2-sec{animation:none!important;}
+}
+/* landscape tablet: hero split · today 가로 */
+@media (min-width:820px) and (min-aspect-ratio:1/1){
+  .h2-hero{flex-direction:row;align-items:stretch;gap:34px;padding:16px 30px 8px;}
+  .h2-hero-main{flex:1 1 55%;min-width:0;display:flex;flex-direction:column;}
+  .h2-hero-visual{flex:1 1 45%;margin-top:0;min-height:340px;align-self:stretch;}
+  .h2-title{font-size:46px;}
+  .h2-menu li{font-size:29px;}
+  .h2-menu{margin-top:auto;}
+  .h2-sec{padding:36px 30px 2px;}
+  .h2-slide{flex-basis:46%;max-width:560px;}
+  .h2-sc{width:360px;}
+  .h2-today-cols{flex-direction:row;align-items:stretch;}
+  .h2-today-cols>*{flex:1;}
+}
+
