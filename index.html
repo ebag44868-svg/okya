@@ -518,6 +518,10 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .m2-more{display:flex;align-items:center;gap:2px;font-size:13px;font-weight:700;color:var(--text-3);}
 .m2-more svg{width:15px;height:15px;stroke:var(--text-3);}
 .m2-txlist .lrow{padding:14px 0;}
+/* 거래 전체보기 2.0: 날짜 헤더 + 플랫 그룹 */
+.hist2-datehd{padding:18px 20px 2px;font-size:12.5px;font-weight:800;color:var(--text-3);}
+.hist2-group{padding:0 20px;}
+.hist2-group .lrow{padding:14px 0;}
 /* 거래 타입 필터 칩 */
 .m2-cats{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding:8px 0 6px;}
 .m2-cats::-webkit-scrollbar{display:none;}
@@ -2352,7 +2356,7 @@ async function rHistory(){
   const match=t=>cur==='전체'?true:cur==='발행'?t.type==='발행':cur==='회수'?t.type==='회수':cur==='받기'?t.to===SESSION.id:cur==='송금'?(t.type==='송금'&&t.from===SESSION.id):cur==='출석'?t.type==='출석':true
   app().innerHTML=`<div class="screen no-nav fade-in p3">
     <div class="phdr"><button class="bk" id="bk2">${I.back}</button><div class="ttl">내역</div><div style="width:34px"></div></div>
-    <div style="display:flex;gap:7px;overflow:auto;padding:8px 18px 4px" id="hist-tags">${filters.map((f,i)=>`<span class="tag ${i===0?'b':'off'}" data-f="${f}">${f}</span>`).join('')}</div>
+    <div class="m2-cats" id="hist-tags" style="padding:10px 20px 6px">${filters.map((f,i)=>`<button class="m2-cat${i===0?' on':''}" data-f="${f}">${f}</button>`).join('')}</div>
     <div id="hist-body"></div>
     <div style="height:12px"></div>
   </div>`
@@ -2361,10 +2365,10 @@ async function rHistory(){
     const fl=data.filter(match),groups={}
     fl.forEach(t=>{const d=(t.at||'').slice(0,10);(groups[d]=groups[d]||[]).push(t)})
     const keys=Object.keys(groups).sort().reverse()
-    document.getElementById('hist-body').innerHTML=keys.length?keys.map(d=>`<div class="datehd">${fmtFull(d)}</div><div class="pcard" style="margin-top:2px">${groups[d].map(t=>txRow(t,admin,rbal[t.id])).join('')}</div>`).join(''):'<div class="empty">내역이 없어요.</div>'
+    document.getElementById('hist-body').innerHTML=keys.length?keys.map(d=>`<div class="hist2-datehd">${fmtFull(d)}</div><div class="hist2-group">${groups[d].map(t=>txRow(t,admin,rbal[t.id])).join('')}</div>`).join(''):'<div class="empty" style="padding:40px 20px">내역이 없어요.</div>'
     wireTxRows(fl)
   }
-  document.querySelectorAll('#hist-tags [data-f]').forEach(el=>el.onclick=()=>{cur=el.dataset.f;document.querySelectorAll('#hist-tags [data-f]').forEach(x=>x.className='tag '+(x.dataset.f===cur?'b':'off'));render()})
+  document.querySelectorAll('#hist-tags [data-f]').forEach(el=>el.onclick=()=>{cur=el.dataset.f;document.querySelectorAll('#hist-tags [data-f]').forEach(x=>x.classList.toggle('on',x.dataset.f===cur));render()})
   render()
 }
 
@@ -2402,7 +2406,7 @@ async function rNotifications(){
     if(!NOTIFS.length){b.innerHTML=emptyHTML({icon:'🔔',title:'아직 알림이 없어요',desc:'새 소식이 오면 여기에서 알려줄게요.'});return}
     const order=['오늘','어제','이번 주','이전'],groups={}
     NOTIFS.forEach(n=>{(groups[notifBucket(n.at)]=groups[notifBucket(n.at)]||[]).push(n)})
-    b.innerHTML=order.filter(k=>groups[k]).map(k=>`<div class="sec" style="margin:16px 20px 8px">${k}</div><div class="pcard">${groups[k].map(rowHTML).join('')}</div>`).join('')
+    b.innerHTML=order.filter(k=>groups[k]).map(k=>`<div class="hist2-datehd">${k}</div><div class="hist2-group">${groups[k].map(rowHTML).join('')}</div>`).join('')
     b.querySelectorAll('[data-nid]').forEach(el=>el.onclick=()=>{const n=NOTIFS.find(x=>x.id===el.dataset.nid);if(n)openNotif(n)})
   }
   render()
@@ -2657,7 +2661,7 @@ async function renderMealRate(dateKey){
     const f=val>=i?1:(val>=i-0.5?0.5:0)
     return`<span class="star-slot"><span class="star-bg">☆</span><span class="star-clip" style="width:${f*100}%"><span class="star-fg">★</span></span></span>`
   }).join('')
-  cur.innerHTML=`<div class="mrate"><div class="mrate-q">오늘 급식 어땠어?<span class="mrate-hint">별 위를 밀어서 평가</span></div><div class="mrate-rows">${slots.map(k=>{
+  cur.innerHTML=`<div class="mrate"><div class="mrate-q">오늘 급식 어땠어?<span class="mrate-hint">별을 눌러 평가 · 밀어도 돼요</span></div><div class="mrate-rows">${slots.map(k=>{
     const key=dateKey+'#'+k
     const rs=rows.filter(x=>x.date===key)
     const mine=rs.find(x=>x.uid===SESSION.id)
@@ -2669,10 +2673,11 @@ async function renderMealRate(dateKey){
   const paint=(el,val)=>el.querySelectorAll('.star-slot').forEach((s,idx)=>{const i=idx+1,f=val>=i?1:(val>=i-0.5?0.5:0);const c=s.querySelector('.star-clip');if(c)c.style.width=(f*100)+'%'})
   cur.querySelectorAll('.mrate-stars').forEach(el=>{
     const key=el.dataset.key
-    const valFromX=cx=>{const r=el.getBoundingClientRect();return Math.max(0.5,Math.min(5,Math.ceil((cx-r.left)/r.width*10)/2))}
+    let rect=null
+    const valFromX=cx=>{const r=rect||el.getBoundingClientRect();return Math.max(0.5,Math.min(5,Math.ceil((cx-r.left)/r.width*10)/2))}
     let dragging=false,pending=0
     const move=e=>{pending=valFromX(e.clientX);paint(el,pending)}
-    el.addEventListener('pointerdown',e=>{e.preventDefault();dragging=true;el.classList.add('dragging');try{el.setPointerCapture(e.pointerId)}catch{}move(e)})
+    el.addEventListener('pointerdown',e=>{e.preventDefault();rect=el.getBoundingClientRect();dragging=true;el.classList.add('dragging');try{el.setPointerCapture(e.pointerId)}catch{}move(e)})
     el.addEventListener('pointermove',e=>{if(dragging)move(e)})
     const end=async e=>{
       if(!dragging)return
