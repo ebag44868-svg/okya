@@ -2452,7 +2452,7 @@ let OK_OV=null
 function openOverlay({variant,title,bodyHTML}){
   closeOverlay()
   const bd=document.createElement('div');bd.className='ov-backdrop'
-  const pn=document.createElement('div');pn.className='ov-panel '+(variant==='center'?'ov-center':'ov-tr')
+  const pn=document.createElement('div');pn.className='ov-panel p3 '+(variant==='center'?'ov-center':'ov-tr')
   pn.innerHTML=`<div class="ov-head"><span class="ov-t">${esc(title)}</span><button class="ov-x" aria-label="닫기">✕</button></div>${bodyHTML||''}`
   document.body.appendChild(bd);document.body.appendChild(pn)
   bd.onclick=closeOverlay
