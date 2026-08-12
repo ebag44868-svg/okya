@@ -1972,7 +1972,9 @@ function calGrid(y,mo,o){o=o||{}
   for(let i=0;i<first;i++)cells+='<div></div>'
   for(let d=1;d<=days;d++){const dow=(first+d-1)%7,isT=o.today===d,isS=o.sel===d,mk=(o.events&&o.events[d])||(o.avail&&o.avail[d]);const bg=isT?'var(--primary)':isS?'var(--primary-tint)':'transparent';const col=isT?'#fff':isS?'var(--primary)':dow===0?'#F0616B':'var(--ink)';const dc=o.clickable?`data-day="${d}"`:''
     const dotc=isT?'#fff':((o.dotColors&&o.dotColors[d])||'var(--primary)')
-    cells+=`<div ${dc} style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;font-size:13px;font-weight:${(isT||isS)?'700':'500'};border-radius:10px;background:${bg};color:${col};cursor:${o.clickable?'pointer':'default'}">${d}${mk?`<span style="position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:${dotc}"></span>`:''}</div>`}
+    const rat=o.ratings&&o.ratings[d]
+    const mark=rat?`<span style="position:absolute;bottom:3px;font-size:8.5px;font-weight:800;letter-spacing:-.3px;line-height:1;color:${isT?'#fff':'#E0930F'}">★${rat.toFixed(1)}</span>`:(mk?`<span style="position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:${dotc}"></span>`:'')
+    cells+=`<div ${dc} style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;font-size:13px;font-weight:${(isT||isS)?'700':'500'};border-radius:10px;background:${bg};color:${col};cursor:${o.clickable?'pointer':'default'}">${d}${mark}</div>`}
   const nav=o.nav?`<div style="display:flex;gap:4px"><button data-mcnav="-1" style="width:30px;height:30px;border:none;border-radius:9px;background:var(--bg);color:var(--ink2);cursor:pointer;font-size:16px">‹</button><button data-mcnav="1" style="width:30px;height:30px;border:none;border-radius:9px;background:var(--bg);color:var(--ink2);cursor:pointer;font-size:16px">›</button></div>`:''
   return`<div style="background:var(--card);border-radius:18px;box-shadow:var(--sh);padding:15px 13px"><div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px 12px"><div style="font-size:14px;font-weight:700">${y}년 ${mo+1}월</div>${nav}</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">${cells}</div></div>`
 }
@@ -1980,20 +1982,29 @@ function monthEvents(){const now=new Date(),y=now.getFullYear(),mo=now.getMonth(
 // 이번 달: {일: [라벨,...]} (일정 있는 날만 키 존재)
 function monthEventsList(y,mo){const map={};SCHEDULE.forEach(s=>{const p=s.date.split('-');if(+p[0]===y&&+p[1]===mo+1){const dd=+p[2];(map[dd]=map[dd]||[]).push(s.label)}});return map}
 // 월간 급식 달력 화면
-let MC_OFF=0,MC_SEL=1,MC_SLOT='조식'
+let MC_OFF=0,MC_SEL=1,MC_SLOT='조식',MC_RATINGS={}
+// 그 달 급식 별점을 날짜별 학생 평균(★)으로 집계(월별 캐시)
+async function loadMonthRatings(y,mo){
+  const mk=`${y}-${String(mo+1).padStart(2,'0')}`
+  if(MC_RATINGS[mk])return MC_RATINGS[mk]
+  const map={}
+  try{const r=await wt(sb.from('okya_meal_ratings').select('date,score').like('date',mk+'-%'),5000);const agg={};(r.data||[]).forEach(x=>{const day=+((x.date||'').split('#')[0].split('-')[2]||0);if(!day)return;(agg[day]=agg[day]||{s:0,c:0});agg[day].s+=(x.score||0);agg[day].c++});Object.keys(agg).forEach(d=>map[d]=(agg[d].s/agg[d].c)/2)}catch{}
+  MC_RATINGS[mk]=map;return map
+}
 function renderMealCalendar(){MC_OFF=0;MC_SEL=new Date().getDate();MC_SLOT=defaultMealSlot();drawMealCalendar()}
 function mcNav(d){MC_OFF+=d;MC_SEL=1;drawMealCalendar()}
 function mcPick(d){MC_SEL=d;drawMealCalendar()}
 function mcSlot(s){MC_SLOT=s;drawMealCalendar()}
-function drawMealCalendar(){
+async function drawMealCalendar(){
   const base=new Date();base.setDate(1);base.setMonth(base.getMonth()+MC_OFF);const y=base.getFullYear(),mo=base.getMonth()
   const pad=n=>String(n).padStart(2,'0'),key=`${y}-${pad(mo+1)}-${pad(MC_SEL)}`
   const avail={},dim=new Date(y,mo+1,0).getDate();for(let d=1;d<=dim;d++){if(mealsOf(`${y}-${pad(mo+1)}-${pad(d)}`))avail[d]=1}
   const today=(MC_OFF===0)?new Date().getDate():-1
   const items=((mealsOf(key)||{})[MC_SLOT]||[]).filter(Boolean)
+  const ratings=await loadMonthRatings(y,mo)
   app().innerHTML=`<div class="screen no-nav fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">급식 달력</div><div style="width:34px"></div></div>
-    <div class="pcard">${calGrid(y,mo,{today,sel:MC_SEL,avail,nav:true,clickable:true})}</div>
+    <div class="pcard">${calGrid(y,mo,{today,sel:MC_SEL,avail,ratings,nav:true,clickable:true})}<div style="padding:10px 4px 0;font-size:11.5px;color:var(--sub)">★ 숫자는 학생들의 평균 별점이에요</div></div>
     <div class="pcard">
       <div class="chd"><div class="sec" style="margin:0">${mo+1}월 ${MC_SEL}일</div><div class="pills" id="mc-seg">${MEAL_SLOTS.map(([k])=>`<button class="ppill${k===MC_SLOT?' on':''}" data-slot="${k}">${k}</button>`).join('')}</div></div>
       <ul class="meal">${items.length?items.map(x=>`<li>${esc(x)}</li>`).join(''):`<div style="padding:8px 0;color:var(--sub);font-size:13.5px">급식 정보가 없어요</div>`}</ul>
@@ -3471,6 +3482,14 @@ async function rDmChat(userId){
   document.getElementById('bk').onclick=pop
   const dmtxt=document.getElementById('dm-txt')
   dmtxt.oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'}
+  // 키보드가 올라올 때 입력창만 키보드 위로(화면 전체가 밀려 올라가지 않게)
+  const vv=window.visualViewport
+  if(vv){
+    const scr=document.querySelector('.dm-screen')
+    const fit=()=>{if(!scr||!document.body.contains(scr)){vv.removeEventListener('resize',fit);vv.removeEventListener('scroll',fit);return}scr.style.height=vv.height+'px';scr.style.transform='translateY('+vv.offsetTop+'px)'}
+    fit();vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit)
+    dmtxt.addEventListener('focus',()=>setTimeout(()=>{const f=document.getElementById('dm-feed');if(f)f.scrollTop=f.scrollHeight},250))
+  }
   const send=async()=>{
     const text=dmtxt.value.trim();if(!text)return
     const btn=document.getElementById('dm-snd');btn.disabled=true
