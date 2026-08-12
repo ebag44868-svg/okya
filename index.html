@@ -1376,6 +1376,9 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .feat-sub{font-size:14px;font-weight:600;color:var(--text-3);margin-top:10px;}
 .feat-hero-visual{margin-top:16px;min-height:120px;border-radius:var(--radius-xl);background:linear-gradient(140deg,#EAE7FF,#F3ECFF 55%,#FDE9F5);display:flex;align-items:center;justify-content:center;overflow:hidden;background-size:cover;background-position:center;}
 .feat-emoji{font-size:54px;opacity:.9;filter:drop-shadow(0 8px 18px rgba(0,0,0,.12));}
+/* 세부탭 폼 2.0: 무거운 카드 → 플랫 필드 그룹(입력 인풋은 그대로) */
+.form2>.pcard{background:none;box-shadow:none;border-radius:0;padding:6px 20px 4px;margin:0;}
+.form2>.pcard+.pcard{border-top:1px solid var(--divider);margin-top:10px;padding-top:16px;}
 @media (min-width:820px) and (min-aspect-ratio:1/1){
   .feat-hero{flex-direction:row;align-items:stretch;gap:30px;padding:12px 30px 6px;}
   .feat-hero-main{flex:1 1 60%;display:flex;flex-direction:column;justify-content:center;}
@@ -3002,7 +3005,7 @@ function rPrintNew(){
   let file=null,bind='spring'
   const calc=()=>{const copies=parseInt((document.getElementById('pr-copies')||{}).value,10)||1;const c=printCost(copies,bind);const el=document.getElementById('pr-cost');if(el)el.textContent=fmt(c)+'옥';return c}
   app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">제본 신청</div><div style="width:34px"></div></div>
-    <div class="chal-detail">
+    <div class="chal-detail form2">
       <div class="pcard">
         <div class="field"><label>제목</label><input id="pr-title" placeholder="예: 미적분 오답노트"></div>
         <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>장수 (선택)</label><input id="pr-pages" type="number" inputmode="numeric" placeholder="24"></div><div class="field" style="flex:1"><label>부수</label><input id="pr-copies" type="number" inputmode="numeric" value="1"></div></div>
@@ -3531,7 +3534,7 @@ function rChallengeNew(){
   let posterFile=null
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">새 챌린지</div><div style="width:34px"></div></div>
-    <div class="chal-detail">
+    <div class="chal-detail form2">
       <div class="pcard">
         <div class="field"><label>포스터(팜플렛)</label>
           <label for="cnf" class="upload" id="cnfl">${I.image}<span>포스터 이미지 추가</span></label>
@@ -3639,7 +3642,7 @@ function rBookNew(){
   let photoFile=null
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">책 등록</div><div style="width:34px"></div></div>
-    <div class="chal-detail">
+    <div class="chal-detail form2">
       <div class="pcard">
         <div class="field"><label>교재명</label><input id="bt" placeholder="예: 통합사회1 (비상)"></div>
         <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>학년</label><select id="bg"><option>1학년</option><option>2학년</option><option>3학년</option></select></div><div class="field" style="flex:1"><label>구분</label><select id="bk2"><option>나눔</option><option>교환</option></select></div></div>
@@ -3924,7 +3927,7 @@ async function rVerify(eid){
   if(!e){toast('챌린지를 찾을 수 없어요');return}
   app().innerHTML=`<div class="screen fade-in p3">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지 인증</div><div style="width:34px"></div></div>
-    <div class="chal-detail">
+    <div class="chal-detail form2">
     <div class="pcard"><div style="display:flex;gap:10px;align-items:center"><div class="chip ti-org">${I.star}</div><div style="flex:1"><div class="ti">${esc(e.title)}</div><div class="su">보상 ${fmt(e.reward)}옥 · ${fmtDate(e.deadline)}</div></div></div></div>
     <div class="pcard">
       <div class="field"><label>참여 학생 이름</label><input id="vn" placeholder="예: 박은찬, 김옥야"></div>
