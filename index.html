@@ -1791,6 +1791,21 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .dash-start:active{transform:scale(.96);}
 .dash-hint{text-align:center;font-size:12.5px;font-weight:600;color:var(--text-3);margin-top:12px;}
 @media (min-width:820px) and (min-aspect-ratio:1/1){.dash-stage{height:360px;max-width:820px;}}
+/* 오늘의 수학 */
+.math-card{background:var(--surface);border-radius:var(--radius-xl);box-shadow:var(--shadow-md);padding:22px 20px;margin-top:18px;}
+.math-eyebrow{font-size:12.5px;font-weight:800;color:var(--accent);letter-spacing:.06em;}
+.math-q{font-size:21px;font-weight:800;color:var(--text-1);line-height:1.5;margin-top:12px;letter-spacing:-.01em;}
+.math-body{margin-top:18px;}
+.math-input-row{display:flex;gap:10px;align-items:stretch;}
+.math-input-row input{flex:1;}
+.math-submit{flex:none;background:var(--text-1);color:#fff;font-size:15px;font-weight:800;padding:0 24px;border-radius:var(--radius-md);transition:transform var(--dur-micro) var(--ease-spring);}
+.math-submit:active{transform:scale(.96);}
+.math-fb-wrong{margin-top:14px;padding:14px 16px;border-radius:14px;background:var(--danger-tint);color:var(--danger);font-size:14.5px;font-weight:800;text-align:center;animation:p3rise2 .3s var(--ease-out) both;}
+.math-result{padding:20px 18px;border-radius:16px;background:#E7F8EF;animation:p3rise2 .4s var(--ease-out) both;}
+.math-res-t{font-size:17px;font-weight:900;color:#16A34A;letter-spacing:.02em;}
+.math-res-a{font-size:15px;font-weight:800;color:var(--text-1);margin-top:8px;}
+.math-res-ex{font-size:14px;font-weight:600;color:var(--text-2);margin-top:6px;line-height:1.55;}
+@media (min-width:820px) and (min-aspect-ratio:1/1){.math-card,.math-body{max-width:640px;}}
 @media (min-width:820px) and (min-aspect-ratio:1/1){
   .arc-wrap{max-width:860px;margin-right:auto;padding:0 30px 34px;}
   .arc-head{padding-top:calc(22px + env(safe-area-inset-top));}
@@ -4622,6 +4637,17 @@ const QUIZ_BANK=[
 ]
 function quizToday(){const s=todayKey();let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return QUIZ_BANK[h%QUIZ_BANK.length]}
 
+// [Phase 8] 오늘의 수학 — 문제 데이터(UI와 분리). 수식은 유니코드(×÷²√ 등)·줄바꿈(\n) 사용.
+// {id, date?, question, answer, explanation, reward}  date 지정 시 그날 고정, 없으면 날짜로 순환.
+const MATH_BANK=[
+  {id:'ma-calc1',  question:'다음을 계산하세요.\n\n12 × 8 − 15', answer:'81',  explanation:'12 × 8 = 96, 96 − 15 = 81 이에요.', reward:100},
+  {id:'ma-square', question:'한 변의 길이가 7인 정사각형의 넓이는?', answer:'49',  explanation:'정사각형의 넓이 = 한 변 × 한 변 = 7 × 7 = 49.', reward:100},
+  {id:'ma-seq',    question:'다음 수열에서 빈칸에 올 수는?\n\n2, 4, 8, 16, ▢', answer:'32', explanation:'앞 항의 2배씩 커지는 등비수열이에요. 16 × 2 = 32.', reward:100},
+  {id:'ma-eq',     question:'x + 5 = 12 일 때, x의 값은?', answer:'7',   explanation:'양변에서 5를 빼면 x = 12 − 5 = 7.', reward:100},
+  {id:'ma-pct',    question:'50의 30%는 얼마일까요?', answer:'15',  explanation:'50 × 0.3 = 15 이에요.', reward:100},
+]
+function mathToday(){const t=todayKey();const dated=MATH_BANK.find(m=>m.date===t);if(dated)return dated;let h=0;for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))>>>0;return MATH_BANK[h%MATH_BANK.length]}
+
 // [Phase 2] 아케이드 메인 (2×2 게임 타일)
 function rArcade(){
   TAB='arcade'
@@ -4785,7 +4811,35 @@ function rDash(){
   stage.addEventListener('pointerdown',()=>{if(state==='run')jump()})
   py=groundY()-ph;showStart();raf=requestAnimationFrame(frame)
 }
-function rMathDaily(){arcShell('오늘의 수학',`<div class="arc-stub"><span>✏️</span><p>곧 만나요</p></div>`)}
+// [Phase 8] 오늘의 수학 — 직접 입력, 정답 시 보상. 오답이면 다시 도전 가능.
+const mathNorm=s=>String(s).trim().toLowerCase().replace(/[\s,]/g,'')
+function mathSolvedHTML(q){return`<div class="math-result"><div class="math-res-t">CORRECT · +${q.reward}옥</div><div class="math-res-a">정답: ${esc(q.answer)}</div><div class="math-res-ex">${esc(q.explanation).replace(/\n/g,'<br>')}</div><div class="quiz-again">내일 새 문제로 다시 만나요</div></div>`}
+function rMathDaily(){
+  const q=mathToday(),done=arcDoneToday('math'),res=arcGet('math_result')
+  const solved=done&&res&&res.date===todayKey()&&res.id===q.id
+  const qHTML=esc(q.question).replace(/\n/g,'<br>')
+  const body=solved?mathSolvedHTML(q)
+    :`<div class="math-input-row"><input id="math-ans" type="text" placeholder="정답을 입력하세요" autocomplete="off" autocapitalize="off"><button class="math-submit" id="math-submit">제출</button></div><div id="math-fb"></div>`
+  arcShell('오늘의 수학',`<div class="math-card"><div class="math-eyebrow">오늘의 수학</div><div class="math-q">${qHTML}</div></div><div class="math-body">${body}</div>`)
+  if(solved)return
+  const input=document.getElementById('math-ans'),btn=document.getElementById('math-submit'),fb=document.getElementById('math-fb')
+  async function submit(){
+    if(btn.disabled)return
+    const val=input.value
+    if(!mathNorm(val)){toast('정답을 입력해줘');return}
+    if(mathNorm(val)===mathNorm(q.answer)){
+      btn.disabled=true;input.disabled=true
+      arcMarkToday('math');arcSet('math_result',{date:todayKey(),id:q.id,correct:true})
+      confettiBurst();popMsg(`정답! +${q.reward}옥`,'🎉');await arcadeReward(q.reward,'오늘의 수학')
+      const be=document.querySelector('.math-body');if(be)be.innerHTML=mathSolvedHTML(q)
+    }else{
+      fb.innerHTML=`<div class="math-fb-wrong">INCORRECT · 다시 도전해봐요</div>`
+      input.classList.add('err');input.focus();input.select();setTimeout(()=>input.classList.remove('err'),600)
+    }
+  }
+  btn.onclick=submit
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submit()}})
+}
 
 // ── 테마 ──
 const THEMES=[
