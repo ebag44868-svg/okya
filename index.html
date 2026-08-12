@@ -2423,7 +2423,8 @@ function okyaCardHTML(txs,admin){
 function goOkyaCard(mode){
   if(mode==='att'){doAttendance();return}
   const g=arcGame(arcDailyGameKey())||ARCADE_GAMES[0]
-  TAB='arcade';STACK=[];rArcade();push(g.route)
+  // 아케이드 탭을 base로 두고 게임으로 바로 진입(뒤로가기 시 아케이드 메인). 중간 화면 flash 없음.
+  TAB='arcade';STACK=[];push(g.route)
 }
 async function rHome(){
   TAB='home'
