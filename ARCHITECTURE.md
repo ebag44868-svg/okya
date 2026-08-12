@@ -7,7 +7,9 @@
 
 ## 1. 앱 개요
 - **무엇**: 창녕옥야고등학교 학생회 앱. 급식/학사일정/청원/옥야머니(교내 포인트)/커뮤니티(챌린지·책교환·제본소)/메시지(DM)/알림.
-- **형태**: **단일 파일 `index.html`** (약 4,540줄 / ~520KB) 안에 HTML + `<style>` + `<script type="module">` 전부 포함. **빌드 스텝 없음.** 브라우저가 그대로 실행.
+- **형태(2026-08-12 모듈 분리 완료)**: `index.html`(진입점: head의 CSS `<link>` + body 끝 JS `<script>`) + **`css/`(8) + `js/`(17)** 로 분리. **빌드 스텝 없음.** 브라우저가 클래식 스크립트를 순서대로 로드(전역 스코프 공유 — 단일 파일 시절과 동일한 동작). supabase는 UMD 전역(`window.supabase.createClient`).
+  - **파일 맵**: `css/` = base·home·money·components·my-overlay·layout-landscape·pages·arcade. `js/` = core(sb·헬퍼·모달·알림·거래) → school-data → navigation → home → money → school → community → message → community2(챌린지/책/청원/게시판) → my → `arcade/`{core,main,lottery,quiz,dash,math} → **app(테마+부팅, 반드시 마지막)**. 로드 순서 = 원본 소스 순서(바꾸지 말 것).
+  - ⚠️ 함수/전역은 여전히 **한 전역 스코프 공유**(파일 캡슐화 아님). 새 함수는 아무 파일에 넣어도 서로 보이지만, **로드 시점에 실행되는 최상위 문장**(const 초기화가 함수 호출, IIFE 등)은 의존 대상보다 뒤 파일에 두지 말 것. 부팅 IIFE는 app.js에 유지.
 - **주 사용 기기**: **가로형 태블릿(landscape tablet)** 우선. 모바일 세로도 지원하지만 QA 기준은 태블릿 가로.
 - **백엔드**: Supabase (CDN import, `@supabase/supabase-js@2.39.3`). 인증 + Postgres 테이블 + Storage(`photos` 버킷).
 - **데이터 서비스(별도 repo)**: 급식/학사일정은 앱이 `https://ebag44868-svg.github.io/okya_data` (GitHub Pages)에서 fetch. 그 repo는 매일 자동 갱신(cron). **이 repo와 합치지 말 것.** 로컬 `okya-data/` 폴더는 `.gitignore`됨.
@@ -18,19 +20,15 @@
 - 배포: GitHub Pages 계열(파일 push하면 반영). 로컬에서 열어도 Supabase는 원격이라 동작.
 
 ## 3. 🔧 빌드 검증 절차 (커밋 전 매번 필수)
-빌드 도구가 없으므로 **직접 검증**한다. Git Bash에서:
+빌드 도구가 없으므로 **직접 검증**한다. 모듈 분리 후에는 각 JS 파일을 문법 검사한다. Git Bash에서:
 ```bash
-cd /c/Users/SAMSUNG/OneDrive/Desktop/okss && python -c "
-import re
-s=open('index.html',encoding='utf-8').read()
-m=max(re.findall(r'<script type=\"module\">(.*?)</script>',s,re.S),key=len)
-open('_check.mjs','w',encoding='utf-8').write(m)
-print('braces {',s.count('{'),'}',s.count('}'))
-" && node --check _check.mjs && echo "JS OK" && rm -f _check.mjs
+cd /c/Users/SAMSUNG/OneDrive/Desktop/okss
+for f in js/*.js js/arcade/*.js; do node --check "$f" || echo "FAIL $f"; done && echo "JS OK"
 ```
-- **`braces { N } N` 의 두 숫자가 같아야 한다** (CSS+JS 중괄호 균형). 다르면 어딘가 깨진 것.
-- **`JS OK`** 가 떠야 한다 (모듈 스크립트 문법 검사).
-- 라이브 기능 테스트는 Supabase 로그인이 필요해 **개발자가 실기기에서 QA**한다. 코드 측 검증은 위 두 가지가 최소선.
+- 모든 파일에서 에러 없이 **`JS OK`** 가 떠야 한다.
+- CSS 중괄호 균형은 편집한 파일에서 `{`/`}` 개수가 같은지 확인.
+- 라이브 기능 테스트는 Supabase 로그인이 필요해 **개발자가 실기기에서 QA**한다.
+- 참고: 최초 분리는 `_split.cjs`(gitignore됨)가 "재결합==원본" 검증과 함께 수행했다. 대규모 재분할이 필요하면 이 스크립트를 참고/재사용.
 
 ## 4. 커밋 / 브랜치 규칙
 - 큰 작업 전 **백업 브랜치** 생성: `git checkout -b backup/before-xxx` 후 `main` 복귀.
@@ -38,10 +36,10 @@ print('braces {',s.count('{'),'}',s.count('}'))
 - 의미 단위로 자주 커밋. push는 개발자 요청 시 or 관례대로.
 - 되돌릴 땐 `git revert <hash> --no-edit` (해당 커밋만 안전하게 취소).
 
-## 5. 코드 전역 구조 (index.html 안 순서, 위→아래)
-1. `<head>` + 거대한 `<style>` (모든 CSS). 다크/테마 변수, 컴포넌트, **랜드스케이프 미디어쿼리** `@media (min-width:820px) and (min-aspect-ratio:1/1)` (여러 곳 반복).
-2. `<div id="app"></div>` + 사운드/토스트 등 DOM.
-3. `<script type="module">` — 앱 전체 로직. import(supabase) → 상수/헬퍼 → 상태 → 렌더 함수들 → 부팅.
+## 5. 코드 전역 구조 (로드 순서 = 원본 소스 순서)
+1. `<head>`: 폰트 CSS(외부) → `css/*.css` 8개(§1 파일맵 순서). **랜드스케이프 미디어쿼리** `@media (min-width:820px) and (min-aspect-ratio:1/1)`는 여러 CSS 파일에 분산(원래 소스 순서 유지 — cascade 보존).
+2. `<body>`: `<div id="app">`(splash) + 토스트 DOM.
+3. supabase UMD `<script>` → `js/*.js` 17개(§1 파일맵 순서). 흐름: 상수/헬퍼 → 상태 → 렌더 함수 → 아케이드 → **부팅(app.js)**. (분리 전 단일 스크립트와 동일한 실행 의미.)
 
 ## 6. 전역 상태 변수 (module 스코프 `let`)
 | 변수 | 용도 |
