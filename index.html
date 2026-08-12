@@ -484,8 +484,8 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 
 /* ===================== OKSS Motion System ===================== */
 /* Ambient: hero visual이 아주 느리게 숨쉬듯 살아있음 (Level 6, transform-only) */
-@keyframes okFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.02)}}
-@keyframes okGlow{0%,100%{opacity:.22;transform:translate(-50%,-50%) scale(1)}50%{opacity:.44;transform:translate(-50%,-50%) scale(1.13)}}
+@keyframes okFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.035)}}
+@keyframes okGlow{0%,100%{opacity:.3;transform:translate(-50%,-50%) scale(1)}50%{opacity:.58;transform:translate(-50%,-50%) scale(1.18)}}
 .h2-hero-visual{position:relative;overflow:hidden;}
 .h2-hero-visual::after{content:"";position:absolute;left:50%;top:50%;width:70%;height:70%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.6),rgba(255,255,255,0) 66%);transform:translate(-50%,-50%);animation:okGlow 11s var(--ease-inout) infinite;pointer-events:none;z-index:0;}
 .h2-visual-emoji{position:relative;z-index:1;animation:okFloat 7s var(--ease-inout) infinite;will-change:transform;}
@@ -493,8 +493,8 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 /* 바로가기 auto-carousel: 포커스 타일 강조 / 나머지 은은하게 (Level 6 소개형) */
 .h2-grid{scroll-behavior:smooth;}
 .h2-grid.ok-focusmode{padding-top:5px;padding-bottom:5px;}
-.h2-grid.ok-focusmode .h2-sc{opacity:.8;transform:scale(.98);transition:opacity var(--dur-standard) var(--ease-out),transform var(--dur-standard) var(--ease-out);transform-origin:center;}
-.h2-grid.ok-focusmode .h2-sc.is-focus{opacity:1;transform:scale(1.02);}
+.h2-grid.ok-focusmode .h2-sc{opacity:.68;transform:scale(.95);transition:opacity var(--dur-standard) var(--ease-out),transform var(--dur-standard) var(--ease-out);transform-origin:center;}
+.h2-grid.ok-focusmode .h2-sc.is-focus{opacity:1;transform:scale(1.055);}
 
 /* Scroll reveal: 스크롤로 등장하는 콘텐츠 (Level 4, IntersectionObserver 구동) */
 .ok-reveal{opacity:0;transform:translateY(13px);transition:opacity .55s var(--ease-out),transform .55s var(--ease-out);will-change:opacity,transform;}
@@ -2031,7 +2031,7 @@ function initShortcutCarousel(){
   }
   const go=i=>{idx=(i%tiles.length+tiles.length)%tiles.length;const t=tiles[idx];rail.scrollTo({left:Math.max(0,t.offsetLeft-(rail.clientWidth-t.offsetWidth)/2),behavior:'smooth'})}
   const tick=()=>{if(paused||!onScreen||document.hidden)return;go(idx+1)}
-  const start=()=>{if(reduce||dead||timer)return;timer=setInterval(tick,4200)}
+  const start=()=>{if(reduce||dead||timer)return;timer=setInterval(tick,5000)}
   const stop=()=>{clearInterval(timer);timer=null}
   const pause=()=>{paused=true;clearTimeout(resumeT);resumeT=setTimeout(()=>{paused=false},5200)}
   rail.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=null;focusUpdate()})},{passive:true})
@@ -3753,7 +3753,7 @@ function rBookNew(){
         <div class="field" id="want-field" style="display:none"><label>받고 싶은 책</label><input id="bwant" placeholder="예: 통합사회2 (미래엔)"><p style="font-size:11.5px;color:var(--sub);margin:6px 2px 0">교환으로 받고 싶은 교재를 적어주세요.</p></div>
         <div class="field" style="margin-bottom:0"><label>책 표지 사진 (선택)</label><label for="bf" class="upload book-up" id="bfl">${I.image}<span>사진 추가하기</span></label><input id="bf" type="file" accept="image/*" style="display:none"></div>
       </div>
-      <div style="padding:0 18px"><button class="pbtn pri" id="badd" style="margin-top:4px">등록하기</button><p style="font-size:12px;color:var(--sub);margin:12px 2px 0;text-align:center">사진이 없으면 표지가 자동 생성돼요.</p></div>
+      <div style="padding:0 18px"><button class="pbtn pri" id="badd" style="margin:4px auto 0;max-width:240px;display:block">등록하기</button><p style="font-size:12px;color:var(--sub);margin:12px 2px 0;text-align:center">사진이 없으면 표지가 자동 생성돼요.</p></div>
     </div>
   </div>${bnav()}`
   bindNav()
@@ -3770,7 +3770,13 @@ function rBookNew(){
     if(photoFile){toast('사진 업로드 중...');photo=await uploadImg(photoFile,'book');if(!photo){btn.disabled=false;btn.textContent='등록하기';return}}
     const row={id:uid('b'),title,grade:document.getElementById('bg').value,kind,want,photo,owner:SESSION.id,owner_name:SESSION.name,status:'open',applicants:[],comments:[],at:nowISO()}
     let{error}=await wt(sb.from('okya_books').insert(row)).catch(e=>({error:e}))
-    if(error&&/want/i.test(error.message||'')){delete row.want;({error}=await wt(sb.from('okya_books').insert(row)).catch(e=>({error:e})))}
+    // 스키마에 없는 컬럼이 있으면 해당 컬럼만 빼고 재시도(최대 4회) — 예: photo/want 컬럼 미존재 대응
+    for(let i=0;error&&i<4;i++){
+      const col=(error.message||'').match(/'([^']+)' column/)?.[1]
+      if(!col||!(col in row))break
+      delete row[col]
+      ;({error}=await wt(sb.from('okya_books').insert(row)).catch(e=>({error:e})))
+    }
     if(error){toast('등록 실패 · '+(error.message||'okya_books 컬럼 확인'));btn.disabled=false;btn.textContent='등록하기';return}
     notifyStudents('book',`새 ${kind} 책`,`'${title}' 책이 올라왔어요`)
     popMsg('책이 등록됐어요','📚');pop()
