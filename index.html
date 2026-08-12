@@ -2490,7 +2490,7 @@ async function openHistoryOverlay(){
     <div class="ov-datebar" id="ovh-datebar" style="display:none"><input type="date" id="ovh-date" max="${kstToday()}"><button class="ov-dclear" id="ovh-dclear">전체 날짜</button></div>
     <div class="ov-body" id="ovh-body"></div>`)
   const body=pn.querySelector('#ovh-body'),datebar=pn.querySelector('#ovh-datebar'),dateInput=pn.querySelector('#ovh-date')
-  const setCats=()=>pn.querySelectorAll('#ovh-cats [data-f]').forEach(x=>x.classList.toggle('on',!dateSel&&x.dataset.f===cur))
+  const setCats=()=>pn.querySelectorAll('#ovh-cats [data-f]').forEach(x=>x.classList.toggle('on',x.dataset.f===cur))
   const setDateBtn=()=>pn.querySelector('#ovh-datebtn').classList.toggle('on',!!dateSel)
   const render=()=>{
     const fl=data.filter(t=>matchCat(t)&&(!dateSel||kstDateKey(t.at)===dateSel)),groups={}
