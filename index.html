@@ -1746,9 +1746,11 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .lot-emoji{font-size:24px;line-height:1;}
 .lot-amt{font-size:12px;font-weight:900;color:#B07C18;}
 .lot-x{font-size:12px;font-weight:800;color:var(--text-3);}
-.lot-status{text-align:center;margin-top:26px;font-size:15.5px;font-weight:800;color:var(--text-2);display:flex;flex-direction:column;gap:5px;}
+.lot-status{text-align:center;margin-top:26px;font-size:15.5px;font-weight:800;color:var(--text-2);display:flex;flex-direction:column;align-items:center;gap:8px;}
 .lot-status.win{color:#B07C18;}
 .lot-again{font-size:12.5px;font-weight:600;color:var(--text-3);}
+.lot-retry{margin-top:2px;background:var(--surface);color:var(--accent);font-size:13.5px;font-weight:800;padding:10px 22px;border-radius:var(--radius-full);box-shadow:var(--shadow-sm);transition:transform var(--dur-micro) var(--ease-spring);}
+.lot-retry:active{transform:scale(.95);}
 /* 옥야 퀴즈 */
 .quiz-card{background:var(--surface);border-radius:var(--radius-xl);box-shadow:var(--shadow-md);padding:22px 20px;margin-top:18px;}
 .quiz-eyebrow{font-size:12.5px;font-weight:800;color:var(--accent);letter-spacing:.06em;}
@@ -1769,6 +1771,26 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .quiz-fb-ex{font-size:14px;font-weight:600;color:var(--text-2);margin-top:7px;line-height:1.5;}
 .quiz-again{font-size:12.5px;font-weight:600;color:var(--text-3);margin-top:10px;}
 @media (min-width:820px) and (min-aspect-ratio:1/1){.quiz-card,#quiz-fb{max-width:640px;}}
+/* 옥야 DASH */
+.dash-wrap{margin-top:16px;}
+.dash-hud{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;padding:0 2px;}
+.dash-score{font-size:26px;font-weight:900;color:var(--text-1);font-variant-numeric:tabular-nums;}
+.dash-best{font-size:13px;font-weight:800;color:var(--text-3);}
+.dash-stage{position:relative;width:100%;height:260px;border-radius:var(--radius-xl);overflow:hidden;background:#EAF4FF;box-shadow:var(--shadow-md);touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+.dash-stage canvas{display:block;width:100%;height:100%;}
+.dash-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.72);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);text-align:center;transition:opacity .25s var(--ease-out);}
+.dash-overlay.hide{opacity:0;pointer-events:none;}
+.dash-ov-emoji{font-size:44px;animation:okFloat 7s var(--ease-inout) infinite;}
+.dash-ov-t{font-size:22px;font-weight:900;color:var(--text-1);letter-spacing:-.02em;}
+.dash-ov-s{font-size:13px;font-weight:600;color:var(--text-3);}
+.dash-ov-score{display:flex;gap:30px;margin:8px 0 2px;}
+.dash-ov-score>div{display:flex;flex-direction:column;gap:2px;}
+.dash-ov-score span{font-size:11px;font-weight:800;color:var(--text-3);letter-spacing:.09em;}
+.dash-ov-score b{font-size:24px;font-weight:900;color:var(--text-1);font-variant-numeric:tabular-nums;}
+.dash-start{margin-top:6px;background:var(--text-1);color:#fff;font-size:15px;font-weight:800;padding:12px 28px;border-radius:var(--radius-full);transition:transform var(--dur-micro) var(--ease-spring);}
+.dash-start:active{transform:scale(.96);}
+.dash-hint{text-align:center;font-size:12.5px;font-weight:600;color:var(--text-3);margin-top:12px;}
+@media (min-width:820px) and (min-aspect-ratio:1/1){.dash-stage{height:360px;max-width:820px;}}
 @media (min-width:820px) and (min-aspect-ratio:1/1){
   .arc-wrap{max-width:860px;margin-right:auto;padding:0 30px 34px;}
   .arc-head{padding-top:calc(22px + env(safe-area-inset-top));}
@@ -4583,8 +4605,11 @@ async function arcadeReward(amount,label){
   if(!amount)return true
   return await addTx({from:'u_council',to:SESSION.id,amount,type:'발행',reason:'아케이드 · '+label},{silent:true})
 }
-// [Phase 5] 당첨 카드 위치 — 날짜+사용자 기반 deterministic(날짜 바뀌면 변경)
-function lotteryWinIndex(){const s=todayKey()+'|'+(SESSION?SESSION.id:'');let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h%5}
+// [Phase 5] 당첨 카드 위치 — 날짜+사용자+플레이횟수 기반(첫판은 날짜 deterministic, 재도전마다 이동)
+function lotteryWinIndex(n){const s=todayKey()+'|'+(SESSION?SESSION.id:'')+'|'+(n||0);let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h%5}
+// 오늘의 뽑기 상태 {date, plays, result}. 날짜 바뀌면 자동 초기화.
+function lotState(){const s=arcGet('lottery_state');return(s&&s.date===todayKey())?s:{date:todayKey(),plays:0,result:null}}
+function saveLotState(st){arcSet('lottery_state',st)}
 
 // [Phase 6] 옥야 퀴즈 — 문제 데이터(UI와 분리, 추가 시 코드 수정 불필요)
 // {id, question, options:[4], answer(0~3), explanation, reward}
@@ -4636,35 +4661,44 @@ function arcShell(title,inner,extraClass=''){
   app().innerHTML=`<div class="screen fade-in p3 arcade ${extraClass}"><div class="phdr"><button class="bk" id="arc-bk">${I.back}</button><div class="ttl">${esc(title)}</div><div style="width:34px"></div></div><div class="arc-wrap arc-game-wrap">${inner}</div></div>${bnav()}`
   bindNav();const bk=document.getElementById('arc-bk');if(bk)bk.onclick=()=>pop()
 }
-// [Phase 5] 오늘의 옥야 뽑기 — 5장 중 1장 당첨, 하루 1회
+// [Phase 5] 오늘의 옥야 뽑기 — 5장 중 1장 당첨. 첫판 무료.
+// ★ BETA: 무료 "다시하기" 버튼(LOT_BETA_RETRY) — 정식 배포 시 false로 끄거나 관련 블록 제거.
+const LOT_BETA_RETRY=true
 const lotBackHTML=(isWin)=>isWin?`<span class="lot-emoji">🎁</span><span class="lot-amt">+${ARCADE_REWARDS.lottery}옥</span>`:`<span class="lot-emoji">🍃</span><span class="lot-x">꽝</span>`
 function rLottery(){
-  const done=arcDoneToday('lottery'),res=arcGet('lottery_result'),win=lotteryWinIndex(),t=todayKey()
-  const revealed=done&&res&&res.date===t
-  const cards=[0,1,2,3,4].map(i=>{
-    let cls='lot-card'
-    let back=''
-    if(revealed){cls+=' flipped';if(i===win)cls+=' win';if(i===res.picked)cls+=res.win?'':' picked-lose';back=lotBackHTML(i===win)}
-    return`<button class="${cls}" data-i="${i}"${done?' disabled':''}><div class="lot-inner"><div class="lot-face lot-front"><span class="lot-q">?</span></div><div class="lot-face lot-back">${back}</div></div></button>`
-  }).join('')
-  const status=revealed
-    ?`<div class="lot-status ${res.win?'win':'lose'}">${res.win?`🎉 축하해요! +${res.amount}옥`:'오늘은 꽝이에요 😅'}<span class="lot-again">내일 다시 도전!</span></div>`
-    :`<div class="lot-status">5장 중 한 곳에 옥야머니가 숨어 있어요<span class="lot-again">하루 한 번, 신중하게 골라요</span></div>`
-  arcShell('오늘의 옥야 뽑기',`<div class="lot-hero"><div class="lot-hero-emoji">🎁</div><div class="lot-hero-t">오늘의 옥야 뽑기</div><div class="lot-hero-s">카드를 골라 옥야머니를 획득하세요</div></div><div class="lot-grid" id="lot-grid">${cards}</div><div id="lot-status">${status}</div>`)
-  if(done)return
-  const grid=document.getElementById('lot-grid')
-  grid.querySelectorAll('.lot-card').forEach(c=>c.onclick=async()=>{
-    if(grid.dataset.locked)return;grid.dataset.locked='1'
-    const i=+c.dataset.i,isWin=i===win,amount=isWin?ARCADE_REWARDS.lottery:0
-    c.querySelector('.lot-back').innerHTML=lotBackHTML(isWin)
-    c.classList.add('flipped',isWin?'win':'picked-lose')
-    grid.querySelectorAll('.lot-card').forEach(o=>{o.disabled=true;if(o!==c)o.classList.add('dim')})
-    setTimeout(()=>grid.querySelectorAll('.lot-card').forEach(o=>{if(o===c)return;const oi=+o.dataset.i;o.querySelector('.lot-back').innerHTML=lotBackHTML(oi===win);o.classList.add('flipped');if(oi===win)o.classList.add('win')}),430)
-    arcMarkToday('lottery');arcSet('lottery_result',{date:todayKey(),picked:i,win:isWin,amount})
-    if(isWin){confettiBurst();popMsg(`+${amount}옥 당첨!`,'🎉');await arcadeReward(amount,'오늘의 옥야 뽑기')}
-    else popMsg('꽝! 내일 다시 도전','🍃')
-    const st=document.getElementById('lot-status');if(st)st.innerHTML=`<div class="lot-status ${isWin?'win':'lose'}">${isWin?`🎉 축하해요! +${amount}옥`:'오늘은 꽝이에요 😅'}<span class="lot-again">내일 다시 도전!</span></div>`
-  })
+  let st=lotState()
+  arcShell('오늘의 옥야 뽑기',`<div class="lot-hero"><div class="lot-hero-emoji">🎁</div><div class="lot-hero-t">오늘의 옥야 뽑기</div><div class="lot-hero-s">카드를 골라 옥야머니를 획득하세요</div></div><div id="lot-body"></div>`)
+  const body=document.getElementById('lot-body')
+  const cardHTML=(i,o={})=>{let cls='lot-card';if(o.flipped)cls+=' flipped';if(o.win)cls+=' win';if(o.pickedLose)cls+=' picked-lose';return`<button class="${cls}" data-i="${i}"${o.disabled?' disabled':''}><div class="lot-inner"><div class="lot-face lot-front"><span class="lot-q">?</span></div><div class="lot-face lot-back">${o.flipped?lotBackHTML(!!o.win):''}</div></div></button>`}
+  function resultStatus(){
+    const r=st.result
+    const retry=LOT_BETA_RETRY?`<button class="lot-retry" id="lot-retry">다시하기</button>`:`<span class="lot-again">내일 다시 도전!</span>`
+    const html=`<div class="lot-status ${r.win?'win':'lose'}">${r.win?`🎉 축하해요! +${r.amount}옥`:'아쉽게 꽝이에요 😅'}${retry}</div>`
+    const cur=body.querySelector('.lot-status');if(cur)cur.outerHTML=html;else body.insertAdjacentHTML('beforeend',html)
+    const rb=document.getElementById('lot-retry');if(rb)rb.onclick=()=>{st.result=null;saveLotState(st);showReady()}
+  }
+  function showReady(){
+    const win=lotteryWinIndex(st.plays)
+    body.innerHTML=`<div class="lot-grid" id="lot-grid">${[0,1,2,3,4].map(i=>cardHTML(i)).join('')}</div><div class="lot-status">${st.plays===0?'5장 중 한 곳에 옥야머니가 숨어 있어요':'재도전! 당첨 위치가 새로 바뀌었어요'}<span class="lot-again">신중하게 골라요</span></div>`
+    const grid=document.getElementById('lot-grid')
+    grid.querySelectorAll('.lot-card').forEach(c=>c.onclick=async()=>{
+      if(grid.dataset.locked)return;grid.dataset.locked='1'
+      const i=+c.dataset.i,isWin=i===win,amount=isWin?ARCADE_REWARDS.lottery:0
+      c.querySelector('.lot-back').innerHTML=lotBackHTML(isWin);c.classList.add('flipped',isWin?'win':'picked-lose')
+      grid.querySelectorAll('.lot-card').forEach(o=>{o.disabled=true;if(o!==c)o.classList.add('dim')})
+      setTimeout(()=>grid.querySelectorAll('.lot-card').forEach(o=>{if(o===c)return;const oi=+o.dataset.i;o.querySelector('.lot-back').innerHTML=lotBackHTML(oi===win);o.classList.add('flipped');if(oi===win)o.classList.add('win')}),430)
+      st.plays++;st.result={picked:i,win:isWin,amount,winIdx:win};saveLotState(st);arcMarkToday('lottery')
+      if(isWin){confettiBurst();popMsg(`+${amount}옥 당첨!`,'🎉');await arcadeReward(amount,'오늘의 옥야 뽑기')}
+      else popMsg('꽝! 다시 도전해봐요','🍃')
+      resultStatus()
+    })
+  }
+  function showResult(){
+    const r=st.result
+    body.innerHTML=`<div class="lot-grid">${[0,1,2,3,4].map(i=>cardHTML(i,{flipped:true,win:i===r.winIdx,pickedLose:i===r.picked&&!r.win,disabled:true})).join('')}</div>`
+    resultStatus()
+  }
+  if(st.result)showResult();else showReady()
 }
 // [Phase 6] 옥야 퀴즈 — 하루 한 문제, 정답 시 보상
 function quizFeedbackHTML(q,correct){return`<div class="quiz-feedback ${correct?'correct':'wrong'}"><div class="quiz-fb-t">${correct?`정답이에요! +${q.reward}옥`:'아쉬워요, 오답이에요'}</div><div class="quiz-fb-ex">${esc(q.explanation)}</div><div class="quiz-again">내일 새 문제로 다시 만나요</div></div>`}
@@ -4689,7 +4723,68 @@ function rQuiz(){
     const el=document.getElementById('quiz-fb');if(el)el.innerHTML=quizFeedbackHTML(q,correct)
   })
 }
-function rDash(){arcShell('옥야 DASH',`<div class="arc-stub"><span>🐱</span><p>곧 만나요</p></div>`)}
+// [Phase 7] 옥야 DASH — 횡스크롤 러너(점프/장애물/점수/최고점수). 캐릭터는 asset(dash/player)로 교체 가능.
+function rDash(){
+  const best0init=arcGet('dash_best',0)||0
+  arcShell('옥야 DASH',`<div class="dash-wrap">
+    <div class="dash-hud"><span class="dash-score" id="dash-score">0</span><span class="dash-best" id="dash-best">최고 ${best0init}</span></div>
+    <div class="dash-stage" id="dash-stage"><canvas id="dash-canvas"></canvas>
+      <div class="dash-overlay" id="dash-ov"></div>
+    </div>
+    <div class="dash-hint">Space · 화면 탭 · 클릭으로 점프</div>
+  </div>`,'dash-screen')
+  const stage=document.getElementById('dash-stage'),canvas=document.getElementById('dash-canvas'),ctx=canvas.getContext('2d')
+  const ov=document.getElementById('dash-ov'),scoreEl=document.getElementById('dash-score'),bestEl=document.getElementById('dash-best')
+  let W=0,H=0;const dpr=Math.min(2,window.devicePixelRatio||1)
+  function resize(){W=stage.clientWidth;H=stage.clientHeight;canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}
+  resize()
+  // 교체 가능한 asset(있으면 이미지, 없으면 placeholder)
+  const imgs={};['player','obstacle','background','ground'].forEach(k=>{const u=arcArt('dash',k);if(u){const im=new Image();im.src=u;imgs[k]=im}})
+  const groundH=26,pw=40,ph=40,gravity=2300,jumpV=-760,baseSpeed=290
+  let state='idle',px=54,py=0,vy=0,speed=baseSpeed,obstacles=[],spawnDist=0,dist=0,score=0,best0=best0init,last=0,raf=0,alive=true
+  const groundY=()=>H-groundH
+  function reset(){px=54;py=groundY()-ph;vy=0;obstacles=[];spawnDist=Math.max(W*0.55,180);dist=0;score=0;speed=baseSpeed;last=performance.now();state='run';ov.classList.add('hide')}
+  function jump(){if(state==='run'){if(py>=groundY()-ph-1){vy=jumpV}}else reset()}
+  function showStart(){ov.innerHTML=`<div class="dash-ov-emoji">🐱</div><div class="dash-ov-t">옥야 DASH</div><div class="dash-ov-s">스페이스 · 화면 탭으로 점프</div><button class="dash-start" id="dash-start">시작하기</button>`;ov.classList.remove('hide');bindStart()}
+  function showOver(){ov.innerHTML=`<div class="dash-ov-t">GAME OVER</div><div class="dash-ov-score"><div><span>SCORE</span><b>${score}</b></div><div><span>BEST</span><b>${best0}</b></div></div><button class="dash-start" id="dash-start">다시 하기</button>`;ov.classList.remove('hide');bindStart()}
+  function bindStart(){const b=document.getElementById('dash-start');if(b)b.onclick=e=>{e.stopPropagation();reset()}}
+  function end(){state='over';if(score>best0){best0=score;arcSet('dash_best',score);bestEl.textContent='최고 '+score}showOver()}
+  function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+  function draw(){
+    ctx.clearRect(0,0,W,H)
+    if(imgs.background&&imgs.background.complete&&imgs.background.naturalWidth)ctx.drawImage(imgs.background,0,0,W,H)
+    else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#EAF4FF');g.addColorStop(1,'#DCEBF7');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+    const gy=groundY()
+    if(imgs.ground&&imgs.ground.complete&&imgs.ground.naturalWidth)ctx.drawImage(imgs.ground,0,gy,W,groundH)
+    else{ctx.fillStyle='#CFE0EE';ctx.fillRect(0,gy,W,groundH);ctx.strokeStyle='#B4CADD';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,gy+1);ctx.lineTo(W,gy+1);ctx.stroke()}
+    for(const o of obstacles){const oy=gy-o.h;if(imgs.obstacle&&imgs.obstacle.complete&&imgs.obstacle.naturalWidth)ctx.drawImage(imgs.obstacle,o.x,oy,o.w,o.h);else{ctx.fillStyle='#7B6CFF';roundRect(o.x,oy,o.w,o.h,5);ctx.fill()}}
+    if(imgs.player&&imgs.player.complete&&imgs.player.naturalWidth)ctx.drawImage(imgs.player,px,py,pw,ph)
+    else{ctx.font=`${ph}px sans-serif`;ctx.textBaseline='top';ctx.fillText('🐱',px,py)}
+  }
+  function frame(now){
+    if(!alive||!document.body.contains(canvas)){cleanup();return}
+    raf=requestAnimationFrame(frame)
+    const dt=Math.min(0.045,(now-last)/1000);last=now
+    if(state==='run'){
+      dist+=speed*dt;score=Math.floor(dist/26);scoreEl.textContent=score
+      speed=baseSpeed+Math.min(260,dist/55)
+      vy+=gravity*dt;py+=vy*dt;const gy=groundY()-ph;if(py>gy){py=gy;vy=0}
+      spawnDist-=speed*dt;if(spawnDist<=0){const h=22+Math.random()*30,w=16+Math.random()*16;obstacles.push({x:W+8,w,h});spawnDist=Math.max(speed*0.92,170)+Math.random()*150}
+      for(const o of obstacles)o.x-=speed*dt
+      obstacles=obstacles.filter(o=>o.x+o.w>-12)
+      const gy2=groundY()
+      for(const o of obstacles){const oy=gy2-o.h;if(px+pw-7>o.x&&px+7<o.x+o.w&&py+ph-5>oy){end();break}}
+    }
+    draw()
+  }
+  function onResize(){resize()}
+  function cleanup(){alive=false;cancelAnimationFrame(raf);window.removeEventListener('keydown',onKey);window.removeEventListener('resize',onResize)}
+  function onKey(e){if(e.code==='Space'||e.key===' '||e.key==='ArrowUp'){e.preventDefault();jump()}}
+  window.addEventListener('keydown',onKey)
+  window.addEventListener('resize',onResize)
+  stage.addEventListener('pointerdown',()=>{if(state==='run')jump()})
+  py=groundY()-ph;showStart();raf=requestAnimationFrame(frame)
+}
 function rMathDaily(){arcShell('오늘의 수학',`<div class="arc-stub"><span>✏️</span><p>곧 만나요</p></div>`)}
 
 // ── 테마 ──
