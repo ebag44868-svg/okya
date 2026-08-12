@@ -1800,6 +1800,9 @@ const skelBlock=()=>`<div style="padding:6px 2px"><div class="skeleton skel-titl
 // Empty state 헬퍼
 function emptyHTML({icon='📭',title='',desc='',action=''}={}){return`<div class="empty-state"><div class="empty-ic">${icon}</div><div class="empty-title">${esc(title)}</div>${desc?`<div class="empty-desc">${esc(desc)}</div>`:''}${action?`<div class="empty-action">${action}</div>`:''}</div>`}
 const nameOf=id=>(USERS.find(u=>u.id===id)||{name:'학생회'}).name
+const photoOf=id=>{const u=id===(SESSION&&SESSION.id)?SESSION:USERS.find(u=>u.id===id);return u&&u.photo||null}
+// 공통 아바타: 프로필 사진 있으면 원형 이미지, 없으면 이니셜 (메시지·송금·프로필 등에서 재사용)
+function avatarHTML(id,size=34){const p=photoOf(id),nm=nameOf(id)||'?';const s=size+'px';return p?`<img src="${esc(p)}" style="width:${s};height:${s};border-radius:50%;object-fit:cover;flex:none">`:`<div style="width:${s};height:${s};border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.4)}px;font-weight:700;color:var(--primary);flex:none">${esc(nm.charAt(0))}</div>`}
 
 // ── 알림 (okya_notifications). 테이블 없으면 조용히 무시(앱 흐름 방해 X) ──
 let NOTIFS=[]
@@ -2508,7 +2511,7 @@ async function fTransfer(mode){
     return fl.map(u=>{
       const on=sel===u.id
       const sub=isRecall?('잔액 '+fmt(balOf(u.id,rtxs))+'옥'):(u.role==='admin'?'학생회 임원':'학생')
-      return`<div class="lrow tf-user${on?' on':''}" data-uid="${u.id}"><div class="chip ti-blue" style="border-radius:50%;${on?'background:var(--grad);color:#fff':''}">${esc(u.name.charAt(0))}</div><div class="body"><div class="ti">${esc(u.name)}</div><div class="su">${sub}</div></div><span style="color:${on?'var(--primary)':'#c9cdd8'};display:flex">${on?ICO_CHECK_SM:I.chev}</span></div>`
+      return`<div class="lrow tf-user${on?' on':''}" data-uid="${u.id}"><div class="chip ti-blue" style="border-radius:50%;overflow:hidden;${on&&!u.photo?'background:var(--grad);color:#fff':''}">${u.photo?`<img src="${esc(u.photo)}" style="width:100%;height:100%;object-fit:cover">`:esc(u.name.charAt(0))}</div><div class="body"><div class="ti">${esc(u.name)}</div><div class="su">${sub}</div></div><span style="color:${on?'var(--primary)':'#c9cdd8'};display:flex">${on?ICO_CHECK_SM:I.chev}</span></div>`
     }).join('')
   }
   app().innerHTML=`<div class="screen fade-in p3 mflow" style="display:flex;flex-direction:column">
@@ -2551,7 +2554,7 @@ async function fTransferAmt(mode,toUser){
   app().innerHTML=`<div class="screen fade-in p3 mflow" style="display:flex;flex-direction:column">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${title}</div><button id="tf-cancel" style="font-size:13px;font-weight:600;color:var(--sub);background:none">취소</button></div>
     <div class="kpwrap">
-      <div class="kpto"><div class="av">${esc(toUser.name.charAt(0))}</div><div><div class="n">${esc(toUser.name)}</div><div class="b">${mode==='발행'?'발행 대상':(isRecall?'회수 대상':'창녕옥야고등학교')}</div></div></div>
+      <div class="kpto"><div class="av" style="overflow:hidden">${toUser.photo?`<img src="${esc(toUser.photo)}" style="width:100%;height:100%;object-fit:cover">`:esc(toUser.name.charAt(0))}</div><div><div class="n">${esc(toUser.name)}</div><div class="b">${mode==='발행'?'발행 대상':(isRecall?'회수 대상':'창녕옥야고등학교')}</div></div></div>
       <div style="margin:auto 0;text-align:center">
         <div class="kp-amt" id="kp-amt" style="margin:0"><span class="cur">0</span><small>옥</small></div>
         <div id="kp-bal" style="font-size:12px;color:var(--sub);opacity:.8;font-weight:600;margin-top:10px">${mode==='발행'?'학생회에서 발행':(isRecall?esc(toUser.name)+'님 보유 '+fmt(availBal)+'옥':'보유 '+fmt(availBal)+'옥')}</div>
@@ -2592,7 +2595,7 @@ function fTransferConfirm(mode,toUser,amount,reason,myBal){
   ov.innerHTML=`<div class="p3sheet">
     <div class="grab"></div>
     <div style="text-align:center;margin-bottom:26px">
-      <div style="width:64px;height:64px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:25px;font-weight:800;color:#fff;box-shadow:var(--sh-blue)">${esc(toUser.name.charAt(0))}</div>
+      ${toUser.photo?`<img src="${esc(toUser.photo)}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 16px;box-shadow:var(--sh-blue)">`:`<div style="width:64px;height:64px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:25px;font-weight:800;color:#fff;box-shadow:var(--sh-blue)">${esc(toUser.name.charAt(0))}</div>`}
       <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.05em;margin-bottom:8px">${mode==='발행'?'발행 확인':(mode==='회수'?'회수 확인':'송금 확인')}</div>
       <div style="font-size:20px;font-weight:800;color:var(--ink);line-height:1.5">${esc(toUser.name)}님${mode==='회수'?'에게서':'에게'}<br><span style="color:var(--primary)">${fmt(amount)}옥</span> ${mode==='발행'?'발행':(mode==='회수'?'회수':'송금')}할까요?</div>
       ${reason?`<div style="margin-top:10px;font-size:13px;color:var(--sub)">"${esc(reason)}"</div>`:''}
@@ -3564,15 +3567,25 @@ async function rDmChat(userId){
   document.getElementById('bk').onclick=pop
   const dmtxt=document.getElementById('dm-txt')
   dmtxt.oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'}
-  // 실제 채팅앱처럼: 화면을 보이는 영역(키보드 제외)에 고정 → 헤더는 위, 입력바는 키보드 바로 위, 메시지 목록만 줄어듦
+  // 사용자가 최신 메시지 근처에 있는지 판단(과거 메시지 읽는 중이면 자동 스크롤로 위치를 뺏지 않음)
+  const nearBottom=f=>!f||(f.scrollHeight-f.scrollTop-f.clientHeight)<90
+  // 키보드가 실제로 뷰포트를 줄일 때만 화면을 '보이는 영역'에 고정 → 헤더는 위, 입력바는 키보드 바로 위, 메시지 목록만 부드럽게 줄어듦.
+  // (데스크톱/하드웨어 키보드처럼 뷰포트가 안 줄면 레이아웃을 건드리지 않아 배경이 튀지 않음. .dm-screen의 rail padding-left는 CSS가 그대로 유지)
   const vv=window.visualViewport
-  const isDesk=matchMedia('(min-width:820px) and (min-aspect-ratio:1/1)').matches
-  if(vv&&!isDesk){
+  if(vv){
     const scr=document.querySelector('.dm-screen')
-    if(scr){scr.style.position='fixed';scr.style.left='0';scr.style.right='0';scr.style.width='100%';scr.style.zIndex='60'}
-    const fit=()=>{if(!scr||!document.body.contains(scr)){vv.removeEventListener('resize',fit);vv.removeEventListener('scroll',fit);return}scr.style.height=vv.height+'px';scr.style.top=vv.offsetTop+'px';const f=document.getElementById('dm-feed');if(f)f.scrollTop=f.scrollHeight}
+    const clear=()=>{if(!scr)return;['position','left','right','width','top','height','zIndex'].forEach(p=>scr.style[p]='')}
+    const fit=()=>{
+      if(!scr||!document.body.contains(scr)){vv.removeEventListener('resize',fit);vv.removeEventListener('scroll',fit);return}
+      if((window.innerHeight-vv.height)>90){
+        scr.style.position='fixed';scr.style.left='0';scr.style.right='0';scr.style.width='100%';scr.style.zIndex='60'
+        scr.style.top=vv.offsetTop+'px';scr.style.height=vv.height+'px'
+        const f=document.getElementById('dm-feed');if(f&&nearBottom(f))f.scrollTop=f.scrollHeight
+      }else clear()
+    }
     fit();vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit)
     dmtxt.addEventListener('focus',()=>setTimeout(fit,300))
+    dmtxt.addEventListener('blur',()=>setTimeout(fit,100))
   }
   const send=async()=>{
     const text=dmtxt.value.trim();if(!text)return
@@ -3581,14 +3594,16 @@ async function rDmChat(userId){
       await wt(sb.from('okya_dm').insert({id:uid('dm'),from_id:myId,to_id:userId,text,at:nowISO()}))
       notify(userId,'dm','새 메시지',`${nameOf(myId)}님: ${text.length>30?text.slice(0,30)+'…':text}`,myId)
       dmtxt.value='';dmtxt.style.height='auto'
-      await loadDms()
+      await loadDms(true)
     }catch{toast('전송 실패')}
     finally{btn.disabled=false;dmtxt.focus()}
   }
   document.getElementById('dm-snd').onclick=send
   // Enter=전송, Shift+Enter=줄바꿈 (모바일 IME 조합 중엔 무시)
   dmtxt.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();send()}})
-  async function loadDms(){
+  async function loadDms(force){
+    // 재렌더 전에 사용자가 최신 근처에 있었는지 기억 → 과거 읽는 중엔 위치 유지
+    const stick=force||nearBottom(document.getElementById('dm-feed'))
     let msgs=[]
     try{const{data}=await wt(sb.from('okya_dm').select('*').or(`and(from_id.eq.${myId},to_id.eq.${userId}),and(from_id.eq.${userId},to_id.eq.${myId})`).order('at',{ascending:true}));msgs=data||[]}catch{}
     const feed=document.getElementById('dm-feed');if(!feed)return
@@ -3599,11 +3614,11 @@ async function rDmChat(userId){
       const isLast=i===a.length-1||a[i+1].from_id!==m.from_id
       const rad=isLast?(isMe?'22px 22px 8px 22px':'8px 22px 22px 22px'):'22px'
       if(isMe){return`<div class="dm-msg me" style="display:flex;justify-content:flex-end;padding:1px 14px;margin-bottom:${isLast?8:2}px"><div style="max-width:74%"><div style="background:var(--primary-tint);color:var(--primary);border-radius:${rad};padding:11px 15px;font-size:14px;line-height:1.55;word-break:break-word">${esc(m.text)}</div>${isLast?`<div style="font-size:10px;color:var(--muted);text-align:right;margin-top:4px">${timeago(m.at)}</div>`:''}</div></div>`}
-      return`<div class="dm-msg" style="display:flex;align-items:flex-start;gap:8px;padding:${showHdr?7:1}px 14px 1px;margin-bottom:${isLast?8:2}px"><div style="width:34px;flex:none">${showHdr?`<div style="width:34px;height:34px;border-radius:50%;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--primary)">${esc(name.charAt(0))}</div>`:''}</div><div style="max-width:74%">${showHdr?`<div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px">${esc(name)}</div>`:''}<div style="background:var(--soft);color:var(--ink);border-radius:${rad};padding:11px 15px;font-size:14px;line-height:1.55;word-break:break-word">${esc(m.text)}</div>${isLast?`<div style="font-size:10px;color:var(--muted);margin-top:4px">${timeago(m.at)}</div>`:''}</div></div>`
+      return`<div class="dm-msg" style="display:flex;align-items:flex-start;gap:8px;padding:${showHdr?7:1}px 14px 1px;margin-bottom:${isLast?8:2}px"><div style="width:34px;flex:none">${showHdr?avatarHTML(userId,34):''}</div><div style="max-width:74%">${showHdr?`<div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px">${esc(name)}</div>`:''}<div style="background:var(--soft);color:var(--ink);border-radius:${rad};padding:11px 15px;font-size:14px;line-height:1.55;word-break:break-word">${esc(m.text)}</div>${isLast?`<div style="font-size:10px;color:var(--muted);margin-top:4px">${timeago(m.at)}</div>`:''}</div></div>`
     }).join('')
-    feed.scrollTop=feed.scrollHeight
+    if(stick)feed.scrollTop=feed.scrollHeight
   }
-  await loadDms()
+  await loadDms(true)
 }
 
 
@@ -4300,6 +4315,7 @@ async function rMy(){
     const url=await uploadImg(f,'profile',400,0.7)
     if(!url)return
     SESSION.photo=url
+    const meU=USERS.find(u=>u.id===SESSION.id);if(meU)meU.photo=url  // 같은 세션 내 다른 화면(메시지/송금 등)에도 즉시 반영
     try{await wt(sb.from('okya_users').update({photo:url}).eq('id',SESSION.id))}catch{}
     rMy()
   }
@@ -4365,7 +4381,7 @@ async function handleUserUpsert(authUser){
       const r=await wt(sb.from('okya_users').insert({id:authUser.id,name,role:'student'}).select().single());SESSION=r.data||{id:authUser.id,name,role:'student'}
     }
   }catch{SESSION={id:authUser.id,name,role}}
-  try{const r=await wt(sb.from('okya_users').select('id,name,role'));USERS=r.data||[]}catch{}
+  try{const r=await wt(sb.from('okya_users').select('id,name,role,photo'));USERS=r.data||[]}catch{}
   STACK=[];routeTab()
 }
 
@@ -4433,7 +4449,7 @@ const DEFAULT_THEME={name:'바이올렛',primary:'#7B6CFF',v:2}
   try{
     // 급식·학사일정 로드 (실패해도 무시하고 진행)
     await Promise.race([loadSchoolData(),new Promise(r=>setTimeout(r,4000))])
-    try{const r=await wt(sb.from('okya_users').select('id,name,role'),6000);USERS=r.data||[]}catch{}
+    try{const r=await wt(sb.from('okya_users').select('id,name,role,photo'),6000);USERS=r.data||[]}catch{}
     const{data}=await wt(sb.auth.getSession(),6000)
     clearTimeout(fallback)
     await holdSplash()
