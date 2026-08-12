@@ -507,7 +507,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .m2-month b{font-weight:800;}
 .m2-dot{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.6);}
 .m2-actions{display:flex;gap:10px;margin-top:22px;}
-.m2-act{flex:1;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.26);border-radius:14px;padding:13px 0;color:#fff;font-size:13.5px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform var(--dur-micro) var(--ease-spring);}
+.m2-act{flex:1;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.26);border-radius:13px;padding:12px 12px;color:#fff;font-size:14px;font-weight:800;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;transition:transform var(--dur-micro) var(--ease-spring);}
 .m2-act:active{transform:scale(.96);}
 .m2-act svg{width:20px;height:20px;}
 .m2-act.pri{background:#fff;color:var(--accent-d);}
@@ -1365,7 +1365,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .pet-hv .vspace-s{font-size:13px;color:var(--accent);opacity:.85;}
 
 /* 청원 헤더: 색 밴드(다른 세부탭과 통일) */
-.pet2-hero{margin:6px 0 0;padding:24px 20px 22px;background:var(--tone-grad,var(--grad));color:#fff;display:flex;flex-direction:column;align-items:flex-start;gap:16px;}
+.pet2-hero{margin:6px 0 0;padding:42px 20px 38px;background:var(--tone-grad,var(--grad));color:#fff;display:flex;flex-direction:column;align-items:flex-start;gap:18px;}
 .pet2-cta{background:#fff;color:var(--tone-d,var(--accent-d));font-size:15px;font-weight:800;padding:12px 22px;border-radius:var(--radius-full);box-shadow:0 6px 16px rgba(0,0,0,.16);transition:transform var(--dur-micro) var(--ease-spring);}
 .pet2-cta:active{transform:scale(.97);}
 /* 세부탭 색상 토큰(이미지 대신 색으로 구별) */
@@ -1374,7 +1374,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 .tone-print{--tone:#5B6CFF;--tone-d:#4A55E0;--tone-soft:#DDE1FF;--tone-border:#BFC6FF;--tone-grad:linear-gradient(120deg,#6C7BFF 0%,#9B6CFF 100%);}
 .tone-peti{--tone:#7B6CFF;--tone-d:#6A4FE0;--tone-soft:#E3DFFF;--tone-border:#CBC2FF;--tone-grad:linear-gradient(120deg,#7B6CFF 0%,#9B6CFF 100%);}
 /* 세부탭 헤더: 제목행 전체를 탭 색 밴드로 */
-.feat-hero{margin:6px 0 0;padding:24px 20px 22px;background:var(--tone-grad,var(--grad));color:#fff;}
+.feat-hero{margin:6px 0 0;padding:42px 20px 38px;background:var(--tone-grad,var(--grad));color:#fff;}
 .feat-title{font-size:28px;font-weight:900;letter-spacing:-.03em;line-height:1.14;color:#fff;}
 .feat-sub{font-size:14px;font-weight:600;color:rgba(255,255,255,.92);margin-top:8px;}
 /* 세부탭 폼: 동계열 옅은 그룹 배경 */
@@ -1383,7 +1383,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
 /* 폼 안 인풋은 흰 배경으로 대비 확보(가독성) */
 .form2 input,.form2 textarea,.form2 select{background:#fff;}
 @media (min-width:820px) and (min-aspect-ratio:1/1){
-  .feat-hero{padding:32px 30px 28px;}
+  .feat-hero{padding:56px 30px 50px;}
   .feat-title{font-size:38px;}
 }
 /* 상세/폼 2.0: 버튼 컴팩트+중앙, 콘텐츠 왼쪽 읽기 컬럼 */
@@ -1392,7 +1392,7 @@ label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bo
   .chal-detail{max-width:720px;margin-right:auto;}
 }
 @media (min-width:820px) and (min-aspect-ratio:1/1){
-  .pet2-hero{padding:32px 30px 28px;}
+  .pet2-hero{padding:56px 30px 50px;}
 }
 @keyframes petrise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 /* 작성 폼 분야 선택 */
@@ -3482,13 +3482,15 @@ async function rDmChat(userId){
   document.getElementById('bk').onclick=pop
   const dmtxt=document.getElementById('dm-txt')
   dmtxt.oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'}
-  // 키보드가 올라올 때 입력창만 키보드 위로(화면 전체가 밀려 올라가지 않게)
+  // 실제 채팅앱처럼: 화면을 보이는 영역(키보드 제외)에 고정 → 헤더는 위, 입력바는 키보드 바로 위, 메시지 목록만 줄어듦
   const vv=window.visualViewport
-  if(vv){
+  const isDesk=matchMedia('(min-width:820px) and (min-aspect-ratio:1/1)').matches
+  if(vv&&!isDesk){
     const scr=document.querySelector('.dm-screen')
-    const fit=()=>{if(!scr||!document.body.contains(scr)){vv.removeEventListener('resize',fit);vv.removeEventListener('scroll',fit);return}scr.style.height=vv.height+'px';scr.style.transform='translateY('+vv.offsetTop+'px)'}
+    if(scr){scr.style.position='fixed';scr.style.left='0';scr.style.right='0';scr.style.width='100%';scr.style.zIndex='60'}
+    const fit=()=>{if(!scr||!document.body.contains(scr)){vv.removeEventListener('resize',fit);vv.removeEventListener('scroll',fit);return}scr.style.height=vv.height+'px';scr.style.top=vv.offsetTop+'px';const f=document.getElementById('dm-feed');if(f)f.scrollTop=f.scrollHeight}
     fit();vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit)
-    dmtxt.addEventListener('focus',()=>setTimeout(()=>{const f=document.getElementById('dm-feed');if(f)f.scrollTop=f.scrollHeight},250))
+    dmtxt.addEventListener('focus',()=>setTimeout(fit,300))
   }
   const send=async()=>{
     const text=dmtxt.value.trim();if(!text)return
@@ -4313,9 +4315,12 @@ function applyTheme(t){
   const r=document.documentElement.style
   const[dga,dgb]=deriveGrad(t.primary)
   const ga=t.ga||dga,gb=t.gb||dgb
-  r.setProperty('--primary',t.primary)
-  r.setProperty('--primary-d',t.d||hslToHex(...(()=>{const[h,s,l]=hexToHsl(t.primary);return[h,s,Math.max(l-0.12,0.30)]})()))
-  r.setProperty('--primary-tint',t.tint||hslToHex(...(()=>{const[h,s]=hexToHsl(t.primary);return[h,Math.min(s,0.85),0.94]})()))
+  const[h,s,l]=hexToHsl(t.primary)
+  const dcol=t.d||hslToHex(h,s,Math.max(l-0.12,0.30))
+  const tint=t.tint||hslToHex(h,Math.min(s,0.85),0.94)
+  r.setProperty('--primary',t.primary);r.setProperty('--primary-d',dcol);r.setProperty('--primary-tint',tint)
+  // 2.0 UI가 쓰는 --accent* 도 함께 갱신 → 홈/학교/머니/MY 등 전체 통일(커뮤 tone 밴드는 --tone이라 고정)
+  r.setProperty('--accent',t.primary);r.setProperty('--accent-d',dcol);r.setProperty('--accent-soft',tint)
   r.setProperty('--ga',ga)
   r.setProperty('--gb',gb)
   r.setProperty('--sh-blue',`0 16px 34px ${t.primary}52,-4px 5px 16px ${t.primary}22`)
