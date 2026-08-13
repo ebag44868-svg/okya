@@ -121,8 +121,15 @@ function rLogin(){
   const gg=document.getElementById('gg')
   gg.onclick=async()=>{
     gg.disabled=true
-    const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+window.location.pathname,queryParams:{prompt:'select_account'}}})
-    if(error){toast('로그인 실패: '+error.message);gg.disabled=false}
+    const isNative=window.Capacitor&&window.Capacitor.isNativePlatform()
+    if(isNative){
+      const{data,error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:'com.okya.okss://auth/callback',queryParams:{prompt:'select_account'},skipBrowserRedirect:true}})
+      if(error){toast('로그인 실패: '+error.message);gg.disabled=false;return}
+      if(data?.url)await window.Capacitor.Plugins.Browser.open({url:data.url})
+    }else{
+      const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+window.location.pathname,queryParams:{prompt:'select_account'}}})
+      if(error){toast('로그인 실패: '+error.message);gg.disabled=false}
+    }
   }
 }
 

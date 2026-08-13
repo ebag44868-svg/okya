@@ -2,7 +2,8 @@
 
 const sb=window.supabase.createClient(
   'https://rzajmazztaarzrqqkezr.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6YWptYXp6dGFhcnpycXFrZXpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxODk0NzQsImV4cCI6MjA5ODc2NTQ3NH0.IDk1fSv_B76wbzYouKS8TP4TObso2nA50rpo9qj96MU'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6YWptYXp6dGFhcnpycXFrZXpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxODk0NzQsImV4cCI6MjA5ODc2NTQ3NH0.IDk1fSv_B76wbzYouKS8TP4TObso2nA50rpo9qj96MU',
+  {auth:{flowType:'pkce'}}
 )
 
 const uid=p=>(p||'x')+'_'+Math.random().toString(36).slice(2,9)

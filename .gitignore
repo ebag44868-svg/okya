@@ -5,3 +5,8 @@ _split.cjs
 _check.mjs
 node_modules/
 www/
+*.jks
+*.keystore
+android/keystore.properties
+.idea/
+android/.idea/

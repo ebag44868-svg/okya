@@ -73,6 +73,14 @@ const DEFAULT_THEME={name:'바이올렛',primary:'#7B6CFF',v:2}
       if((event==='SIGNED_IN'||event==='INITIAL_SESSION')&&s)await handleUserUpsert(s.user)
       else if(event==='SIGNED_OUT'){SESSION=null;USERS=[];rLogin()}
     })
+    if(window.Capacitor&&window.Capacitor.isNativePlatform()){
+      window.Capacitor.Plugins.App.addListener('appUrlOpen',async({url})=>{
+        if(!url.startsWith('com.okya.okss://'))return
+        try{await window.Capacitor.Plugins.Browser.close()}catch{}
+        const{error}=await sb.auth.exchangeCodeForSession(url)
+        if(error)toast('로그인 실패: '+error.message)
+      })
+    }
   }catch{
     clearTimeout(fallback)
     await holdSplash()
