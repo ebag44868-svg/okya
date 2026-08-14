@@ -5,27 +5,22 @@
      → 토큰 재정의만으로 시안 매칭(학교와 동일 전략). 도메인별 점진 확장.
    · 헤더(.rd .phdr)·레일(.rd+.bnav)은 기존 스코프 재사용.
    =================================================================== */
-.cmrd{
-  --primary:#2FC178; --primary-d:#25A867; --primary-tint:#E9F8F0;
-  --accent:#2FC178; --accent-d:#25A867; --accent-soft:#E9F8F0;
-  --grad:linear-gradient(135deg,#2FC178,#25A867);
-  --ga:#2FC178; --gb:#59D79B;
-  --sh-blue:0 12px 28px rgba(47,193,120,.28),-3px 4px 14px rgba(47,193,120,.12);
-}
+/* .cmrd 자체는 토큰을 덮지 않음 → 루트 테마(--accent/--primary/--grad) 상속.
+   색상 테마(MY 팔레트) 선택이 커뮤 화면 전체에 반영됨. */
 
-/* 세부탭 색 밴드/폼 톤(오렌지/청록/파랑/보라) → 그린 통일 */
+/* 세부탭 색 밴드/폼 톤 → 테마색 통일 */
 .cmrd .tone-chal,.cmrd .tone-book,.cmrd .tone-print,.cmrd .tone-peti{
-  --tone:#2FC178; --tone-d:#25A867; --tone-soft:#EAF7F0; --tone-border:#CFEEDD;
-  --tone-grad:linear-gradient(120deg,#3AD07F 0%,#2FC178 100%);
+  --tone:var(--accent); --tone-d:var(--accent-d); --tone-soft:var(--accent-soft); --tone-border:var(--accent-soft);
+  --tone-grad:linear-gradient(120deg,var(--gb) 0%,var(--accent) 100%);
 }
 /* feat-hero 밴드: 시안처럼 옅은 그린 + 어두운 글씨 + 부제 */
-.cmrd .feat-hero{position:relative;overflow:hidden;background:linear-gradient(120deg,#E4F7EC 0%,#F2FBF6 60%,#FFFFFF 100%);color:#1B2A24;padding:24px 22px 22px;}
+.cmrd .feat-hero{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--accent-soft) 0%,#FFFFFF 60%,#FFFFFF 100%);color:#1B2A24;padding:24px 22px 22px;}
 .cmrd .feat-title{color:#1B2A24;font-size:24px;}
 .cmrd .feat-sub{color:#5C6B63;font-size:13.5px;margin-top:6px;}
 /* 커뮤 공용 정보 배너 */
-.cmrd .cm-info{margin:12px 20px 4px;padding:12px 15px;background:#E9F8F0;border:1px solid #CFEEDD;
+.cmrd .cm-info{margin:12px 20px 4px;padding:12px 15px;background:var(--accent-soft);border:1px solid var(--accent-soft);
   border-radius:13px;font-size:12.5px;line-height:1.6;color:#2c3a33;}
-.cmrd .cm-info b{color:#25A867;font-weight:800;}
+.cmrd .cm-info b{color:var(--accent-d);font-weight:800;}
 
 /* ── P1 청원 ── */
 /* 시안엔 상단 색 밴드(feat-hero)가 없고 대표 청원부터 시작 → 밴드 숨김 */
@@ -34,11 +29,11 @@
 /* ── P2 챌린지 ── */
 /* 포스터 보상 뱃지 + 참여하기(카드 클릭으로 상세 이동) */
 .cmrd .chal-poster{position:relative;}
-.cmrd .chal-reward{position:absolute;top:10px;right:10px;z-index:2;background:#25A867;color:#fff;
+.cmrd .chal-reward{position:absolute;top:10px;right:10px;z-index:2;background:var(--accent-d);color:#fff;
   font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.18);}
-.cmrd .chal-join{margin-top:9px;width:100%;padding:9px 0;border:0;border-radius:10px;background:#E9F8F0;
-  color:#25A867;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;}
-.cmrd .chal-join:active{background:#DCF2E7;}
+.cmrd .chal-join{margin-top:9px;width:100%;padding:9px 0;border:0;border-radius:10px;background:var(--accent-soft);
+  color:var(--accent-d);font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;}
+.cmrd .chal-join:active{background:var(--accent-soft);}
 
 /* ── P4 제본소 ── */
 /* 제본 신청 버튼: 보라 펄스 그림자 → 그린(정적) */

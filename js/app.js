@@ -48,14 +48,15 @@ function applyTheme(t){
   r.setProperty('--ga',ga)
   r.setProperty('--gb',gb)
   r.setProperty('--sh-blue',`0 16px 34px ${t.primary}52,-4px 5px 16px ${t.primary}22`)
-  localStorage.setItem('okya-theme',JSON.stringify({...t,v:2}))
+  localStorage.setItem('okya-theme',JSON.stringify({...t,v:3}))
 }
-const DEFAULT_THEME={name:'바이올렛',primary:'#7B6CFF',v:2}
+// 리디자인(그린) 기본 테마. v:3 — 이전(v2 바이올렛) 저장값은 1회 그린으로 리셋 후 사용자 선택 유지.
+const DEFAULT_THEME={name:'옥야그린',primary:'#2FC178',v:3}
 
 // ── 초기화 ──
 ;(async()=>{
   // 저장된 테마 적용 (v 없는 예전 저장값은 무시하고 바이올렛 기본 적용)
-  try{const st=localStorage.getItem('okya-theme'),t=st&&JSON.parse(st);applyTheme(t&&t.v?t:DEFAULT_THEME)}catch{applyTheme(DEFAULT_THEME)}
+  try{const st=localStorage.getItem('okya-theme'),t=st&&JSON.parse(st);applyTheme(t&&t.v>=3?t:DEFAULT_THEME)}catch{applyTheme(DEFAULT_THEME)}
   const _t0=Date.now()
   // 스플래시 최소 1.5초 표시 보장
   const holdSplash=()=>new Promise(r=>setTimeout(r,Math.max(0,1500-(Date.now()-_t0))))

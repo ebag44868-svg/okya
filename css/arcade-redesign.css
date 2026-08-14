@@ -5,13 +5,8 @@
      게임별 파스텔(복숭아/라벤더/그린/크림) 유지 + 흰 원형 아이콘 디스크.
    · 아이콘/잎은 교체 가능 placeholder(이모지/소프트글로우). 나중에 에셋 교체.
    =================================================================== */
-.arcrd{
-  --primary:#2FC178; --primary-d:#25A867; --primary-tint:#E9F8F0;
-  --accent:#2FC178; --accent-d:#25A867; --accent-soft:#E9F8F0;
-  --grad:linear-gradient(135deg,#2FC178,#25A867);
-  --ga:#2FC178; --gb:#59D79B;
-  --sh-blue:0 12px 28px rgba(47,193,120,.28),-3px 4px 14px rgba(47,193,120,.12);
-}
+/* .arcrd는 토큰을 덮지 않음 → 루트 테마 상속. 헤더/레일/액션버튼/퀴즈뱃지가 색상 테마 따라감.
+   게임 타일 파스텔 배경은 의도된 멀티컬러라 고정. */
 
 /* ── 메인 타일: 파스텔 카드 + 원형 아이콘 디스크 ── */
 .arcrd .arc-tile{background:#F3F6F4;padding:20px 18px 44px;border-radius:22px;box-shadow:0 8px 22px rgba(31,64,45,.06);overflow:visible;}
@@ -24,8 +19,8 @@
 .arcrd .arc-ic img{width:64%;height:64%;object-fit:contain;}
 .arcrd .arc-tile-name{font-size:17px;font-weight:900;color:#1B2A24;}
 .arcrd .arc-tile-desc{font-size:12.5px;font-weight:600;color:#5C6B63;margin-top:4px;}
-.arcrd .arc-tile-badge{background:#25A867;color:#fff;top:16px;left:auto;right:16px;backdrop-filter:none;-webkit-backdrop-filter:none;}
-.arcrd .arc-tile-done{top:16px;right:16px;color:#25A867;}
+.arcrd .arc-tile-badge{background:var(--accent-d);color:#fff;top:16px;left:auto;right:16px;backdrop-filter:none;-webkit-backdrop-filter:none;}
+.arcrd .arc-tile-done{top:16px;right:16px;color:var(--accent-d);}
 .arcrd .arc-tile-go{right:18px;bottom:18px;color:#8A9A90;}
 
 /* ── 서브게임 공용: 주요 액션 버튼 그린 ── */

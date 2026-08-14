@@ -19,8 +19,8 @@ async function rMy(){
   const {lv,cur,need,pct}=(()=>{let lv=1,need=100,acc=0;while(pts>=acc+need){acc+=need;lv++;need=Math.round(need*1.4)}return{lv,cur:pts-acc,need,pct:Math.max(4,Math.round((pts-acc)/need*100))}})()
 
   const photoSrc=SESSION.photo||null,initials=esc(SESSION.name.charAt(0))
-  let curPri='#7B6CFF';try{const st=JSON.parse(localStorage.getItem('okya-theme')||'null');if(st&&st.primary)curPri=st.primary}catch{}
-  const PRESETS=[['바이올렛','#7B6CFF'],['블루','#5B9BFF'],['인디고','#6C6BFF'],['스카이','#38BDF8'],['민트','#2DD4BF'],['그린','#34D399'],['라임','#A3E635'],['앰버','#FBBF24'],['코랄','#FB923C'],['로즈','#FB7185'],['핑크','#F472B6'],['라벤더','#C084FC']]
+  let curPri='#2FC178';try{const st=JSON.parse(localStorage.getItem('okya-theme')||'null');if(st&&st.primary)curPri=st.primary}catch{}
+  const PRESETS=[['옥야그린','#2FC178'],['민트','#2DD4BF'],['블루','#5B9BFF'],['스카이','#38BDF8'],['바이올렛','#7B6CFF'],['인디고','#6C6BFF'],['라벤더','#C084FC'],['라임','#A3E635'],['앰버','#FBBF24'],['코랄','#FB923C'],['로즈','#FB7185'],['핑크','#F472B6']]
   const grad=p=>{const[a,b]=deriveGrad(p);return`linear-gradient(135deg,${a},${b})`}
   const pfis=PRESETS.map(([n,p])=>{const on=p.toLowerCase()===curPri.toLowerCase();return`<div class="pfi${on?' on':''}" data-pri="${p}" data-name="${n}" style="background:${grad(p)}"><div class="pl">${n}</div></div>`}).join('')
 

@@ -6,14 +6,8 @@
    · 자습감독표·회의록은 시안 없음 → 토큰 미사용(중립)이라 사실상 그대로.
    · 레일 그린은 기존 .rd+.bnav 스코프로 자동.
    =================================================================== */
-.rd.school-screen{
-  --primary:#2FC178; --primary-d:#25A867; --primary-tint:#E9F8F0;
-  --accent:#2FC178; --accent-d:#25A867; --accent-soft:#E9F8F0;
-  --grad:linear-gradient(135deg,#2FC178,#25A867);
-  --ga:#2FC178; --gb:#59D79B;
-  --sh-blue:0 12px 28px rgba(47,193,120,.28),-3px 4px 14px rgba(47,193,120,.12);
-}
-/* 상단 세그먼트 탭: 시안 톤(약간 여유 + 활성 그린) */
+/* .rd.school-screen은 토큰을 덮지 않음 → 루트 테마 상속(색상 선택이 학교 전체 반영). */
+/* 상단 세그먼트 탭: 시안 톤(약간 여유 + 활성 강조색) */
 .rd.school-screen .school-tabs{padding:4px 24px 14px;}
 .rd.school-screen .school-tab{border-radius:12px;font-size:14px;}
 /* 활성 탭은 토큰(--accent)으로 이미 그린. 미세: 급식 큰 메뉴 색 유지 확인용 여백만 */
