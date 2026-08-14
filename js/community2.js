@@ -201,7 +201,7 @@ function petStart(p){return p.approved_at||p.at}
 function petDeadline(p){const d=new Date(petStart(p));d.setDate(d.getDate()+30);return d}
 function petDaysLeft(p){return Math.ceil((petDeadline(p)-new Date())/86400000)}
 async function rPetitionPage(){
-  app().innerHTML=`<div class="screen fade-in p3 pet2">
+  app().innerHTML=`<div class="screen fade-in p3 pet2 rd cmrd">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">청원</div><button id="pet-new2" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 작성</button></div>
     ${featHero('📢','청원',null,'peti')}
     <div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
@@ -217,7 +217,7 @@ function rPetitionNew(){
   const STEPS=['기본 정보','청원 작성','미리보기']
   let step=0
   const render=()=>{
-    app().innerHTML=`<div class="screen fade-in p3">
+    app().innerHTML=`<div class="screen fade-in p3 rd cmrd">
       <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">청원 올리기</div><div style="width:34px"></div></div>
       <div class="pw-steps">${STEPS.map((s,i)=>`<div class="pw-step${i===step?' on':''}${i<step?' done':''}"><span class="pw-num">${i<step?'✓':i+1}</span><span class="pw-l">${s}</span></div>`).join('<span class="pw-line"></span>')}</div>
       <div class="chal-detail" id="pw-body"></div>
@@ -290,7 +290,7 @@ function rPetitionNew(){
 }
 async function rPetitionDetail(pid){
   const admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">청원</div>${admin?`<button id="pd-del" style="font-size:12px;font-weight:700;color:var(--danger);background:none">삭제</button>`:'<div style="width:34px"></div>'}</div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
+  app().innerHTML=`<div class="screen fade-in p3 rd cmrd"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">청원</div>${admin?`<button id="pd-del" style="font-size:12px;font-weight:700;color:var(--danger);background:none">삭제</button>`:'<div style="width:34px"></div>'}</div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
   bindNav()
   document.getElementById('bk').onclick=pop
   let p=null
