@@ -4,7 +4,7 @@ const SCHOOL_SECTS=['급식','학사일정','자습감독표','회의록']
 function rSchool(idx){
   TAB='school'
   const start=Math.max(0,Math.min(3,idx|0))
-  app().innerHTML=`<div class="screen p3 school-screen">
+  app().innerHTML=`<div class="screen p3 school-screen rd">
     <div class="topbar" style="flex:none"><div class="t">학교</div><div style="width:34px"></div></div>
     <div class="school-tabs" id="sc-tabs">${SCHOOL_SECTS.map((s,i)=>`<button class="school-tab${i===start?' on':''}" data-si="${i}">${s}</button>`).join('')}</div>
     <div class="school-deck" id="sc-deck">
