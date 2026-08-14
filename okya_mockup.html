@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OKYA · Design Mockup</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{
+  --bg:#F7F7F9; --surface:#FFFFFF; --subtle:#F2F2F5; --border:#E8E8ED;
+  --ink:#1A1A22; --muted:#8A8A93; --faint:#B4B4BD;
+  --accent:#7668F6; --accent-l:#EEEBFF; --accent-s:#6557E8;
+  --green:#2FBF71; --red:#F0553B;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --radius:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:"Pretendard",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+.shell{display:flex;min-height:100vh;max-width:1400px;margin:0 auto}
+
+/* ===== 사이드바 ===== */
+.side{width:232px;flex:none;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:26px 16px;position:sticky;top:0;height:100vh}
+.logo{display:flex;align-items:center;gap:10px;padding:6px 12px 26px}
+.logo .mark{width:28px;height:28px;border-radius:8px;background:var(--accent);display:grid;place-items:center}
+.logo .mark svg{width:16px;height:16px;color:#fff}
+.logo .name{font-size:19px;font-weight:800;letter-spacing:-.01em}
+.navitem{display:flex;align-items:center;gap:13px;padding:11px 12px;border-radius:12px;cursor:pointer;color:var(--muted);font-size:15px;font-weight:600;transition:background .18s var(--ease),color .18s var(--ease);margin-bottom:2px}
+.navitem svg{width:21px;height:21px;flex:none}
+.navitem:hover{background:var(--subtle);color:var(--ink)}
+.navitem.active{background:var(--accent-l);color:var(--accent-s)}
+.navitem .badge{margin-left:auto;font-size:11px;font-weight:700;background:var(--accent);color:#fff;border-radius:999px;padding:2px 7px}
+.side .spacer{flex:1}
+.profile{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:14px;cursor:pointer;transition:background .18s var(--ease)}
+.profile:hover{background:var(--subtle)}
+.profile .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#c3b8ff,#a78bfa);display:grid;place-items:center;font-size:17px;flex:none}
+.profile .pn{font-size:14px;font-weight:700}
+.profile .pr{font-size:12px;color:var(--muted);margin-top:1px}
+
+/* ===== 메인 ===== */
+.main{flex:1;min-width:0;padding:38px 44px 60px;position:relative;overflow:hidden}
+.screen{display:none}
+.screen.on{display:block}
+.screen.on{animation:pageIn .34s var(--ease)}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* 상단 헤더 */
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:30px}
+.hello .cap{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--accent);margin-bottom:8px}
+.hello h1{font-size:32px;font-weight:800;letter-spacing:-.02em}
+.hello .date{font-size:14px;color:var(--muted);margin-top:8px}
+.topicons{display:flex;gap:8px}
+.iconbtn{width:42px;height:42px;border-radius:13px;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;color:#55555f;transition:transform .18s var(--ease),background .18s var(--ease)}
+.iconbtn:hover{background:var(--subtle)}
+.iconbtn:active{transform:scale(.95)}
+.iconbtn svg{width:20px;height:20px}
+
+/* 카드 공통 */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.card-h{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.02em;margin-bottom:16px}
+
+/* ===== 홈 레이아웃 ===== */
+.home-grid{display:grid;grid-template-columns:1.35fr 1fr;grid-template-rows:auto auto;gap:20px}
+.hero{grid-row:span 2;background:linear-gradient(160deg,#f3f1ff 0%,#fbfaff 60%,#fff 100%);border:1px solid var(--border);border-radius:26px;position:relative;overflow:hidden;min-height:340px;display:flex;flex-direction:column;justify-content:flex-end;padding:30px}
+.hero .htxt{position:relative;z-index:2}
+.hero .htxt .l{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.04em}
+.hero .htxt .b{font-size:22px;font-weight:800;margin-top:8px;letter-spacing:-.01em}
+.hero .htxt .s{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+.orbit{position:absolute;top:-40px;right:-30px;width:340px;height:340px;z-index:1;animation:heroIn .9s var(--ease) both}
+@keyframes heroIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.orbit .ring{fill:none;stroke:#d9d2ff;stroke-width:1}
+.sphere{filter:drop-shadow(0 20px 40px rgba(118,104,246,.28))}
+.spin-slow{transform-origin:170px 170px;animation:spin 60s linear infinite}
+.float-a{animation:floatY 7s ease-in-out infinite}
+.float-b{animation:floatY 9s ease-in-out infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* 잔액 카드 */
+.balance .row{display:flex;align-items:center;justify-content:space-between}
+.balance .num{font-size:44px;font-weight:800;letter-spacing:-.03em;margin-top:6px;font-variant-numeric:tabular-nums}
+.balance .num small{font-size:20px;font-weight:700;color:var(--muted);margin-left:3px}
+.balance .delta{font-size:13.5px;color:var(--muted);margin-top:10px}
+.balance .delta b{color:var(--green)}
+.bar{height:6px;background:var(--subtle);border-radius:999px;margin-top:16px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:999px;width:64%;transition:width .5s var(--ease)}
+.pill{font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-l);padding:4px 10px;border-radius:999px}
+
+/* 급식 카드 */
+.meal .cap{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.03em}
+.meal .mm{font-size:17px;font-weight:600;margin-top:10px;line-height:1.6}
+.meal .stars{color:#ffb300;font-size:14px;margin-top:12px;letter-spacing:2px}
+
+/* 바로가기 */
+.shortcuts{grid-column:span 2;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 16px;cursor:pointer;display:flex;flex-direction:column;gap:12px;transition:transform .18s var(--ease),border-color .18s var(--ease)}
+.sc:hover{transform:translateY(-2px);border-color:#d8d2f7}
+.sc:active{transform:scale(.98)}
+.sc .ci{width:40px;height:40px;border-radius:11px;background:var(--accent-l);display:grid;place-items:center;color:var(--accent-s)}
+.sc .ci svg{width:21px;height:21px}
+.sc .t{font-size:14.5px;font-weight:600}
+
+/* stagger */
+.stag>*{opacity:0;animation:up .5s var(--ease) forwards}
+.stag>*:nth-child(1){animation-delay:.04s}
+.stag>*:nth-child(2){animation-delay:.10s}
+.stag>*:nth-child(3){animation-delay:.16s}
+.stag>*:nth-child(4){animation-delay:.22s}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ===== 리스트 / 거래내역 ===== */
+.h1s{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.sub{font-size:14px;color:var(--muted)}
+.seclabel{font-size:12px;font-weight:700;color:var(--faint);letter-spacing:.05em;text-transform:uppercase;margin:34px 0 6px}
+.tx{display:flex;align-items:center;gap:14px;padding:15px 8px;border-radius:10px;border-bottom:1px solid var(--subtle);cursor:pointer;transition:background .16s var(--ease),transform .16s var(--ease)}
+.tx:hover{background:var(--subtle);transform:translateX(2px)}
+.tx .ti{flex:1}
+.tx .tt{font-size:16px;font-weight:600}
+.tx .ts{font-size:13px;color:var(--muted);margin-top:2px}
+.tx .amt{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+.amt.plus{color:var(--green)}.amt.minus{color:var(--red)}
+
+/* 액션 원형 */
+.acts{display:flex;gap:14px;margin-top:24px}
+.actbtn{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:transform .18s var(--ease),border-color .18s}
+.actbtn:hover{border-color:#d8d2f7;transform:translateY(-2px)}
+.actbtn:active{transform:scale(.98)}
+.actbtn .ac{width:44px;height:44px;border-radius:50%;background:var(--accent-l);display:grid;place-items:center;color:var(--accent-s)}
+.actbtn span{font-size:13.5px;font-weight:600}
+
+/* 키패드 (송금) */
+.pad{max-width:360px;margin:0 auto}
+.pad .amount{text-align:center;font-size:48px;font-weight:800;letter-spacing:-.03em;margin:20px 0 8px;font-variant-numeric:tabular-nums}
+.pad .amount .u{font-size:22px;color:var(--muted);margin-left:4px}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:20px}
+.key{font-size:24px;font-weight:600;padding:18px;text-align:center;border-radius:16px;cursor:pointer;transition:transform .12s var(--ease),background .12s}
+.key:hover{background:var(--subtle)}
+.key:active{transform:scale(.92);background:var(--accent-l);color:var(--accent-s)}
+.primary{width:100%;margin-top:22px;padding:16px;border:none;border-radius:16px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;cursor:pointer;transition:transform .18s var(--ease),box-shadow .25s,background .2s;font-family:inherit}
+.primary:hover{box-shadow:0 8px 24px rgba(118,104,246,.35);background:var(--accent-s)}
+.primary:active{transform:scale(.98)}
+.primary:disabled{background:var(--subtle);color:var(--faint);cursor:default;box-shadow:none}
+
+/* 챌린지 / progress */
+.prog{height:8px;background:var(--subtle);border-radius:999px;overflow:hidden;margin:14px 0 6px}
+.prog>i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .5s var(--ease)}
+.dots{display:flex;gap:9px;margin-top:8px}
+.dots .dd{width:16px;height:16px;border-radius:50%;border:1.6px solid var(--border)}
+.dots .dd.on{background:var(--accent);border-color:var(--accent)}
+
+/* 게임 그리드 */
+.games{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px}
+.gcard{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;cursor:pointer;transition:transform .18s var(--ease),border-color .18s}
+.gcard:hover{transform:translateY(-3px);border-color:#d8d2f7}
+.gcard .emo{font-size:30px}
+.gcard .gt{font-size:18px;font-weight:700;margin-top:14px}
+.gcard .gs{font-size:13px;color:var(--muted);margin-top:4px}
+.gcard .gr{display:inline-block;font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-l);padding:4px 10px;border-radius:999px;margin-top:14px}
+
+/* 메시지 */
+.dm{display:flex;align-items:center;gap:14px;padding:15px 8px;border-radius:12px;border-bottom:1px solid var(--subtle);cursor:pointer;transition:background .16s var(--ease)}
+.dm:hover{background:var(--subtle)}
+.dm .av{width:46px;height:46px;border-radius:50%;background:var(--accent-l);flex:none;display:grid;place-items:center;font-size:20px}
+.dm .di{flex:1;min-width:0}
+.dm .dn{font-size:15.5px;font-weight:700}
+.dm .dl{font-size:14px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dm .dt{font-size:12px;color:var(--faint)}
+
+/* MY */
+.myhead{display:flex;align-items:center;gap:20px}
+.myhead .av{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#c3b8ff,#a78bfa);display:grid;place-items:center;font-size:34px}
+.myhead .n{font-size:24px;font-weight:800}
+.myhead .m{font-size:14px;color:var(--muted);margin-top:4px}
+.mystats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.mystat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center}
+.mystat .n{font-size:26px;font-weight:800}
+.mystat .l{font-size:12.5px;color:var(--muted);margin-top:6px}
+.setrow{display:flex;align-items:center;padding:16px 8px;border-bottom:1px solid var(--subtle);cursor:pointer;font-size:16px;font-weight:500;transition:background .16s var(--ease),transform .16s}
+.setrow:hover{background:var(--subtle);transform:translateX(2px)}
+.setrow .chev{margin-left:auto;color:var(--faint)}
+.setrow .chev svg{width:18px;height:18px}
+
+/* 학교 시간표 */
+.tt{margin-top:8px}
+.ttrow{display:flex;align-items:center;gap:18px;padding:16px 10px;border-radius:12px;border-bottom:1px solid var(--subtle);cursor:pointer;transition:background .16s var(--ease)}
+.ttrow:hover{background:var(--subtle)}
+.ttrow .pnum{width:30px;font-size:13px;font-weight:700;color:var(--accent);text-align:center}
+.ttrow .sub{font-size:16px;font-weight:600;color:var(--ink)}
+.ttrow .room{margin-left:auto;font-size:13px;color:var(--muted)}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ===== 사이드바 ===== -->
+  <aside class="side">
+    <div class="logo"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg></div><div class="name">OKYA</div></div>
+    <div class="navitem active" data-go="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>홈</div>
+    <div class="navitem" data-go="money"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="13" rx="2.5"/><circle cx="12" cy="12.5" r="2.6"/></svg>옥야머니</div>
+    <div class="navitem" data-go="school"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-5 9 5-9 5-9-5z"/><path d="M7 11v5c0 1 5 3 5 3s5-2 5-3v-5"/></svg>학교</div>
+    <div class="navitem" data-go="comm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 8a5 5 0 0 0-10 0v0a5 5 0 0 0 5 5"/><circle cx="12" cy="17" r="1.5"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>커뮤니티</div>
+    <div class="navitem" data-go="arcade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="11" rx="4"/><line x1="7" y1="12.5" x2="11" y2="12.5"/><line x1="9" y1="10.5" x2="9" y2="14.5"/><circle cx="16" cy="11.5" r="1"/><circle cx="18" cy="14" r="1"/></svg>아케이드</div>
+    <div class="navitem" data-go="msg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 3z"/></svg>메시지<span class="badge">2</span></div>
+    <div class="navitem" data-go="my"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>MY</div>
+    <div class="spacer"></div>
+    <div class="profile"><div class="av">🐱</div><div><div class="pn">박민준</div><div class="pr">창녕옥야고 2-3</div></div></div>
+  </aside>
+
+  <!-- ===== 메인 ===== -->
+  <main class="main">
+
+    <!-- 홈 -->
+    <section class="screen on" data-screen="home">
+      <div class="topbar">
+        <div class="hello">
+          <div class="cap">GOOD MORNING</div>
+          <h1>민준아, 좋은 아침!</h1>
+          <div class="date">2025. 05. 13 화요일</div>
+        </div>
+        <div class="topicons">
+          <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></div>
+          <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.5 20a1.8 1.8 0 0 0 3 0"/></svg></div>
+        </div>
+      </div>
+
+      <div class="home-grid stag">
+        <!-- Hero -->
+        <div class="hero">
+          <svg class="orbit" viewBox="0 0 340 340">
+            <g class="spin-slow">
+              <circle class="ring" cx="170" cy="170" r="150"/>
+              <circle class="ring" cx="170" cy="170" r="110"/>
+              <circle cx="320" cy="170" r="4" fill="#b5a8ff"/>
+              <circle cx="60" cy="170" r="3" fill="#cabfff"/>
+            </g>
+            <g class="float-a">
+              <circle class="sphere" cx="200" cy="150" r="70" fill="url(#g1)"/>
+            </g>
+            <circle class="float-b" cx="120" cy="230" r="10" fill="#d9d2ff"/>
+            <defs>
+              <radialGradient id="g1" cx="35%" cy="30%">
+                <stop offset="0%" stop-color="#a99bff"/>
+                <stop offset="70%" stop-color="#7668F6"/>
+                <stop offset="100%" stop-color="#6557E8"/>
+              </radialGradient>
+            </defs>
+          </svg>
+          <div class="htxt">
+            <div class="l">오늘의 옥야</div>
+            <div class="b">출석하고 20옥 받기</div>
+            <div class="s">이번 주 3일 연속 출석 중이에요.<br>오늘도 잊지 말고 도장 쾅!</div>
+          </div>
+        </div>
+
+        <!-- 잔액 -->
+        <div class="card balance">
+          <div class="row"><span class="card-h" style="margin:0">옥야머니</span><span class="pill">＋ 충전</span></div>
+          <div class="num" id="bal">12,500<small>옥</small></div>
+          <div class="delta">이번 달 <b>+2,500옥</b> 받음</div>
+          <div class="bar"><i></i></div>
+        </div>
+
+        <!-- 급식 -->
+        <div class="card meal">
+          <div class="cap">오늘의 점심</div>
+          <div class="mm">닭갈비 · 된장국<br>양배추샐러드 · 깍두기</div>
+          <div class="stars">★★★★☆ <span style="color:var(--muted);font-size:12px">4.1</span></div>
+        </div>
+
+        <!-- 바로가기 -->
+        <div class="shortcuts">
+          <div class="sc"><div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h14M13 6l6 6-6 6"/></svg></div><div class="t">송금하기</div></div>
+          <div class="sc"><div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></div><div class="t">충전하기</div></div>
+          <div class="sc"><div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="6" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="6" y1="16" x2="14" y2="16"/></svg></div><div class="t">거래 내역</div></div>
+          <div class="sc"><div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/></svg></div><div class="t">오늘의 일정</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 옥야머니 -->
+    <section class="screen" data-screen="money">
+      <div class="two" style="align-items:start">
+        <div>
+          <div class="h1s">옥야머니</div>
+          <div class="balance card" style="margin-top:18px">
+            <div class="num" id="bal2" style="font-size:52px">12,500<small>옥</small></div>
+            <div class="delta">이번 달 <b>+2,500</b> 받음 · <span style="color:var(--red)">−800</span> 사용</div>
+            <div class="bar"><i style="width:64%"></i></div>
+          </div>
+          <div class="acts">
+            <div class="actbtn"><div class="ac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h14M13 6l6 6-6 6"/></svg></div><span>송금</span></div>
+            <div class="actbtn"><div class="ac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></div><span>충전</span></div>
+            <div class="actbtn"><div class="ac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12H6M11 6L5 12l6 6"/></svg></div><span>회수</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="seclabel" style="margin-top:8px">2025. 05. 13</div>
+          <div class="tx"><div class="ti"><div class="tt">출석 보상</div><div class="ts">08:20</div></div><div class="amt plus">+20</div></div>
+          <div class="tx"><div class="ti"><div class="tt">김다현 → 나</div><div class="ts">받은 옥야머니</div></div><div class="amt plus">+12,500</div></div>
+          <div class="tx"><div class="ti"><div class="tt">제본소</div><div class="ts">시험자료 출력</div></div><div class="amt minus">−800</div></div>
+          <div class="seclabel">2025. 05. 12</div>
+          <div class="tx"><div class="ti"><div class="tt">퀴즈 보상</div><div class="ts">21:10</div></div><div class="amt plus">+20</div></div>
+          <div class="tx"><div class="ti"><div class="tt">급식비</div><div class="ts">정산</div></div><div class="amt minus">−4,000</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 학교 -->
+    <section class="screen" data-screen="school">
+      <div class="h1s">학교</div>
+      <div class="sub">2025. 05. 13 화요일 · 2학년 3반</div>
+      <div class="two" style="margin-top:28px;align-items:start">
+        <div>
+          <div class="seclabel" style="margin-top:0">오늘의 시간표</div>
+          <div class="tt">
+            <div class="ttrow"><div class="pnum">1</div><div class="sub" style="color:var(--ink)">국어</div><div class="room">2-3 교실</div></div>
+            <div class="ttrow"><div class="pnum">2</div><div class="sub" style="color:var(--ink)">수학</div><div class="room">2-3 교실</div></div>
+            <div class="ttrow" style="background:var(--accent-l)"><div class="pnum">3</div><div class="sub" style="color:var(--accent-s)">영어</div><div class="room" style="color:var(--accent-s)">어학실</div></div>
+            <div class="ttrow"><div class="pnum">4</div><div class="sub" style="color:var(--ink)">한국사</div><div class="room">2-3 교실</div></div>
+            <div class="ttrow"><div class="pnum">5</div><div class="sub" style="color:var(--ink)">체육</div><div class="room">운동장</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="seclabel" style="margin-top:0">학교 서비스</div>
+          <div class="setrow">학사일정<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+          <div class="setrow">자습감독표<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+          <div class="setrow">회의록<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+          <div class="setrow">교실 예약<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+          <div class="setrow">제본소<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 커뮤니티 -->
+    <section class="screen" data-screen="comm">
+      <div class="h1s">커뮤니티</div>
+      <div class="two" style="margin-top:26px;align-items:start">
+        <div class="card">
+          <div class="card-h">이번 주 챌린지</div>
+          <div style="font-size:19px;font-weight:700">물 8잔 마시기 💧</div>
+          <div style="font-size:14px;color:var(--muted);margin-top:6px">6 / 8 잔</div>
+          <div class="prog"><i style="width:75%"></i></div>
+          <div class="dots"><span class="dd on"></span><span class="dd on"></span><span class="dd on"></span><span class="dd on"></span><span class="dd on"></span><span class="dd on"></span><span class="dd"></span><span class="dd"></span></div>
+          <button class="primary" style="margin-top:20px">오늘 기록하기</button>
+        </div>
+        <div class="card">
+          <div class="card-h">청원</div>
+          <div style="font-size:17px;font-weight:700;line-height:1.4">교내 급식 메뉴<br>개선을 요청합니다</div>
+          <div style="font-size:14px;color:var(--muted);margin-top:12px">423 / 500명 참여</div>
+          <div class="prog"><i style="width:84%"></i></div>
+          <button class="primary" style="margin-top:20px">청원 참여하기</button>
+        </div>
+      </div>
+      <div class="seclabel">더 둘러보기</div>
+      <div class="setrow">책 교환<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+      <div class="setrow">게시판<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+      <div class="setrow">분실물<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+    </section>
+
+    <!-- 아케이드 -->
+    <section class="screen" data-screen="arcade">
+      <div class="h1s">아케이드</div>
+      <div class="sub">하루 한 판, 옥야를 모아보세요</div>
+      <div class="games">
+        <div class="gcard"><div class="emo">🎰</div><div class="gt">랜덤 뽑기</div><div class="gs">오늘의 운을 시험해보세요</div><div class="gr">+50옥</div></div>
+        <div class="gcard"><div class="emo">🧠</div><div class="gt">옥야 퀴즈</div><div class="gs">상식 한 문제</div><div class="gr">+20옥</div></div>
+        <div class="gcard"><div class="emo">🏃</div><div class="gt">옥야 DASH</div><div class="gs">달리기 러너 게임</div><div class="gr">최고점수 갱신</div></div>
+        <div class="gcard"><div class="emo">➗</div><div class="gt">오늘의 수학</div><div class="gs">계산 스피드</div><div class="gr">+100옥</div></div>
+      </div>
+    </section>
+
+    <!-- 메시지 -->
+    <section class="screen" data-screen="msg">
+      <div class="h1s">메시지</div>
+      <div style="margin-top:22px">
+        <div class="dm"><div class="av">🙂</div><div class="di"><div class="dn">김다현</div><div class="dl">이제 급식비 보내줘! 😭</div></div><div class="dt">10:30</div></div>
+        <div class="dm"><div class="av">😎</div><div class="di"><div class="dn">이서연</div><div class="dl">책 교환 확정했어 고마워!</div></div><div class="dt">1시간</div></div>
+        <div class="dm"><div class="av">🐱</div><div class="di"><div class="dn">옥야 봇</div><div class="dl">오늘의 퀴즈가 도착했어요</div></div><div class="dt">어제</div></div>
+        <div class="dm"><div class="av">🎓</div><div class="di"><div class="dn">학생회</div><div class="dl">체육대회 안내드립니다</div></div><div class="dt">어제</div></div>
+      </div>
+    </section>
+
+    <!-- MY -->
+    <section class="screen" data-screen="my">
+      <div class="myhead">
+        <div class="av">🐱</div>
+        <div><div class="n">박민준</div><div class="m">창녕옥야고등학교 · 2학년 3반</div></div>
+      </div>
+      <div class="mystats">
+        <div class="mystat"><div class="n">12,500</div><div class="l">옥야머니</div></div>
+        <div class="mystat"><div class="n">1,250</div><div class="l">포인트</div></div>
+        <div class="mystat"><div class="n">8개</div><div class="l">뱃지</div></div>
+      </div>
+      <div class="seclabel">설정</div>
+      <div class="setrow">내 정보<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+      <div class="setrow">알림 설정<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+      <div class="setrow">색상 테마<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+      <div class="setrow">앱 정보<div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+      <div class="setrow" style="color:var(--red)">로그아웃</div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  var nav=document.querySelectorAll('.navitem'),screens=document.querySelectorAll('.screen');
+  nav.forEach(function(n){n.onclick=function(){
+    nav.forEach(x=>x.classList.remove('active'));n.classList.add('active');
+    var g=n.getAttribute('data-go');
+    screens.forEach(s=>s.classList.toggle('on',s.getAttribute('data-screen')===g));
+    window.scrollTo(0,0);
+  };});
+
+  // 잔액 숫자 rolling 데모 (Living Interface): 홈 잔액 카드 클릭 시
+  function roll(el,to){
+    var from=parseInt(el.textContent.replace(/[^0-9]/g,''))||0,t0=performance.now(),dur=650;
+    function tick(t){var p=Math.min(1,(t-t0)/dur);p=1-Math.pow(1-p,3);
+      var v=Math.round(from+(to-from)*p);el.innerHTML=v.toLocaleString()+'<small>옥</small>';
+      if(p<1)requestAnimationFrame(tick);}
+    requestAnimationFrame(tick);
+  }
+  var bal=document.getElementById('bal');
+  if(bal)bal.parentElement.onclick=function(){
+    var next=bal.textContent.indexOf('12,500')>=0?13500:12500;
+    roll(bal,next);
+    var b=bal.parentElement.querySelector('.bar>i');if(b)b.style.width=(next===13500?'70%':'64%');
+  };
+</script>
+</body>
+</html>

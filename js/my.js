@@ -24,24 +24,24 @@ async function rMy(){
   const grad=p=>{const[a,b]=deriveGrad(p);return`linear-gradient(135deg,${a},${b})`}
   const pfis=PRESETS.map(([n,p])=>{const on=p.toLowerCase()===curPri.toLowerCase();return`<div class="pfi${on?' on':''}" data-pri="${p}" data-name="${n}" style="background:${grad(p)}"><div class="pl">${n}</div></div>`}).join('')
 
-  app().innerHTML=`<div class="screen fade-in p3 my2">
+  app().innerHTML=`<div class="screen fade-in p3 my2 rd myrd">
     <div class="topbar"><div class="t">MY</div><button id="my-bell" data-bell>${I.bell}</button></div>
-    <section class="my2-prof">
-      <div class="av">${photoSrc?`<img src="${photoSrc}">`:initials}<label class="camera" for="my-photo-input"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></label></div>
-      <input id="my-photo-input" type="file" accept="image/*" style="display:none">
-      <div class="my2-id"><div class="my2-name">${esc(SESSION.name)}</div><div class="my2-cl">창녕옥야고등학교 · ${isAdmin?'학생회':'학생'}</div></div>
-      <div class="my2-lv">Lv.${lv}</div>
-    </section>
-    <section class="my2-block">
+    <section class="my2-hero">
+      <div class="my2-prof">
+        <div class="av">${photoSrc?`<img src="${photoSrc}">`:initials}<label class="camera" for="my-photo-input"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></label></div>
+        <input id="my-photo-input" type="file" accept="image/*" style="display:none">
+        <div class="my2-id"><div class="my2-name">${esc(SESSION.name)}</div><div class="my2-cl">창녕옥야고등학교 · ${isAdmin?'학생회':'학생'}</div></div>
+        <div class="my2-lv">Lv.${lv}</div>
+      </div>
       <div class="my-lv-bar"><i style="width:0%"></i></div>
       <div class="my2-lvsub">활동점수 <b>${fmt(pts)}</b>p · 다음 레벨까지 ${fmt(Math.max(0,need-cur))}p · 🔥 ${streak}일 연속</div>
     </section>
     <div class="my2-stats">
-      <div class="my2-stat"><div class="v">${fmt(isAdmin?issued:bal)}</div><div class="k">${isAdmin?'발행량':'옥야머니'}</div></div>
-      <div class="my2-stat"><div class="v">${attend}</div><div class="k">출석</div></div>
-      <div class="my2-stat"><div class="v">${chal}</div><div class="k">챌린지</div></div>
-      <div class="my2-stat"><div class="v">${bookCount}</div><div class="k">등록 책</div></div>
-      <div class="my2-stat"><div class="v">${petiCount}</div><div class="k">참여 청원</div></div>
+      <div class="my2-stat"><span class="si si-money">${I.money}</span><div class="v">${fmt(isAdmin?issued:bal)}</div><div class="k">${isAdmin?'발행량':'옥야머니'}</div></div>
+      <div class="my2-stat"><span class="si si-att">${I.hist}</span><div class="v">${attend}</div><div class="k">출석</div></div>
+      <div class="my2-stat"><span class="si si-chal">${I.star}</span><div class="v">${chal}</div><div class="k">챌린지</div></div>
+      <div class="my2-stat"><span class="si si-book">${I.book}</span><div class="v">${bookCount}</div><div class="k">등록 책</div></div>
+      <div class="my2-stat"><span class="si si-peti">${I.petition}</span><div class="v">${petiCount}</div><div class="k">참여 청원</div></div>
     </div>
     <section class="my2-block">
       <div class="my2-menu">

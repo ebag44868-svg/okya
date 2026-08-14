@@ -1,0 +1,43 @@
+/* ===================================================================
+   my-redesign.css — MY 탭 리디자인 (그린/자연)
+   · 래퍼에 .rd(레일/배경) + .myrd(그린 토큰 스코프) 부여.
+   · 프로필+레벨을 시안처럼 하나의 흰 카드(my2-hero)로 통합.
+   · 통계 타일은 좌측 컬러 아이콘 + 좌측정렬(시안 매칭).
+   · 팔레트 프리셋(.pfi)은 인라인 background(원색) 사용 → 토큰 그린화 영향 없음(자동 보존).
+   · 장식 잎은 교체 가능 placeholder(::after 소프트 글로우). 나중에 에셋 교체.
+   =================================================================== */
+.myrd{
+  --primary:#2FC178; --primary-d:#25A867; --primary-tint:#E9F8F0;
+  --accent:#2FC178; --accent-d:#25A867; --accent-soft:#E9F8F0;
+  --grad:linear-gradient(135deg,#2FC178,#25A867);
+  --ga:#2FC178; --gb:#59D79B;
+  --sh-blue:0 12px 28px rgba(47,193,120,.28),-3px 4px 14px rgba(47,193,120,.12);
+}
+
+/* ── 프로필 + 레벨 통합 카드 ── */
+.myrd .my2-hero{position:relative;overflow:hidden;margin:8px 20px 2px;padding:16px 18px 15px;
+  background:#fff;border-radius:18px;box-shadow:0 6px 18px rgba(31,64,45,.06);}
+.myrd .my2-hero .my2-prof{padding:0;position:relative;z-index:1;}
+.myrd .my2-hero .my-lv-bar{margin-top:14px;position:relative;z-index:1;}
+.myrd .my2-hero .my2-lvsub{position:relative;z-index:1;}
+/* 장식 잎(교체 가능 에셋 placeholder) */
+.myrd .my2-hero::after{content:"";position:absolute;right:-12px;top:-14px;width:130px;height:130px;
+  background:radial-gradient(circle at 68% 32%,#DBF3E6 0%,rgba(219,243,230,0) 62%);pointer-events:none;z-index:0;}
+
+/* ── 통계 타일: 컬러 아이콘 + 좌측정렬 ── */
+.myrd .my2-stats{padding:14px 20px 2px;}
+.myrd .my2-stat{text-align:left;padding:13px 13px 14px;box-shadow:0 6px 18px rgba(31,64,45,.06);}
+.myrd .my2-stat .si{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.myrd .my2-stat .si svg{width:17px;height:17px;}
+.myrd .si-money{background:#E9F8F0;color:#2FC178;}
+.myrd .si-att{background:#DCF5F1;color:#14B8A6;}
+.myrd .si-chal{background:#E3EDFF;color:#3B82F6;}
+.myrd .si-book{background:#E7E8FD;color:#6366F1;}
+.myrd .si-peti{background:#FDE6EC;color:#F43F5E;}
+
+/* ── 메뉴 카드 ── */
+.myrd .my2-menu{background:#fff;border-radius:16px;padding:2px 16px;box-shadow:0 6px 18px rgba(31,64,45,.06);}
+.myrd .my2-row{padding:15px 4px;}
+
+/* ── 개인설정 카드 ── */
+.myrd .my2-block:last-of-type{background:#fff;border-radius:16px;margin:14px 20px 2px;padding:16px 18px 8px;box-shadow:0 6px 18px rgba(31,64,45,.06);}
