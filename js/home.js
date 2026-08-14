@@ -112,7 +112,7 @@ async function rHome(){
         <h1 class="hm-hero-title">오늘의 급식</h1>
         <div class="hm-slotseg" id="hero-seg"></div>
         <ul class="hm-menu" id="hero-menu"></ul>
-        <button class="hm-hero-cta" data-goto="school-food">급식 자세히 보기 <span>→</span></button>
+        <button class="hm-hero-cta" data-goto="school-food">급식 자세히 보기</button>
       </div>
       ${okyaCardHTML(txs,admin)}
     </section>

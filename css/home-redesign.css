@@ -12,6 +12,11 @@
 .screen.p3.rd{background:#F4F7F5;}
 .rd .hm-wrap{max-width:1180px;margin:0 auto;padding:22px 26px 44px;}
 
+/* 좌측 레일 그린 통합 — .rd 다음 형제 .bnav = 홈 화면일 때만. 다른 화면/테마 무영향 */
+.rd + .bnav::before{color:#25A867;}
+.rd + .bnav .bnav-item.active{background:#E9F8F0;color:#25A867;}
+.rd + .bnav .bnav-subitem:hover .subarr{color:#25A867;}
+
 /* ── 상단 ── */
 .rd .hm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .rd .hm-eyebrow{font-size:13px;font-weight:600;color:var(--mut);}
@@ -48,9 +53,9 @@
 .rd .hm-menu li.h2-menu-empty{padding-left:0;color:var(--mut);font-weight:600;}
 .rd .hm-menu li.h2-menu-empty::before{display:none;}
 
-.rd .hm-hero-cta{margin-top:auto;margin-bottom:2px;align-self:flex-start;display:inline-flex;
-  align-items:center;gap:6px;background:var(--g);color:#fff;border:0;font-family:inherit;
-  font-size:13.5px;font-weight:700;padding:11px 18px;border-radius:12px;cursor:pointer;}
+.rd .hm-hero-cta{margin-top:auto;margin-bottom:2px;align-self:flex-start;background:none;border:0;
+  padding:0;font-family:inherit;color:var(--gd);font-size:12.5px;font-weight:600;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px;}
 
 /* 오늘의 옥야 카드(okyaCardHTML의 .okya-card/.okc-* 재사용 → 재스킨) */
 .rd .okya-card{margin-top:0;min-height:0;border:1px solid var(--ln);border-radius:20px;padding:24px;
@@ -127,12 +132,17 @@
 .rd .hm-up-dd.soon{color:#e0603a;background:#FDEAE3;}
 .rd .hm-empty{font-size:13.5px;color:var(--mut);padding:10px 0;}
 
-/* ── landscape(태블릿 가로) : hero 2열 · 타일 4열 · 학교생활 가로 ── */
+/* ── landscape(태블릿 가로, iPad 13") : 화면 꽉 채움 — 좌우 여백 제거 + 세로로 hero가 남는 공간 흡수 ── */
 @media (min-width:820px) and (min-aspect-ratio:1/1){
-  .rd .hm-hero-row{grid-template-columns:1.5fr 1fr;gap:18px;}
-  .rd .hm-hero{min-height:320px;}
-  .rd .hm-hero-title{font-size:34px;}
-  .rd .hm-tiles{grid-template-columns:repeat(4,1fr);gap:14px;}
-  .rd .hm-life-grid{grid-template-columns:1.5fr 1fr;gap:40px;align-items:start;}
-  .rd .hm-up{border-left:1px solid var(--ln);padding-left:38px;}
+  .rd .hm-wrap{box-sizing:border-box;max-width:none;margin:0;padding:24px 40px 30px;
+    min-height:calc(100dvh - 32px);display:flex;flex-direction:column;gap:20px;}
+  .rd .hm-top{margin-bottom:0;}
+  .rd .hm-hero-row{grid-template-columns:1.6fr 1fr;gap:20px;flex:1 1 auto;min-height:260px;}
+  .rd .hm-hero{min-height:0;}
+  .rd .hm-hero-title{font-size:36px;}
+  .rd .hm-tiles{grid-template-columns:repeat(4,1fr);gap:16px;margin-top:0;}
+  .rd .hm-tile{padding:20px;}
+  .rd .hm-life{margin-top:0;}
+  .rd .hm-life-grid{grid-template-columns:1.6fr 1fr;gap:44px;align-items:start;}
+  .rd .hm-up{border-left:1px solid var(--ln);padding-left:40px;}
 }
