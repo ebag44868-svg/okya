@@ -8,8 +8,20 @@
   --g:var(--accent); --gd:var(--accent-d); --gt:var(--accent-soft);
   --i1:#1B2A24; --i2:#5C6B63; --mut:#93A199;
   --ln:#EAEFEB; --ln2:#F1F5F2;
+  --sh-hero:0 10px 32px rgba(42,69,58,.08); --sh-sc:0 7px 20px rgba(42,69,58,.055);
 }
 .screen.p3.rd{background:#F4F7F5;}
+/* ── PAGE AMBIENT (홈): 옅은 tint + page_background_overlay 실연결 + 가장자리 장식 ── */
+.screen.p3.home2.rd{position:relative;isolation:isolate;
+  background:linear-gradient(140deg,#F7FAF8 0%,var(--accent-soft) 100%);}
+.screen.p3.home2.rd::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;
+  background:url(../assets/page_background_overlay.svg) center/cover no-repeat;opacity:.22;}
+.rd .hm-wrap{position:relative;z-index:1;}
+/* 페이지 가장자리 잎(좌하단, 비대칭) — 화면에 인지될 강도 */
+.screen.p3.home2.rd::after{content:"";position:absolute;left:-40px;bottom:40px;width:280px;height:280px;
+  pointer-events:none;z-index:-1;background-color:var(--accent);opacity:.12;transform:scaleX(-1);
+  -webkit-mask:url(../assets/leaf_branch_large.svg) no-repeat bottom left/contain;
+  mask:url(../assets/leaf_branch_large.svg) no-repeat bottom left/contain;}
 .rd .hm-wrap{max-width:1180px;margin:0 auto;padding:22px 26px 44px;}
 
 /* 좌측 레일 그린 통합 — .rd 다음 형제 .bnav = 홈 화면일 때만. 다른 화면/테마 무영향 */
@@ -27,15 +39,24 @@
 
 /* ── Hero row ── */
 .rd .hm-hero-row{display:grid;grid-template-columns:1fr;gap:16px;}
-.rd .hm-hero{position:relative;overflow:hidden;padding:26px 28px;border:1px solid var(--ln);
-  border-radius:20px;min-height:300px;display:flex;flex-direction:column;
-  background:linear-gradient(135deg,var(--accent-soft) 0%,#FFFFFF 48%,#FFFFFF 100%);}
-.rd .hm-hero>*{position:relative;z-index:1;}
-/* 잎 가지 장식(테마색 mask) — 시안처럼 우상단에서 흘러내림 */
-.rd .hm-hero::before{content:"";position:absolute;top:-30px;right:-40px;width:420px;height:325px;z-index:0;
-  pointer-events:none;background-color:var(--accent);opacity:.42;
-  -webkit-mask:url(../assets/leaf_branch_large.svg) no-repeat top right/contain;
-  mask:url(../assets/leaf_branch_large.svg) no-repeat top right/contain;}
+.rd .hm-hero{position:relative;overflow:hidden;padding:26px 28px;border:1px solid var(--okc-bd,rgba(255,255,255,.72));
+  box-shadow:var(--sh-hero);border-radius:28px;min-height:300px;display:flex;flex-direction:column;
+  background:radial-gradient(120% 90% at 88% 108%,var(--accent-soft) 0%,rgba(233,248,240,0) 60%),
+    linear-gradient(135deg,var(--accent-soft) 0%,#F6FBF8 46%,#FFFFFF 100%);}
+.rd .hm-hero>:not(.oy-layer){position:relative;z-index:1;}
+/* MEAL HERO 장식 레이어(07 배치 사양): blob(우측→하단), 큰 잎(우하단 잘림), 점클러스터(우상단), 원×2 */
+.rd .mh-blob{right:-6%;bottom:-34%;width:82%;height:124%;opacity:.38;
+  -webkit-mask-image:url(../assets/blob_wave_mint.svg);mask-image:url(../assets/blob_wave_mint.svg);
+  -webkit-mask-position:right bottom;mask-position:right bottom;-webkit-mask-size:cover;mask-size:cover;}
+.rd .mh-leaf{right:-40px;bottom:-30px;width:360px;height:278px;opacity:.30;
+  -webkit-mask-image:url(../assets/leaf_branch_large.svg);mask-image:url(../assets/leaf_branch_large.svg);
+  -webkit-mask-position:right bottom;mask-position:right bottom;}
+.rd .mh-dots{right:14px;top:12px;width:150px;height:150px;opacity:.32;
+  -webkit-mask-image:url(../assets/dotted_cluster_gold.svg);mask-image:url(../assets/dotted_cluster_gold.svg);}
+.rd .mh-c1{right:22%;top:38%;width:92px;height:92px;opacity:.24;
+  -webkit-mask-image:url(../assets/soft_circle_mint.svg);mask-image:url(../assets/soft_circle_mint.svg);}
+.rd .mh-c2{right:7%;bottom:22%;width:60px;height:60px;opacity:.22;
+  -webkit-mask-image:url(../assets/soft_circle_mint.svg);mask-image:url(../assets/soft_circle_mint.svg);}
 .rd .hm-hero-eyebrow{font-size:12.5px;font-weight:700;color:var(--gd);}
 .rd .hm-hero-title{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-top:6px;color:var(--i1);}
 
@@ -58,22 +79,28 @@
   padding:0;font-family:inherit;color:var(--gd);font-size:12.5px;font-weight:600;cursor:pointer;
   text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px;}
 
-/* HeroGameCard(오늘의 옥야) — 잔잔한 그래픽 카드: 소프트 배경 + 잎/점 장식 */
-.rd .okya-card{position:relative;overflow:hidden;margin-top:0;min-height:0;border:1px solid var(--ln);
-  border-radius:20px;padding:24px;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;gap:12px;background:linear-gradient(158deg,#EEF6FA 0%,#F6FBFD 58%,#FFFFFF 100%);}
-.rd .okya-card.okc-att{background:linear-gradient(150deg,var(--accent-soft),#FFFFFF);}
-/* 우하단 잎 새싹(테마색 mask) */
-.rd .okya-card::after{content:"";display:block;position:absolute;right:-26px;bottom:-30px;width:170px;height:170px;
-  z-index:0;pointer-events:none;background-color:var(--accent);opacity:.30;
-  -webkit-mask:url(../assets/leaf_sprig_small.svg) no-repeat bottom right/contain;
-  mask:url(../assets/leaf_sprig_small.svg) no-repeat bottom right/contain;}
-/* 좌상단 점 링 장식(테마색 mask) */
-.rd .okya-card::before{content:"";display:block;position:absolute;left:-30px;top:-30px;width:130px;height:130px;
-  z-index:0;pointer-events:none;background-color:var(--accent);opacity:.16;
-  -webkit-mask:url(../assets/dotted_ring.svg) no-repeat center/contain;
-  mask:url(../assets/dotted_ring.svg) no-repeat center/contain;}
-.rd .okya-card>*{position:relative;z-index:1;}
+/* HeroGameCard(오늘의 옥야) — 존재감 있는 그래픽 카드: pale field + 큰 잎 + 점링 + 원 */
+.rd .okya-card{position:relative;overflow:hidden;margin-top:0;min-height:0;
+  border:1px solid var(--okc-bd,rgba(255,255,255,.72));box-shadow:var(--sh-hero);
+  border-radius:28px;padding:24px;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:12px;
+  background:radial-gradient(130% 110% at 82% 104%,var(--accent-soft) 0%,rgba(233,248,240,0) 66%),
+    linear-gradient(160deg,var(--accent-soft) 0%,#F2FAF6 52%,#FFFFFF 100%);}
+.rd .okya-card.okc-att{background:radial-gradient(130% 110% at 82% 104%,var(--accent-soft) 0%,rgba(233,248,240,0) 64%),
+    linear-gradient(150deg,var(--accent-soft),#FFFFFF);}
+.rd .okya-card>:not(.oy-layer){position:relative;z-index:1;}
+/* GAME HERO 장식 레이어(07): 큰 잎 우하단(확실히), 점링 상단, 원×2 */
+.rd .gc-field{right:-18%;bottom:-28%;width:96%;height:104%;opacity:1;border-radius:50%;
+  background:radial-gradient(circle,var(--accent-soft) 0%,rgba(233,248,240,0) 68%);-webkit-mask:none;mask:none;}
+.rd .gc-leaf{right:-40px;bottom:-34px;width:300px;height:232px;opacity:.30;
+  -webkit-mask-image:url(../assets/leaf_branch_large.svg);mask-image:url(../assets/leaf_branch_large.svg);
+  -webkit-mask-position:right bottom;mask-position:right bottom;}
+.rd .gc-ring{left:-24px;top:-24px;width:150px;height:150px;opacity:.28;
+  -webkit-mask-image:url(../assets/dotted_ring.svg);mask-image:url(../assets/dotted_ring.svg);}
+.rd .gc-c1{left:15%;bottom:20%;width:70px;height:70px;opacity:.22;
+  -webkit-mask-image:url(../assets/soft_circle_mint.svg);mask-image:url(../assets/soft_circle_mint.svg);}
+.rd .gc-c2{right:13%;top:15%;width:50px;height:50px;opacity:.22;
+  -webkit-mask-image:url(../assets/soft_circle_mint.svg);mask-image:url(../assets/soft_circle_mint.svg);}
 .rd .okc-eyebrow{color:var(--i2);width:100%;text-align:center;}
 .rd .okc-att .okc-eyebrow{color:var(--gd);}
 .rd .okc-emoji{animation:none;font-size:46px;align-self:center;filter:none;}
@@ -86,24 +113,29 @@
 /* ── ShortcutCard 4개 (파스텔 배경 + 아이콘칩 + 은은한 장식) ── */
 .rd .hm-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;}
 .rd .hm-tile{position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;
-  background:var(--tile-bg);border:1px solid var(--tile-bd);border-radius:16px;padding:16px 18px;
-  cursor:pointer;font-family:inherit;text-align:left;transition:transform .16s cubic-bezier(.22,1,.36,1);}
+  background:var(--tile-bg);border:1px solid var(--tile-bd);border-radius:20px;padding:16px 18px;
+  box-shadow:var(--sh-sc);cursor:pointer;font-family:inherit;text-align:left;
+  transition:transform .16s cubic-bezier(.22,1,.36,1);}
 .rd .hm-tile:active{transform:scale(.98);}
 .rd .hm-tile-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;
   background:#fff;box-shadow:0 3px 10px rgba(41,53,70,.07);position:relative;z-index:1;}
 .rd .hm-tile-ic svg{width:21px;height:21px;}
 .rd .hm-tile-l{font-size:14.5px;font-weight:700;color:var(--i1);position:relative;z-index:1;}
 /* 카드별 파스텔 배경/보더/아이콘색/장식색(카테고리 뉘앙스) */
-.rd .t-green{--tile-bg:#E9F6EF;--tile-bd:#D6EEE1;--tile-ic:#37A374;--tile-dec:#37A374;}
-.rd .t-lav{--tile-bg:#EFECFB;--tile-bd:#E1DBF6;--tile-ic:#7C6CF0;--tile-dec:#7C6CF0;}
-.rd .t-cyan{--tile-bg:#E6F4F8;--tile-bd:#D2ECF1;--tile-ic:#2FA3BE;--tile-dec:#2FA3BE;}
-.rd .t-pink{--tile-bg:#FBEAF3;--tile-bd:#F3D8E7;--tile-ic:#E0619B;--tile-dec:#E0619B;}
+.rd .t-green{--tile-bg:#DEF2E8;--tile-bd:#C9E9D8;--tile-ic:#2E9E6C;--tile-dec:#2E9E6C;}
+.rd .t-lav{--tile-bg:#E8E4F9;--tile-bd:#D8D0F3;--tile-ic:#7059EE;--tile-dec:#7059EE;}
+.rd .t-cyan{--tile-bg:#DCEFF5;--tile-bd:#C6E5EC;--tile-ic:#2795B2;--tile-dec:#2795B2;}
+.rd .t-pink{--tile-bg:#F8E0EE;--tile-bd:#EFCEE0;--tile-ic:#DB4F90;--tile-dec:#DB4F90;}
 .rd .hm-tile-ic{color:var(--tile-ic);}
-/* 우하단 은은한 잎 장식 */
-.rd .hm-tile::after{content:"";position:absolute;right:-16px;bottom:-16px;width:78px;height:78px;z-index:0;
-  pointer-events:none;background-color:var(--tile-dec);opacity:.14;
-  -webkit-mask:url(../assets/leaf_sprig_small.svg) no-repeat bottom right/contain;
-  mask:url(../assets/leaf_sprig_small.svg) no-repeat bottom right/contain;}
+/* 우측/하단 장식 순환(잎/원/점) — 카드마다 다른 asset(07 규정) */
+.rd .sc-dec{background-color:var(--tile-dec);}
+.rd .sc-leaf{right:-14px;bottom:-14px;width:86px;height:86px;opacity:.20;
+  -webkit-mask-image:url(../assets/leaf_sprig_small.svg);mask-image:url(../assets/leaf_sprig_small.svg);
+  -webkit-mask-position:bottom right;mask-position:bottom right;}
+.rd .sc-circle{right:-10px;bottom:-18px;width:74px;height:74px;opacity:.22;
+  -webkit-mask-image:url(../assets/soft_circle_mint.svg);mask-image:url(../assets/soft_circle_mint.svg);}
+.rd .sc-dots{right:8px;bottom:-6px;width:66px;height:66px;opacity:.24;
+  -webkit-mask-image:url(../assets/dotted_ring.svg);mask-image:url(../assets/dotted_ring.svg);}
 
 /* ── 오늘의 학교생활 (선+여백) ── */
 .rd .hm-life{margin-top:28px;}

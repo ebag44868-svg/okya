@@ -6,6 +6,11 @@
    · 그라데이션 카드 배경(hero/quiz_*.svg)은 마스크 불가 → 기존 테마 그라데이션 사용.
    · 배치는 각 화면 redesign.css의 ::before/::after(또는 .oy-dec 요소)에서 지정.
    =================================================================== */
+/* 다중 장식 레이어(카드 내부 절대배치 span). 각 .hm-dec-*/.gc-*가 mask-image+위치 지정. */
+.oy-layer{position:absolute;pointer-events:none;z-index:0;background-color:var(--accent);
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:contain;mask-size:contain;
+  -webkit-mask-position:center;mask-position:center;}
+
 .oy-dec{position:absolute;pointer-events:none;z-index:0;background-color:var(--accent);
   -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
   -webkit-mask-size:contain;mask-size:contain;

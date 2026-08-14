@@ -43,6 +43,11 @@ function okyaCardHTML(txs,admin){
   const attNeed=!admin&&!attDoneToday(txs)
   if(attNeed){
     return`<div class="h2-hero-visual okya-card okc-att" id="okya-card" data-okya="att" role="button" tabindex="0">
+      <span class="oy-layer gc-field" aria-hidden="true"></span>
+      <span class="oy-layer gc-leaf" aria-hidden="true"></span>
+      <span class="oy-layer gc-ring" aria-hidden="true"></span>
+      <span class="oy-layer gc-c1" aria-hidden="true"></span>
+      <span class="oy-layer gc-c2" aria-hidden="true"></span>
       <div class="okc-eyebrow">오늘의 옥야</div>
       <div class="okc-emoji">✓</div>
       <div class="okc-body"><div class="okc-title">오늘 출석 체크</div><div class="okc-desc">아직 출석하지 않았어요</div></div>
@@ -51,6 +56,11 @@ function okyaCardHTML(txs,admin){
   }
   const g=arcGame(arcDailyGameKey())||ARCADE_GAMES[0]
   return`<div class="h2-hero-visual okya-card okc-game" id="okya-card" data-okya="game" role="button" tabindex="0">
+    <span class="oy-layer gc-field" aria-hidden="true"></span>
+    <span class="oy-layer gc-leaf" aria-hidden="true"></span>
+    <span class="oy-layer gc-ring" aria-hidden="true"></span>
+    <span class="oy-layer gc-c1" aria-hidden="true"></span>
+    <span class="oy-layer gc-c2" aria-hidden="true"></span>
     <div class="okc-eyebrow">오늘의 옥야</div>
     <div class="okc-emoji">${g.emoji}</div>
     <div class="okc-body"><div class="okc-label">오늘의 추천 게임</div><div class="okc-title">${esc(g.name)}</div></div>
@@ -77,21 +87,27 @@ const HOME_TICO={
 }
 // 바로가기 4카드 — 학사일정/회의록/책교환/제본소, 카테고리 파스텔(그린/라벤더/시안/핑크)
 const HOME_TILES=[
-  {k:'school-cal',l:'학사일정',ic:'cal',  tone:'green'},
-  {k:'school-mt', l:'회의록',  ic:'vid',  tone:'lav'},
-  {k:'book',      l:'책교환',  ic:'book', tone:'cyan'},
-  {k:'print',     l:'제본소',  ic:'print',tone:'pink'},
+  {k:'school-cal',l:'학사일정',ic:'cal',  tone:'green',dec:'leaf'},
+  {k:'school-mt', l:'회의록',  ic:'vid',  tone:'lav',  dec:'circle'},
+  {k:'book',      l:'책교환',  ic:'book', tone:'cyan', dec:'dots'},
+  {k:'print',     l:'제본소',  ic:'print',tone:'pink', dec:'leaf'},
 ]
-// ShortcutCard: 파스텔 배경 + 아이콘칩 + 라벨 + 은은한 장식(::after 잎/원, CSS)
-function ShortcutCard({k,l,ic,tone}){
+// ShortcutCard: 파스텔 배경 + 아이콘칩 + 라벨 + 카드별 장식(잎/원/점 순환)
+function ShortcutCard({k,l,ic,tone,dec}){
   return`<button class="hm-tile t-${tone}" data-goto="${k}">
+    <span class="oy-layer sc-dec sc-${dec}" aria-hidden="true"></span>
     <span class="hm-tile-ic">${HOME_TICO[ic]}</span>
     <span class="hm-tile-l">${l}</span>
   </button>`
 }
-// HeroMealCard: 홈에서 가장 중요한 카드(급식). 세그/메뉴/CTA + 배경 잎 장식(CSS).
+// HeroMealCard: 홈에서 가장 중요한 카드(급식). 시각 레이어(tint+blob+잎+점+원) + 세그/메뉴/CTA.
 function HeroMealCard(){
   return`<div class="hm-hero">
+    <span class="oy-layer mh-blob" aria-hidden="true"></span>
+    <span class="oy-layer mh-leaf" aria-hidden="true"></span>
+    <span class="oy-layer mh-dots" aria-hidden="true"></span>
+    <span class="oy-layer mh-c1" aria-hidden="true"></span>
+    <span class="oy-layer mh-c2" aria-hidden="true"></span>
     <div class="hm-hero-eyebrow">오늘의 급식</div>
     <h1 class="hm-hero-title">오늘의 급식</h1>
     <div class="hm-slotseg" id="hero-seg"></div>
