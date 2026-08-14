@@ -64,67 +64,76 @@ function goOkyaCard(mode){
   // 아케이드 탭을 base로 두고 게임으로 바로 진입(뒤로가기 시 아케이드 메인). 중간 화면 flash 없음.
   TAB='arcade';STACK=[];push(g.route)
 }
+// ── 홈 리디자인(그린/자연) — 마크업+스타일만 교체, 데이터/라우팅/기능은 기존 헬퍼 그대로 ──
+// 스타일: css/home-redesign.css (.rd 스코프). 애니메이션(캐러셀/리빌)은 후속 단계라 이 단계에선 호출 안 함.
 async function rHome(){
   TAB='home'
-  const topbar=`<div class="h2-top">
-      <div class="t brand"><img src="${LOGO}" style="width:26px;height:26px;border-radius:8px;object-fit:cover">okya</div>
-      <div style="display:flex;align-items:center;gap:2px">
-        <button id="home-search" aria-label="검색"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
-        <button data-bell>${I.bell}</button>
+  const admin=SESSION.role==='admin'
+  const d=new Date(),DOW=['일','월','화','수','목','금','토']
+  const dateLine=`${d.getMonth()+1}월 ${d.getDate()}일 ${DOW[d.getDay()]}요일`
+  const SICO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
+  const topbar=`<header class="hm-top">
+      <div class="hm-eyebrow">오늘의 옥야 · ${dateLine}</div>
+      <div class="hm-actions">
+        <button class="hm-ico" id="home-search" aria-label="검색">${SICO}</button>
+        <button class="hm-ico" data-bell aria-label="알림">${I.bell}</button>
       </div>
-    </div>`
-  app().innerHTML=`<div class="screen fade-in p3 home2"><div class="h2-wrap">${topbar}<div class="loader" style="min-height:220px"><div class="spin"></div></div></div></div>${bnav()}`
+    </header>`
+  app().innerHTML=`<div class="screen fade-in p3 home2 rd"><div class="hm-wrap">${topbar}<div class="loader" style="min-height:220px"><div class="spin"></div></div></div></div>${bnav()}`
   bindNav()
 
-  const admin=SESSION.role==='admin'
   const[txs]=await Promise.all([getAllTx(),loadNotifs()])
   const bal=balOf(SESSION.id,txs)
   const issued=txs.filter(t=>t.type==='발행').reduce((s,t)=>s+t.amount,0)
   const todayStr=new Date().toISOString().slice(0,10)
   const upcoming=SCHEDULE.filter(s=>s.date>=todayStr).sort((a,b)=>a.date<b.date?-1:1)
-  const d=new Date(),DOW=['일','월','화','수','목','금','토']
-  const dateLine=`${d.getMonth()+1}월 ${d.getDate()}일 ${DOW[d.getDay()]}요일`
   const slot0=defaultMealSlot()
 
-  // 바로가기 타일: 각진 정사각형, 여백 없이 붙여서 가로 슬라이드. 각 타일은 향후 이미지를 꽉 채워 넣을 슬롯
-  const SHORTCUTS=[['money','옥야머니','💰'],['petition','청원','📢'],['challenge','챌린지','🔥'],['school-food','급식','🍚'],['school-cal','학사일정','📅'],['school-mt','회의록','📹'],['book','책교환','📚'],['print','제본소','📖']]
-  const shortcuts=SHORTCUTS.map(([k,l,e],i)=>`<button class="h2-sc sc-${i}" data-goto="${k}"><span class="h2-sc-emoji">${e}</span><span class="h2-sc-l">${l}</span></button>`).join('')
+  const TICO={
+    cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="18" rx="2.5"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>',
+    vid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="2" y="6" width="14" height="12" rx="2.5"/><path d="M16 10l6-3v10l-6-3z"/></svg>',
+    book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5a2 2 0 0 1 2-2h6v16H6a2 2 0 0 0-2 2z"/><path d="M20 5a2 2 0 0 0-2-2h-6v16h6a2 2 0 0 1 2 2z"/></svg>',
+    print:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="6" y="3" width="12" height="7" rx="1.5"/><rect x="4" y="10" width="16" height="8" rx="2"/><path d="M8 18v3h8v-3"/></svg>'
+  }
+  const TILES=[['school-cal','학사일정','cal','t-green'],['school-mt','회의록','vid','t-lav'],['book','책교환','book','t-blue'],['print','제본소','print','t-pink']]
+  const tiles=TILES.map(([k,l,ic,cls])=>`<button class="hm-tile ${cls}" data-goto="${k}"><span class="hm-tile-ic">${TICO[ic]}</span><span class="hm-tile-l">${l}</span></button>`).join('')
 
-  const up=upcoming.slice(0,3).map(s=>{const dd=Math.max(0,Math.ceil((new Date(s.date)-new Date(todayStr))/86400000));return`<div class="h2-up-row"><div><div class="h2-up-t">${esc(s.label)}</div><div class="h2-up-d">${fmtDate(s.date)}</div></div><div class="h2-up-dd">D-${dd}</div></div>`}).join('')||`<div class="h2-empty">다가오는 일정이 없어요</div>`
+  const LEAF='<svg class="leaf %C" viewBox="0 0 100 100" fill="currentColor"><path d="M50 5C30 25 20 55 50 95 80 55 70 25 50 5z"/></svg>'
+  const leaves=LEAF.replace('%C','l1')+LEAF.replace('%C','l2')+LEAF.replace('%C','l3')
 
-  app().innerHTML=`<div class="screen fade-in p3 home2"><div class="h2-wrap">
+  const up=upcoming.slice(0,3).map(s=>{const dd=Math.max(0,Math.ceil((new Date(s.date)-new Date(todayStr))/86400000));return`<div class="hm-up-row"><div><div class="hm-up-t">${esc(s.label)}</div><div class="hm-up-d">${fmtDate(s.date)}</div></div><div class="hm-up-dd${dd<=7?' soon':''}">D-${dd}</div></div>`}).join('')||`<div class="hm-empty">다가오는 일정이 없어요</div>`
+
+  app().innerHTML=`<div class="screen fade-in p3 home2 rd"><div class="hm-wrap">
     ${topbar}
-    <section class="h2-hero">
-      <div class="h2-hero-main">
-        <div class="h2-eyebrow">오늘의 옥야 · ${dateLine}</div>
-        <h1 class="h2-title">오늘의 급식</h1>
-        <div class="h2-slotseg" id="hero-seg"></div>
-        <ul class="h2-menu" id="hero-menu"></ul>
-        <button class="h2-cta" data-goto="school-food">급식 자세히 보기 <span>→</span></button>
+    <section class="hm-hero-row">
+      <div class="hm-hero">
+        ${leaves}
+        <div class="hm-hero-eyebrow">오늘의 급식</div>
+        <h1 class="hm-hero-title">오늘의 급식</h1>
+        <div class="hm-slotseg" id="hero-seg"></div>
+        <ul class="hm-menu" id="hero-menu"></ul>
+        <button class="hm-hero-cta" data-goto="school-food">급식 자세히 보기 <span>→</span></button>
       </div>
       ${okyaCardHTML(txs,admin)}
     </section>
 
-    <section class="h2-sec h2-sec-flush">
-      <div class="h2-sec-head" style="padding:0 20px"><h2 class="h2-sec-t">바로가기</h2></div>
-      <div class="h2-grid" id="h2-grid">${shortcuts}</div>
-    </section>
+    <section class="hm-tiles">${tiles}</section>
 
-    <section class="h2-sec">
-      <div class="h2-sec-head"><h2 class="h2-sec-t">오늘의 학교생활</h2></div>
-      <div class="h2-today">
-        ${admin?'':`<div class="pcard tight att h2-att" id="att-panel">${attendancePanelHTML(txs)}</div>`}
-        <div class="h2-today-cols">
-          <button class="h2-surf h2-money" data-goto="money">
-            <div class="h2-surf-lbl">${admin?'총 발행량':'옥야머니'}</div>
-            <div class="h2-bignum"><span id="balnum">0</span><small>옥</small></div>
-            <div class="h2-prog"><i id="progbar" style="width:0"></i></div>
-            <div class="h2-prog-lbl"><span>${d.getFullYear()}년</span><span><b id="progpct">0</b>% 지남</span></div>
+    <section class="hm-life">
+      <h2 class="hm-life-h">오늘의 학교생활</h2>
+      <div class="hm-life-grid">
+        <div class="hm-life-left">
+          ${admin?'':`<div class="hm-att" id="att-panel">${attendancePanelHTML(txs)}</div>`}
+          <button class="hm-bal" data-goto="money">
+            <div class="hm-bal-lbl">${admin?'총 발행량':'옥야머니'}</div>
+            <div class="hm-bal-num"><span id="balnum">0</span><small>옥</small></div>
+            <div class="hm-gauge"><i id="progbar"></i></div>
+            <div class="hm-gauge-lbl"><span>${d.getFullYear()}년</span><span><b id="progpct">0</b>% 지남</span></div>
           </button>
-          <div class="h2-surf h2-updates" data-goto="school-cal" role="button" tabindex="0">
-            <div class="h2-surf-lbl">다가오는 일정</div>
-            ${up}
-          </div>
+        </div>
+        <div class="hm-up">
+          <div class="hm-up-h">다가오는 일정</div>
+          ${up}
         </div>
       </div>
     </section>
@@ -144,7 +153,7 @@ async function rHome(){
     else if(k==='book'){push(rBookPage)}
     else if(k==='print'){push(rPrint)}
   }
-  document.querySelectorAll('.home2 [data-goto]').forEach(el=>{
+  document.querySelectorAll('.rd [data-goto]').forEach(el=>{
     el.addEventListener('click',()=>goHome(el.dataset.goto))
     if(el.getAttribute('role')==='button')el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();goHome(el.dataset.goto)}})
   })
@@ -152,11 +161,7 @@ async function rHome(){
   const attBtn=document.getElementById('att-btn');if(attBtn)attBtn.onclick=doAttendance
   const okc=document.getElementById('okya-card');if(okc){okc.onclick=()=>goOkyaCard(okc.dataset.okya);okc.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();goOkyaCard(okc.dataset.okya)}}}
   document.getElementById('home-search').onclick=()=>push(()=>rGlobalSearch())
-  const brand=document.querySelector('.h2-top .brand');if(brand){brand.style.cursor='pointer';brand.onclick=()=>eggTap('logo',5,()=>{brand.classList.remove('egg-wobble');void brand.offsetWidth;brand.classList.add('egg-wobble');confettiBurst();popMsg('옥야 파이팅!','🎉')})}
   countUp(document.getElementById('balnum'),admin?issued:bal)
   animateGauge(document.getElementById('progbar'),document.getElementById('progpct'),yearPct())
   wireBell()
-  initShortcutCarousel()          // 바로가기 자동 소개 carousel (Phase 7·8)
-  okRevealObserve(app())          // 스크롤 등장 리빌 (Phase 17)
 }
-

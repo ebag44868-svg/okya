@@ -1,0 +1,138 @@
+/* ===================================================================
+   home-redesign.css — 홈 리디자인 (그린/자연 테마)
+   · 전부 .rd 스코프. .rd는 rHome() 래퍼에만 붙음 → 다른 화면 무영향.
+   · 레일/사이드바(bnav)·오버레이·공유 keyframe은 건드리지 않음.
+   · 애니메이션은 후속 단계(여기선 정적 재현 + 실데이터 표시).
+   =================================================================== */
+.rd{
+  --g:#2FC178; --gd:#25A867; --gt:#E9F8F0;
+  --i1:#1B2A24; --i2:#5C6B63; --mut:#93A199;
+  --ln:#EAEFEB; --ln2:#F1F5F2;
+}
+.screen.p3.rd{background:#F4F7F5;}
+.rd .hm-wrap{max-width:1180px;margin:0 auto;padding:22px 26px 44px;}
+
+/* ── 상단 ── */
+.rd .hm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.rd .hm-eyebrow{font-size:13px;font-weight:600;color:var(--mut);}
+.rd .hm-actions{display:flex;gap:8px;}
+.rd .hm-ico{width:38px;height:38px;border-radius:11px;background:#fff;border:1px solid var(--ln);
+  display:grid;place-items:center;color:#5c6b63;cursor:pointer;position:relative;}
+.rd .hm-ico svg{width:19px;height:19px;}
+
+/* ── Hero row ── */
+.rd .hm-hero-row{display:grid;grid-template-columns:1fr;gap:16px;}
+.rd .hm-hero{position:relative;overflow:hidden;padding:26px 28px;border:1px solid var(--ln);
+  border-radius:20px;min-height:300px;display:flex;flex-direction:column;
+  background:linear-gradient(135deg,#E4F7EC 0%,#F2FBF6 48%,#FFFFFF 100%);}
+.rd .hm-hero>*{position:relative;z-index:1;}
+.rd .hm-hero .leaf{position:absolute;color:#B7E7CC;opacity:.5;z-index:0;}
+.rd .hm-hero .leaf.l1{top:-10px;right:38%;width:120px;transform:rotate(15deg);}
+.rd .hm-hero .leaf.l2{top:40px;right:6%;width:150px;transform:rotate(-8deg);opacity:.46;}
+.rd .hm-hero .leaf.l3{bottom:-24px;right:22%;width:110px;opacity:.4;}
+.rd .hm-hero-eyebrow{font-size:12.5px;font-weight:700;color:var(--gd);}
+.rd .hm-hero-title{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-top:6px;color:var(--i1);}
+
+/* 급식 세그(renderHeroMeal이 .h2-slotbtn 생성) */
+.rd .hm-slotseg{display:inline-flex;gap:2px;background:#fff;border:1px solid var(--ln);
+  border-radius:999px;padding:3px;margin-top:14px;align-self:flex-start;}
+.rd .hm-slotseg .h2-slotbtn{padding:7px 16px;border-radius:999px;font-size:13px;font-weight:700;
+  color:var(--i2);background:transparent;box-shadow:none;}
+.rd .hm-slotseg .h2-slotbtn.on{background:var(--g);color:#fff;box-shadow:none;}
+
+/* 급식 메뉴 리스트 */
+.rd .hm-menu{list-style:none;margin:16px 0 0;display:flex;flex-direction:column;gap:7px;}
+.rd .hm-menu li{font-size:15.5px;font-weight:600;color:#2c3a33;padding-left:16px;position:relative;}
+.rd .hm-menu li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;
+  border-radius:50%;background:var(--g);}
+.rd .hm-menu li.h2-menu-empty{padding-left:0;color:var(--mut);font-weight:600;}
+.rd .hm-menu li.h2-menu-empty::before{display:none;}
+
+.rd .hm-hero-cta{margin-top:auto;margin-bottom:2px;align-self:flex-start;display:inline-flex;
+  align-items:center;gap:6px;background:var(--g);color:#fff;border:0;font-family:inherit;
+  font-size:13.5px;font-weight:700;padding:11px 18px;border-radius:12px;cursor:pointer;}
+
+/* 오늘의 옥야 카드(okyaCardHTML의 .okya-card/.okc-* 재사용 → 재스킨) */
+.rd .okya-card{margin-top:0;min-height:0;border:1px solid var(--ln);border-radius:20px;padding:24px;
+  flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;
+  background:linear-gradient(160deg,#F3F0FF 0%,#FBF6FF 55%,#FFF0F6 100%);}
+.rd .okya-card.okc-att{background:linear-gradient(150deg,#E9F8F0,#F1FBF6);}
+.rd .okya-card::after{display:none;}
+.rd .okc-eyebrow{color:#8a7fb8;width:100%;text-align:center;}
+.rd .okc-att .okc-eyebrow{color:var(--gd);}
+.rd .okc-emoji{animation:none;font-size:46px;align-self:center;filter:none;}
+.rd .okc-body{text-align:center;}
+.rd .okc-label,.rd .okc-desc{color:var(--i2);font-weight:600;}
+.rd .okc-title{font-size:22px;color:var(--i1);}
+.rd .okc-btn{align-self:center;background:#fff;color:var(--i1);
+  box-shadow:0 6px 16px -8px rgba(124,108,240,.5);}
+.rd .okc-att .okc-btn{background:var(--g);color:#fff;box-shadow:none;}
+
+/* ── 바로가기 타일 (전부 화이트 + 파스텔 아이콘칩) ── */
+.rd .hm-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;}
+.rd .hm-tile{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--ln);
+  border-radius:16px;padding:16px 18px;cursor:pointer;font-family:inherit;text-align:left;
+  transition:transform .16s cubic-bezier(.22,1,.36,1);}
+.rd .hm-tile:active{transform:scale(.98);}
+.rd .hm-tile-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;}
+.rd .hm-tile-ic svg{width:21px;height:21px;}
+.rd .hm-tile-l{font-size:14.5px;font-weight:700;color:var(--i1);}
+.rd .t-green .hm-tile-ic{background:var(--gt);color:var(--gd);}
+.rd .t-lav .hm-tile-ic{background:#EFEBFF;color:#7C6CF0;}
+.rd .t-blue .hm-tile-ic{background:#E5F0FF;color:#3A8DF0;}
+.rd .t-pink .hm-tile-ic{background:#FDE9F1;color:#E8619B;}
+
+/* ── 오늘의 학교생활 (선+여백) ── */
+.rd .hm-life{margin-top:28px;}
+.rd .hm-life-h{font-size:16px;font-weight:800;letter-spacing:-.01em;margin-bottom:14px;color:var(--i1);}
+.rd .hm-life-grid{display:grid;grid-template-columns:1fr;gap:26px;}
+.rd .hm-life-left{display:flex;flex-direction:column;gap:20px;}
+
+/* 매일 출석(attendancePanelHTML: .t/.dots/.dot/.get 재사용) */
+.rd .hm-att{position:relative;padding:2px 2px 2px;}
+.rd .hm-att .t{font-size:13px;font-weight:700;color:var(--i2);}
+.rd .hm-att .get{position:absolute;top:-2px;right:0;font-size:12px;font-weight:800;color:var(--gd);
+  background:var(--gt);border:0;padding:6px 13px;border-radius:999px;cursor:pointer;font-family:inherit;}
+.rd .hm-att .get[disabled]{color:var(--mut);background:var(--ln2);cursor:default;}
+.rd .hm-att .dots{display:flex;gap:10px;margin-top:14px;}
+.rd .hm-att .dot{width:30px;height:30px;border-radius:50%;background:var(--ln2);display:flex;
+  align-items:center;justify-content:center;color:var(--mut);font-size:12.5px;font-weight:700;
+  border:1.5px solid var(--ln);}
+.rd .hm-att .dot.on{background:var(--g);border-color:var(--g);color:#fff;}
+.rd .hm-att .dot svg{width:15px;height:15px;stroke-width:2.4;}
+
+/* 옥야머니 잔액(선+여백, 카드 아님) */
+.rd .hm-bal{display:block;width:100%;text-align:left;background:transparent;border:0;padding:0;
+  cursor:pointer;font-family:inherit;}
+.rd .hm-bal-lbl{font-size:13px;font-weight:700;color:var(--i2);}
+.rd .hm-bal-num{font-size:38px;font-weight:800;letter-spacing:-.03em;margin-top:6px;color:var(--i1);
+  font-variant-numeric:tabular-nums;}
+.rd .hm-bal-num small{font-size:18px;font-weight:700;color:var(--i2);margin-left:3px;}
+.rd .hm-gauge{height:8px;background:var(--ln2);border-radius:999px;margin-top:12px;overflow:hidden;}
+.rd .hm-gauge>i{display:block;height:100%;width:0;border-radius:999px;
+  background:linear-gradient(90deg,var(--g),#59D79B);}
+.rd .hm-gauge-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);
+  margin-top:8px;font-weight:600;}
+
+/* 다가오는 일정(선+여백) */
+.rd .hm-up{padding:0;}
+.rd .hm-up-h{font-size:13px;font-weight:700;color:var(--i2);margin-bottom:8px;}
+.rd .hm-up-row{display:flex;align-items:center;justify-content:space-between;padding:12px 2px;
+  border-bottom:1px solid var(--ln2);}
+.rd .hm-up-row:last-child{border-bottom:none;}
+.rd .hm-up-t{font-size:14.5px;font-weight:600;color:var(--i1);}
+.rd .hm-up-d{font-size:12px;color:var(--mut);margin-top:2px;}
+.rd .hm-up-dd{font-size:12px;font-weight:800;color:var(--gd);background:var(--gt);
+  padding:5px 10px;border-radius:999px;}
+.rd .hm-up-dd.soon{color:#e0603a;background:#FDEAE3;}
+.rd .hm-empty{font-size:13.5px;color:var(--mut);padding:10px 0;}
+
+/* ── landscape(태블릿 가로) : hero 2열 · 타일 4열 · 학교생활 가로 ── */
+@media (min-width:820px) and (min-aspect-ratio:1/1){
+  .rd .hm-hero-row{grid-template-columns:1.5fr 1fr;gap:18px;}
+  .rd .hm-hero{min-height:320px;}
+  .rd .hm-hero-title{font-size:34px;}
+  .rd .hm-tiles{grid-template-columns:repeat(4,1fr);gap:14px;}
+  .rd .hm-life-grid{grid-template-columns:1.5fr 1fr;gap:40px;align-items:start;}
+  .rd .hm-up{border-left:1px solid var(--ln);padding-left:38px;}
+}
