@@ -1,0 +1,24 @@
+/* ===================================================================
+   assets.css — 지피티 에셋(잎/웨이브/점/스파클) 통합
+   · 색이 박힌 SVG를 mask-image로 쓰고 background-color:var(--accent)로 채움
+     → 장식 색이 색상 테마(--accent)를 따라감(민트 고정 아님).
+   · SVG 자체 opacity(0.4~0.48)는 mask 알파로 남아 은은함 유지.
+   · 그라데이션 카드 배경(hero/quiz_*.svg)은 마스크 불가 → 기존 테마 그라데이션 사용.
+   · 배치는 각 화면 redesign.css의 ::before/::after(또는 .oy-dec 요소)에서 지정.
+   =================================================================== */
+.oy-dec{position:absolute;pointer-events:none;z-index:0;background-color:var(--accent);
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-size:contain;mask-size:contain;
+  -webkit-mask-position:center;mask-position:center;}
+
+/* 개별 에셋 마스크(경로는 css/ 기준 상대) */
+.oy-leaf-br{-webkit-mask-image:url(../assets/leaf_branch_large.svg);mask-image:url(../assets/leaf_branch_large.svg);}
+.oy-leaf-sm{-webkit-mask-image:url(../assets/leaf_sprig_small.svg);mask-image:url(../assets/leaf_sprig_small.svg);}
+.oy-leaf-cy{-webkit-mask-image:url(../assets/leaf_sprig_cyan.svg);mask-image:url(../assets/leaf_sprig_cyan.svg);}
+.oy-wave{-webkit-mask-image:url(../assets/blob_wave_mint.svg);mask-image:url(../assets/blob_wave_mint.svg);}
+.oy-waveln{-webkit-mask-image:url(../assets/thin_wave_lines.svg);mask-image:url(../assets/thin_wave_lines.svg);}
+.oy-ring{-webkit-mask-image:url(../assets/dotted_ring.svg);mask-image:url(../assets/dotted_ring.svg);}
+.oy-cluster{-webkit-mask-image:url(../assets/dotted_cluster_gold.svg);mask-image:url(../assets/dotted_cluster_gold.svg);}
+.oy-circle{-webkit-mask-image:url(../assets/soft_circle_mint.svg);mask-image:url(../assets/soft_circle_mint.svg);}
+.oy-plus{-webkit-mask-image:url(../assets/plus_mint.svg);mask-image:url(../assets/plus_mint.svg);}
+.oy-sparkle{-webkit-mask-image:url(../assets/sparkle_pink.svg);mask-image:url(../assets/sparkle_pink.svg);}

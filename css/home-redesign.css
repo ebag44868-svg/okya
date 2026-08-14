@@ -31,10 +31,11 @@
   border-radius:20px;min-height:300px;display:flex;flex-direction:column;
   background:linear-gradient(135deg,var(--accent-soft) 0%,#FFFFFF 48%,#FFFFFF 100%);}
 .rd .hm-hero>*{position:relative;z-index:1;}
-.rd .hm-hero .leaf{position:absolute;color:#B7E7CC;opacity:.5;z-index:0;}
-.rd .hm-hero .leaf.l1{top:-10px;right:38%;width:120px;transform:rotate(15deg);}
-.rd .hm-hero .leaf.l2{top:40px;right:6%;width:150px;transform:rotate(-8deg);opacity:.46;}
-.rd .hm-hero .leaf.l3{bottom:-24px;right:22%;width:110px;opacity:.4;}
+/* 잎 가지 장식(테마색 mask) — 시안처럼 우상단에서 흘러내림 */
+.rd .hm-hero::before{content:"";position:absolute;top:-30px;right:-40px;width:420px;height:325px;z-index:0;
+  pointer-events:none;background-color:var(--accent);opacity:.42;
+  -webkit-mask:url(../assets/leaf_branch_large.svg) no-repeat top right/contain;
+  mask:url(../assets/leaf_branch_large.svg) no-repeat top right/contain;}
 .rd .hm-hero-eyebrow{font-size:12.5px;font-weight:700;color:var(--gd);}
 .rd .hm-hero-title{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-top:6px;color:var(--i1);}
 
@@ -62,7 +63,13 @@
   flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;
   background:linear-gradient(160deg,#F3F0FF 0%,#FBF6FF 55%,#FFF0F6 100%);}
 .rd .okya-card.okc-att{background:linear-gradient(150deg,var(--accent-soft),#FFFFFF);}
-.rd .okya-card::after{display:none;}
+/* 옥야 카드 우하단 잎 새싹(테마색 mask) */
+.rd .okya-card{position:relative;overflow:hidden;}
+.rd .okya-card::after{content:"";display:block;position:absolute;right:-26px;bottom:-26px;width:150px;height:150px;
+  z-index:0;pointer-events:none;background-color:var(--accent);opacity:.34;
+  -webkit-mask:url(../assets/leaf_sprig_small.svg) no-repeat bottom right/contain;
+  mask:url(../assets/leaf_sprig_small.svg) no-repeat bottom right/contain;}
+.rd .okya-card>*{position:relative;z-index:1;}
 .rd .okc-eyebrow{color:#8a7fb8;width:100%;text-align:center;}
 .rd .okc-att .okc-eyebrow{color:var(--gd);}
 .rd .okc-emoji{animation:none;font-size:46px;align-self:center;filter:none;}

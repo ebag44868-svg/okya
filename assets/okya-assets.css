@@ -1,0 +1,22 @@
+:root {
+  --okya-mint: #72CFA4;
+  --okya-mint-dark: #4DBA86;
+  --okya-mint-light: #DFF7ED;
+  --okya-cyan: #9DDBE6;
+  --okya-cyan-light: #E7F7FA;
+  --okya-lavender: #B9B0F5;
+  --okya-pink: #F0B8D9;
+  --okya-gold: #EFCB8B;
+}
+
+.okya-page-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: url('./page_background_overlay.svg') center/cover no-repeat;
+  opacity: .85;
+}
+
+.okya-hero-bg {
+  background: url('./hero_card_background.svg') center/cover no-repeat;
+}

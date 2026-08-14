@@ -98,16 +98,12 @@ async function rHome(){
   const TILES=[['school-cal','학사일정','cal','t-green'],['school-mt','회의록','vid','t-lav'],['book','책교환','book','t-blue'],['print','제본소','print','t-pink']]
   const tiles=TILES.map(([k,l,ic,cls])=>`<button class="hm-tile ${cls}" data-goto="${k}"><span class="hm-tile-ic">${TICO[ic]}</span><span class="hm-tile-l">${l}</span></button>`).join('')
 
-  const LEAF='<svg class="leaf %C" viewBox="0 0 100 100" fill="currentColor"><path d="M50 5C30 25 20 55 50 95 80 55 70 25 50 5z"/></svg>'
-  const leaves=LEAF.replace('%C','l1')+LEAF.replace('%C','l2')+LEAF.replace('%C','l3')
-
   const up=upcoming.slice(0,3).map(s=>{const dd=Math.max(0,Math.ceil((new Date(s.date)-new Date(todayStr))/86400000));return`<div class="hm-up-row"><div><div class="hm-up-t">${esc(s.label)}</div><div class="hm-up-d">${fmtDate(s.date)}</div></div><div class="hm-up-dd${dd<=7?' soon':''}">D-${dd}</div></div>`}).join('')||`<div class="hm-empty">다가오는 일정이 없어요</div>`
 
   app().innerHTML=`<div class="screen fade-in p3 home2 rd"><div class="hm-wrap">
     ${topbar}
     <section class="hm-hero-row">
       <div class="hm-hero">
-        ${leaves}
         <div class="hm-hero-eyebrow">오늘의 급식</div>
         <h1 class="hm-hero-title">오늘의 급식</h1>
         <div class="hm-slotseg" id="hero-seg"></div>
