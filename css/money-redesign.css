@@ -78,3 +78,71 @@
   .rd .mn-hero-actions{align-self:center;}
   .rd .mn-hero-bal{font-size:48px;}
 }
+
+/* ===================================================================
+   송금 플로우 P2 — ① 받는사람(fTransfer) · ② 금액(fTransferAmt)
+   phdr/tf-*/kp-*/keypad는 money.js가 쓰는 훅. .rd 스코프로만 스킨.
+   =================================================================== */
+/* 공통 헤더 */
+.rd .phdr{display:flex;align-items:center;gap:8px;padding:16px 22px 12px;background:#F4F7F5;}
+.rd .phdr .bk{width:34px;height:34px;border-radius:10px;background:none;border:0;display:grid;
+  place-items:center;color:#1B2A24;cursor:pointer;flex:none;}
+.rd .phdr .bk svg{width:22px;height:22px;}
+.rd .phdr .ttl{flex:1;text-align:left;font-size:17px;font-weight:800;color:#1B2A24;}
+.rd .tf-x{background:none;border:0;font-family:inherit;font-size:13.5px;font-weight:600;color:#93A199;cursor:pointer;}
+
+/* ① 받는사람 */
+.rd .tf-search{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E3E9E4;
+  border-radius:14px;padding:12px 15px;margin:2px 22px 0;}
+.rd .tf-search svg{width:18px;height:18px;stroke:#93A199;fill:none;stroke-width:2;stroke-linecap:round;flex:none;}
+.rd .tf-search input{flex:1;background:none;border:none;outline:none;font-size:14px;font-family:inherit;color:#1B2A24;padding:0;}
+.rd .tf-list{flex:1;overflow:auto;min-height:0;padding:10px 22px 0;}
+.rd .tf-list .empty{color:#93A199;font-size:14px;text-align:center;padding:36px 0;}
+.rd .tf-user{display:flex;align-items:center;gap:13px;padding:12px 8px;border-bottom:1px solid #F1F5F2;
+  cursor:pointer;border-radius:12px;}
+.rd .tf-user.on{background:#E9F8F0;border-bottom-color:transparent;}
+.rd .tf-av{width:42px;height:42px;border-radius:50%;background:#E5F0FF;color:#3A8DF0;display:flex;
+  align-items:center;justify-content:center;font-size:17px;font-weight:800;flex:none;overflow:hidden;}
+.rd .tf-avimg{width:100%;height:100%;object-fit:cover;}
+.rd .tf-user .body{flex:1;min-width:0;}
+.rd .tf-user .ti{font-size:15px;font-weight:700;color:#1B2A24;}
+.rd .tf-user .su{font-size:12.5px;color:#93A199;margin-top:2px;}
+.rd .tf-check{display:flex;color:#cdd5ce;flex:none;}
+.rd .tf-check svg{width:20px;height:20px;}
+.rd .tf-user.on .tf-check{color:#25A867;}
+.rd .tf-foot{padding:10px 22px calc(16px + env(safe-area-inset-bottom));}
+.rd .tf-next{width:100%;padding:15px;border:0;border-radius:14px;color:#fff;font-family:inherit;
+  font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#2FC178,#25A867);}
+.rd .tf-next:disabled{background:#E3E9E4;color:#B4BDB6;cursor:default;}
+
+/* ② 금액 키패드 */
+.rd .kpwrap{display:flex;flex-direction:column;flex:1;min-height:0;padding:8px 22px calc(16px + env(safe-area-inset-bottom));}
+.rd .amt-to{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E3E9E4;border-radius:16px;padding:12px 16px;}
+.rd .amt-av{width:44px;height:44px;border-radius:50%;background:#E5F0FF;color:#3A8DF0;display:flex;
+  align-items:center;justify-content:center;font-size:18px;font-weight:800;flex:none;overflow:hidden;}
+.rd .amt-n{font-size:15px;font-weight:700;color:#1B2A24;}
+.rd .amt-b{font-size:12.5px;color:#93A199;margin-top:2px;}
+.rd .amt-center{margin:auto 0;text-align:center;}
+.rd .kp-amt{font-size:46px;font-weight:800;letter-spacing:-.03em;color:#1B2A24;
+  font-variant-numeric:tabular-nums;line-height:1;}
+.rd .kp-amt .cur{color:#2FC178;}
+.rd .kp-amt small{font-size:20px;font-weight:700;color:#93A199;margin-left:4px;}
+.rd .amt-bal{font-size:12.5px;color:#93A199;font-weight:600;margin-top:10px;}
+.rd .amt-warn{text-align:center;color:#E0603A;font-size:12px;font-weight:700;margin-bottom:8px;}
+.rd .kpquick{display:flex;gap:8px;margin-bottom:10px;}
+.rd .kpquick span{flex:1;text-align:center;background:#fff;border:1px solid #E3E9E4;border-radius:12px;
+  padding:10px 0;font-size:13px;font-weight:700;color:#25A867;cursor:pointer;}
+.rd .kpquick span:active{background:#E9F8F0;}
+.rd .amt-msg{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E3E9E4;
+  border-radius:13px;padding:11px 14px;margin-bottom:12px;}
+.rd .amt-msgic{display:flex;color:#93A199;flex:none;}
+.rd .amt-msgic svg{width:18px;height:18px;}
+.rd .amt-msg input{flex:1;background:none;border:none;outline:none;font-size:13.5px;font-family:inherit;color:#1B2A24;padding:0;}
+.rd .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+.rd .keypad .key{display:flex;align-items:center;justify-content:center;padding:16px 0;font-size:22px;
+  font-weight:600;color:#1B2A24;border-radius:14px;cursor:pointer;font-family:inherit;}
+.rd .keypad .key:active{background:#E9F8F0;color:#25A867;}
+.rd .keypad .key svg{width:24px;height:24px;stroke:#5C6B63;fill:none;}
+.rd .kpnext{width:100%;padding:15px;border:0;border-radius:14px;color:#fff;font-family:inherit;
+  font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#2FC178,#25A867);}
+.rd .kpnext:disabled{background:#E3E9E4;color:#B4BDB6;cursor:default;}
