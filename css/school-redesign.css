@@ -12,3 +12,16 @@
 .rd.school-screen .school-tab{border-radius:12px;font-size:14px;}
 /* 활성 탭은 토큰(--accent)으로 이미 그린. 미세: 급식 큰 메뉴 색 유지 확인용 여백만 */
 .rd.school-screen .mmenu-slot{letter-spacing:-.01em;}
+
+/* 페이지 잎 장식(테마색 mask) — 시안처럼 우측/우하단 */
+.rd.school-screen{position:relative;}
+.rd.school-screen::before{content:"";position:absolute;top:150px;right:-30px;width:220px;height:220px;z-index:0;
+  pointer-events:none;background-color:var(--accent);opacity:.20;
+  -webkit-mask:url(../assets/leaf_sprig_small.svg) no-repeat top right/contain;
+  mask:url(../assets/leaf_sprig_small.svg) no-repeat top right/contain;}
+.rd.school-screen::after{content:"";position:absolute;bottom:96px;right:-20px;width:170px;height:170px;z-index:0;
+  pointer-events:none;background-color:var(--accent);opacity:.16;
+  -webkit-mask:url(../assets/leaf_sprig_cyan.svg) no-repeat bottom right/contain;
+  mask:url(../assets/leaf_sprig_cyan.svg) no-repeat bottom right/contain;}
+/* 콘텐츠는 잎 위 */
+.rd.school-screen .topbar,.rd.school-screen .school-tabs,.rd.school-screen .school-deck{position:relative;z-index:1;}

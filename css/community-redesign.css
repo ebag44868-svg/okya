@@ -15,6 +15,12 @@
 }
 /* feat-hero 밴드: 시안처럼 옅은 그린 + 어두운 글씨 + 부제 */
 .cmrd .feat-hero{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--accent-soft) 0%,#FFFFFF 60%,#FFFFFF 100%);color:#1B2A24;padding:24px 22px 22px;}
+/* 밴드 잎 장식(테마색 mask) */
+.cmrd .feat-hero::before{content:"";position:absolute;top:-18px;right:-24px;width:240px;height:186px;z-index:0;
+  pointer-events:none;background-color:var(--accent);opacity:.28;
+  -webkit-mask:url(../assets/leaf_branch_large.svg) no-repeat top right/contain;
+  mask:url(../assets/leaf_branch_large.svg) no-repeat top right/contain;}
+.cmrd .feat-hero>*{position:relative;z-index:1;}
 .cmrd .feat-title{color:#1B2A24;font-size:24px;}
 .cmrd .feat-sub{color:#5C6B63;font-size:13.5px;margin-top:6px;}
 /* 커뮤 공용 정보 배너 */

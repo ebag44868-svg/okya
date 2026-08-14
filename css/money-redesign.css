@@ -13,10 +13,11 @@
   padding:26px 28px;background:linear-gradient(135deg,var(--accent-soft) 0%,#FFFFFF 52%,#FFFFFF 100%);
   display:flex;flex-direction:column;gap:18px;}
 .rd .mn-hero>*{position:relative;z-index:1;}
-/* 잎사귀 placeholder(교체용) — 후에 background-image/에셋으로 대체 */
-.rd .mn-leaf{position:absolute;color:#B7E7CC;opacity:.5;z-index:0;}
-.rd .mn-leaf.d1{top:-8px;right:9%;width:120px;transform:rotate(-8deg);}
-.rd .mn-leaf.d2{bottom:-26px;right:26%;width:104px;opacity:.4;}
+/* 잎 가지 장식(테마색 mask) — 우상단에서 흘러내림 */
+.rd .mn-hero::before{content:"";position:absolute;top:-24px;right:-30px;width:340px;height:264px;z-index:0;
+  pointer-events:none;background-color:var(--accent);opacity:.34;
+  -webkit-mask:url(../assets/leaf_branch_large.svg) no-repeat top right/contain;
+  mask:url(../assets/leaf_branch_large.svg) no-repeat top right/contain;}
 .rd .mn-hero-lbl{font-size:13px;font-weight:700;color:#5C6B63;}
 .rd .mn-hero-bal{font-size:44px;font-weight:800;letter-spacing:-.03em;margin-top:6px;color:#1B2A24;
   font-variant-numeric:tabular-nums;line-height:1;}

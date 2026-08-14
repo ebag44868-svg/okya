@@ -15,9 +15,11 @@
 .myrd .my2-hero .my2-prof{padding:0;position:relative;z-index:1;}
 .myrd .my2-hero .my-lv-bar{margin-top:14px;position:relative;z-index:1;}
 .myrd .my2-hero .my2-lvsub{position:relative;z-index:1;}
-/* 장식 잎(교체 가능 에셋 placeholder) */
-.myrd .my2-hero::after{content:"";position:absolute;right:-12px;top:-14px;width:130px;height:130px;
-  background:radial-gradient(circle at 68% 32%,#DBF3E6 0%,rgba(219,243,230,0) 62%);pointer-events:none;z-index:0;}
+/* 프로필 카드 우측 잎 장식(테마색 mask) */
+.myrd .my2-hero::after{content:"";position:absolute;right:-18px;top:-22px;width:190px;height:190px;z-index:0;
+  pointer-events:none;background-color:var(--accent);opacity:.30;
+  -webkit-mask:url(../assets/leaf_sprig_small.svg) no-repeat top right/contain;
+  mask:url(../assets/leaf_sprig_small.svg) no-repeat top right/contain;}
 
 /* ── 통계 타일: 컬러 아이콘 + 좌측정렬 ── */
 .myrd .my2-stats{padding:14px 20px 2px;}

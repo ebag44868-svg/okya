@@ -33,14 +33,9 @@ async function rMoney(){
   const rowsFor=cat=>{const l=baseList.filter(t=>catMatch(t,cat)).slice(0,20);return{l,html:l.length?l.map(t=>txRow(t,admin,rbal[t.id])).join(''):'<div class="empty" style="padding:30px 20px">해당 거래가 없어요.</div>'}}
   const first=rowsFor('전체')
 
-  // 잎사귀 placeholder(교체용 에셋) — 후에 이미지로 대체 가능
-  const DECO='<svg class="mn-leaf %C" viewBox="0 0 100 100" fill="currentColor"><path d="M50 5C30 25 20 55 50 95 80 55 70 25 50 5z"/></svg>'
-  const deco=DECO.replace('%C','d1')+DECO.replace('%C','d2')
-
   app().innerHTML=`<div class="screen fade-in p3 rd money2"><div class="mn-wrap">
     <div class="mn-top"><div class="mn-title">옥야머니</div></div>
     <section class="mn-hero">
-      ${deco}
       <div class="mn-hero-l">
         <div class="mn-hero-lbl">${admin?'학생회 총 발행량':'내 잔액'}</div>
         <div class="mn-hero-bal"><span id="mbalnum">0</span><small>옥</small></div>

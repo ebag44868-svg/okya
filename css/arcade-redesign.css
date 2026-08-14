@@ -8,6 +8,18 @@
 /* .arcrd는 토큰을 덮지 않음 → 루트 테마 상속. 헤더/레일/액션버튼/퀴즈뱃지가 색상 테마 따라감.
    게임 타일 파스텔 배경은 의도된 멀티컬러라 고정. */
 
+/* ── 페이지 잎 장식(메인/서브 공통, 테마색 mask) ── */
+.arcrd .arc-wrap{position:relative;}
+.arcrd .arc-wrap::before{content:"";position:absolute;top:8px;right:-30px;width:300px;height:232px;z-index:0;
+  pointer-events:none;background-color:var(--accent);opacity:.24;
+  -webkit-mask:url(../assets/leaf_branch_large.svg) no-repeat top right/contain;
+  mask:url(../assets/leaf_branch_large.svg) no-repeat top right/contain;}
+.arcrd .arc-wrap::after{content:"";position:absolute;bottom:10px;left:-24px;width:150px;height:150px;z-index:0;
+  pointer-events:none;background-color:var(--accent);opacity:.18;
+  -webkit-mask:url(../assets/leaf_sprig_cyan.svg) no-repeat bottom left/contain;
+  mask:url(../assets/leaf_sprig_cyan.svg) no-repeat bottom left/contain;transform:scaleX(-1);}
+.arcrd .arc-head,.arcrd .arc-grid,.arcrd .arc-game-wrap>*{position:relative;z-index:1;}
+
 /* ── 메인 타일: 파스텔 카드 + 원형 아이콘 디스크 ── */
 .arcrd .arc-tile{background:#F3F6F4;padding:20px 18px 44px;border-radius:22px;box-shadow:0 8px 22px rgba(31,64,45,.06);overflow:visible;}
 .arcrd .arc-lottery{background:linear-gradient(150deg,#FCEBE0,#FBE0E9);}
