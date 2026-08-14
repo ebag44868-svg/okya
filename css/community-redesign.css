@@ -39,3 +39,7 @@
 .cmrd .chal-join{margin-top:9px;width:100%;padding:9px 0;border:0;border-radius:10px;background:#E9F8F0;
   color:#25A867;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;}
 .cmrd .chal-join:active{background:#DCF2E7;}
+
+/* ── P4 제본소 ── */
+/* 제본 신청 버튼: 보라 펄스 그림자 → 그린(정적) */
+.cmrd .pr-subbtn{animation:none;box-shadow:0 8px 22px rgba(47,193,120,.32);}

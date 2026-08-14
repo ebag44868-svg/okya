@@ -402,7 +402,7 @@ function prSteps(si){return`<div class="pet-steps pr-steps">${PR_STATUS.map((s,i
 function printCover(p){const si=Math.max(0,PR_STATUS.indexOf(p.status||'접수'));const grad=BOOK_COVERS[((p.title||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0)+3)%BOOK_COVERS.length];return`<div class="book-cover"${p.file?'':` style="background:${grad}"`}>${p.file?`<img src="${esc(p.file)}">`:`<div class="bc-title">${esc(p.title||'')}</div>`}<span class="book-badge pr-badge s${si}">${PR_STATUS[si]}</span></div>`}
 async function rPrint(){
   const admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야제본소</div>${admin?'<div style="width:34px"></div>':`<button id="pr-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 신청</button>`}</div>${featHero('🖨️','옥야제본소','인쇄물을 가져오면 학생회가 제본해 드려요','print')}<div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
+  app().innerHTML=`<div class="screen fade-in p3 rd cmrd"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야제본소</div>${admin?'<div style="width:34px"></div>':`<button id="pr-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 신청</button>`}</div>${featHero('🖨️','옥야제본소','인쇄물을 직접 가져오면 학생회가 제본해 드려요','print')}<div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
   bindNav()
   document.getElementById('bk').onclick=pop
   const nb=document.getElementById('pr-new');if(nb)nb.onclick=()=>push(rPrintNew)
@@ -424,7 +424,7 @@ async function iPrint(){
 }
 async function rPrintDetail(id){
   const admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">제본 진행현황</div><div style="width:34px"></div></div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
+  app().innerHTML=`<div class="screen fade-in p3 rd cmrd"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">제본 진행현황</div><div style="width:34px"></div></div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
   bindNav();document.getElementById('bk').onclick=pop
   let p=null
   try{const r=await wt(sb.from('okya_prints').select('*').eq('id',id).single());p=r.data}catch{}
@@ -461,7 +461,7 @@ async function rPrintDetail(id){
 function rPrintNew(){
   let file=null,bind='spring'
   const calc=()=>{const copies=parseInt((document.getElementById('pr-copies')||{}).value,10)||1;const c=printCost(copies,bind);const el=document.getElementById('pr-cost');if(el)el.textContent=fmt(c)+'옥';return c}
-  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">제본 신청</div><div style="width:34px"></div></div>
+  app().innerHTML=`<div class="screen fade-in p3 rd cmrd"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">제본 신청</div><div style="width:34px"></div></div>
     <div class="chal-detail form2 tone-print">
       <div class="pcard">
         <div class="field"><label>제목</label><input id="pr-title" placeholder="예: 미적분 오답노트"></div>
