@@ -50,7 +50,7 @@ function okyaCardHTML(txs,admin){
     </div>`
   }
   const g=arcGame(arcDailyGameKey())||ARCADE_GAMES[0]
-  return`<div class="h2-hero-visual okya-card okc-game" id="okya-card" data-okya="game" role="button" tabindex="0" style="background:${g.grad}">
+  return`<div class="h2-hero-visual okya-card okc-game" id="okya-card" data-okya="game" role="button" tabindex="0">
     <div class="okc-eyebrow">오늘의 옥야</div>
     <div class="okc-emoji">${g.emoji}</div>
     <div class="okc-body"><div class="okc-label">오늘의 추천 게임</div><div class="okc-title">${esc(g.name)}</div></div>
@@ -64,6 +64,61 @@ function goOkyaCard(mode){
   // 아케이드 탭을 base로 두고 게임으로 바로 진입(뒤로가기 시 아케이드 메인). 중간 화면 flash 없음.
   TAB='arcade';STACK=[];push(g.route)
 }
+// ══════════════════════════════════════════════════════════════════
+//  홈 컴포넌트 (OKYA_UI_KIT 준수: 재사용 컴포넌트로 분리)
+//  · 구조/계층/여백은 references/01_confirmed_home_reference.png 기준.
+//  · 색은 토큰(var(--accent...)) — 카테고리 파스텔은 카드별 뉘앙스로 허용(킷 규정).
+// ══════════════════════════════════════════════════════════════════
+const HOME_TICO={
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="18" rx="2.5"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>',
+  vid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="2" y="6" width="14" height="12" rx="2.5"/><path d="M16 10l6-3v10l-6-3z"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5a2 2 0 0 1 2-2h6v16H6a2 2 0 0 0-2 2z"/><path d="M20 5a2 2 0 0 0-2-2h-6v16h6a2 2 0 0 1 2 2z"/></svg>',
+  print:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="6" y="3" width="12" height="7" rx="1.5"/><rect x="4" y="10" width="16" height="8" rx="2"/><path d="M8 18v3h8v-3"/></svg>'
+}
+// 바로가기 4카드 — 학사일정/회의록/책교환/제본소, 카테고리 파스텔(그린/라벤더/시안/핑크)
+const HOME_TILES=[
+  {k:'school-cal',l:'학사일정',ic:'cal',  tone:'green'},
+  {k:'school-mt', l:'회의록',  ic:'vid',  tone:'lav'},
+  {k:'book',      l:'책교환',  ic:'book', tone:'cyan'},
+  {k:'print',     l:'제본소',  ic:'print',tone:'pink'},
+]
+// ShortcutCard: 파스텔 배경 + 아이콘칩 + 라벨 + 은은한 장식(::after 잎/원, CSS)
+function ShortcutCard({k,l,ic,tone}){
+  return`<button class="hm-tile t-${tone}" data-goto="${k}">
+    <span class="hm-tile-ic">${HOME_TICO[ic]}</span>
+    <span class="hm-tile-l">${l}</span>
+  </button>`
+}
+// HeroMealCard: 홈에서 가장 중요한 카드(급식). 세그/메뉴/CTA + 배경 잎 장식(CSS).
+function HeroMealCard(){
+  return`<div class="hm-hero">
+    <div class="hm-hero-eyebrow">오늘의 급식</div>
+    <h1 class="hm-hero-title">오늘의 급식</h1>
+    <div class="hm-slotseg" id="hero-seg"></div>
+    <ul class="hm-menu" id="hero-menu"></ul>
+    <button class="hm-hero-cta" data-goto="school-food">급식 자세히 보기</button>
+  </div>`
+}
+// HeroGameCard: 우측 추천 게임/출석 카드(존재감 있는 그래픽 카드). okyaCardHTML 재사용.
+function HeroGameCard(txs,admin){return okyaCardHTML(txs,admin)}
+// InfoPanel: 오늘의 학교생활(출석 + 옥야머니 요약) — 좌측 정보 흐름.
+function InfoPanel(txs,admin,d){
+  return`<div class="hm-life-left">
+    ${admin?'':`<div class="hm-att" id="att-panel">${attendancePanelHTML(txs)}</div>`}
+    <button class="hm-bal" data-goto="money">
+      <div class="hm-bal-lbl">${admin?'총 발행량':'옥야머니'}</div>
+      <div class="hm-bal-num"><span id="balnum">0</span><small>옥</small></div>
+      <div class="hm-gauge"><i id="progbar"></i></div>
+      <div class="hm-gauge-lbl"><span>${d.getFullYear()}년</span><span><b id="progpct">0</b>% 지남</span></div>
+    </button>
+  </div>`
+}
+// ScheduleListCard: 다가오는 일정(D-day 우측 정렬 리스트).
+function ScheduleListCard(upcoming,todayStr){
+  const up=upcoming.slice(0,3).map(s=>{const dd=Math.max(0,Math.ceil((new Date(s.date)-new Date(todayStr))/86400000));return`<div class="hm-up-row"><div><div class="hm-up-t">${esc(s.label)}</div><div class="hm-up-d">${fmtDate(s.date)}</div></div><div class="hm-up-dd${dd<=7?' soon':''}">D-${dd}</div></div>`}).join('')||`<div class="hm-empty">다가오는 일정이 없어요</div>`
+  return`<div class="hm-up"><div class="hm-up-h">다가오는 일정</div>${up}</div>`
+}
+
 // ── 홈 리디자인(그린/자연) — 마크업+스타일만 교체, 데이터/라우팅/기능은 기존 헬퍼 그대로 ──
 // 스타일: css/home-redesign.css (.rd 스코프). 애니메이션(캐러셀/리빌)은 후속 단계라 이 단계에선 호출 안 함.
 async function rHome(){
@@ -89,28 +144,13 @@ async function rHome(){
   const upcoming=SCHEDULE.filter(s=>s.date>=todayStr).sort((a,b)=>a.date<b.date?-1:1)
   const slot0=defaultMealSlot()
 
-  const TICO={
-    cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="18" rx="2.5"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>',
-    vid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="2" y="6" width="14" height="12" rx="2.5"/><path d="M16 10l6-3v10l-6-3z"/></svg>',
-    book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5a2 2 0 0 1 2-2h6v16H6a2 2 0 0 0-2 2z"/><path d="M20 5a2 2 0 0 0-2-2h-6v16h6a2 2 0 0 1 2 2z"/></svg>',
-    print:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="6" y="3" width="12" height="7" rx="1.5"/><rect x="4" y="10" width="16" height="8" rx="2"/><path d="M8 18v3h8v-3"/></svg>'
-  }
-  const TILES=[['school-cal','학사일정','cal','t-green'],['school-mt','회의록','vid','t-lav'],['book','책교환','book','t-blue'],['print','제본소','print','t-pink']]
-  const tiles=TILES.map(([k,l,ic,cls])=>`<button class="hm-tile ${cls}" data-goto="${k}"><span class="hm-tile-ic">${TICO[ic]}</span><span class="hm-tile-l">${l}</span></button>`).join('')
-
-  const up=upcoming.slice(0,3).map(s=>{const dd=Math.max(0,Math.ceil((new Date(s.date)-new Date(todayStr))/86400000));return`<div class="hm-up-row"><div><div class="hm-up-t">${esc(s.label)}</div><div class="hm-up-d">${fmtDate(s.date)}</div></div><div class="hm-up-dd${dd<=7?' soon':''}">D-${dd}</div></div>`}).join('')||`<div class="hm-empty">다가오는 일정이 없어요</div>`
+  const tiles=HOME_TILES.map(ShortcutCard).join('')
 
   app().innerHTML=`<div class="screen fade-in p3 home2 rd"><div class="hm-wrap">
     ${topbar}
     <section class="hm-hero-row">
-      <div class="hm-hero">
-        <div class="hm-hero-eyebrow">오늘의 급식</div>
-        <h1 class="hm-hero-title">오늘의 급식</h1>
-        <div class="hm-slotseg" id="hero-seg"></div>
-        <ul class="hm-menu" id="hero-menu"></ul>
-        <button class="hm-hero-cta" data-goto="school-food">급식 자세히 보기</button>
-      </div>
-      ${okyaCardHTML(txs,admin)}
+      ${HeroMealCard()}
+      ${HeroGameCard(txs,admin)}
     </section>
 
     <section class="hm-tiles">${tiles}</section>
@@ -118,19 +158,8 @@ async function rHome(){
     <section class="hm-life">
       <h2 class="hm-life-h">오늘의 학교생활</h2>
       <div class="hm-life-grid">
-        <div class="hm-life-left">
-          ${admin?'':`<div class="hm-att" id="att-panel">${attendancePanelHTML(txs)}</div>`}
-          <button class="hm-bal" data-goto="money">
-            <div class="hm-bal-lbl">${admin?'총 발행량':'옥야머니'}</div>
-            <div class="hm-bal-num"><span id="balnum">0</span><small>옥</small></div>
-            <div class="hm-gauge"><i id="progbar"></i></div>
-            <div class="hm-gauge-lbl"><span>${d.getFullYear()}년</span><span><b id="progpct">0</b>% 지남</span></div>
-          </button>
-        </div>
-        <div class="hm-up">
-          <div class="hm-up-h">다가오는 일정</div>
-          ${up}
-        </div>
+        ${InfoPanel(txs,admin,d)}
+        ${ScheduleListCard(upcoming,todayStr)}
       </div>
     </section>
   </div></div>${bnav()}`

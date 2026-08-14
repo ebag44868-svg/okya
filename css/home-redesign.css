@@ -58,41 +58,52 @@
   padding:0;font-family:inherit;color:var(--gd);font-size:12.5px;font-weight:600;cursor:pointer;
   text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px;}
 
-/* 오늘의 옥야 카드(okyaCardHTML의 .okya-card/.okc-* 재사용 → 재스킨) */
-.rd .okya-card{margin-top:0;min-height:0;border:1px solid var(--ln);border-radius:20px;padding:24px;
-  flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;
-  background:linear-gradient(160deg,#F3F0FF 0%,#FBF6FF 55%,#FFF0F6 100%);}
+/* HeroGameCard(오늘의 옥야) — 잔잔한 그래픽 카드: 소프트 배경 + 잎/점 장식 */
+.rd .okya-card{position:relative;overflow:hidden;margin-top:0;min-height:0;border:1px solid var(--ln);
+  border-radius:20px;padding:24px;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:12px;background:linear-gradient(158deg,#EEF6FA 0%,#F6FBFD 58%,#FFFFFF 100%);}
 .rd .okya-card.okc-att{background:linear-gradient(150deg,var(--accent-soft),#FFFFFF);}
-/* 옥야 카드 우하단 잎 새싹(테마색 mask) */
-.rd .okya-card{position:relative;overflow:hidden;}
-.rd .okya-card::after{content:"";display:block;position:absolute;right:-26px;bottom:-26px;width:150px;height:150px;
-  z-index:0;pointer-events:none;background-color:var(--accent);opacity:.34;
+/* 우하단 잎 새싹(테마색 mask) */
+.rd .okya-card::after{content:"";display:block;position:absolute;right:-26px;bottom:-30px;width:170px;height:170px;
+  z-index:0;pointer-events:none;background-color:var(--accent);opacity:.30;
   -webkit-mask:url(../assets/leaf_sprig_small.svg) no-repeat bottom right/contain;
   mask:url(../assets/leaf_sprig_small.svg) no-repeat bottom right/contain;}
+/* 좌상단 점 링 장식(테마색 mask) */
+.rd .okya-card::before{content:"";display:block;position:absolute;left:-30px;top:-30px;width:130px;height:130px;
+  z-index:0;pointer-events:none;background-color:var(--accent);opacity:.16;
+  -webkit-mask:url(../assets/dotted_ring.svg) no-repeat center/contain;
+  mask:url(../assets/dotted_ring.svg) no-repeat center/contain;}
 .rd .okya-card>*{position:relative;z-index:1;}
-.rd .okc-eyebrow{color:#8a7fb8;width:100%;text-align:center;}
+.rd .okc-eyebrow{color:var(--i2);width:100%;text-align:center;}
 .rd .okc-att .okc-eyebrow{color:var(--gd);}
 .rd .okc-emoji{animation:none;font-size:46px;align-self:center;filter:none;}
 .rd .okc-body{text-align:center;}
 .rd .okc-label,.rd .okc-desc{color:var(--i2);font-weight:600;}
 .rd .okc-title{font-size:22px;color:var(--i1);}
-.rd .okc-btn{align-self:center;background:#fff;color:var(--i1);
-  box-shadow:0 6px 16px -8px rgba(124,108,240,.5);}
+.rd .okc-btn{align-self:center;background:#fff;color:var(--i1);box-shadow:0 6px 16px -8px rgba(41,53,70,.28);}
 .rd .okc-att .okc-btn{background:var(--g);color:#fff;box-shadow:none;}
 
-/* ── 바로가기 타일 (전부 화이트 + 파스텔 아이콘칩) ── */
+/* ── ShortcutCard 4개 (파스텔 배경 + 아이콘칩 + 은은한 장식) ── */
 .rd .hm-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;}
-.rd .hm-tile{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--ln);
-  border-radius:16px;padding:16px 18px;cursor:pointer;font-family:inherit;text-align:left;
-  transition:transform .16s cubic-bezier(.22,1,.36,1);}
+.rd .hm-tile{position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;
+  background:var(--tile-bg);border:1px solid var(--tile-bd);border-radius:16px;padding:16px 18px;
+  cursor:pointer;font-family:inherit;text-align:left;transition:transform .16s cubic-bezier(.22,1,.36,1);}
 .rd .hm-tile:active{transform:scale(.98);}
-.rd .hm-tile-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;}
+.rd .hm-tile-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;
+  background:#fff;box-shadow:0 3px 10px rgba(41,53,70,.07);position:relative;z-index:1;}
 .rd .hm-tile-ic svg{width:21px;height:21px;}
-.rd .hm-tile-l{font-size:14.5px;font-weight:700;color:var(--i1);}
-.rd .t-green .hm-tile-ic{background:var(--gt);color:var(--gd);}
-.rd .t-lav .hm-tile-ic{background:#EFEBFF;color:#7C6CF0;}
-.rd .t-blue .hm-tile-ic{background:#E5F0FF;color:#3A8DF0;}
-.rd .t-pink .hm-tile-ic{background:#FDE9F1;color:#E8619B;}
+.rd .hm-tile-l{font-size:14.5px;font-weight:700;color:var(--i1);position:relative;z-index:1;}
+/* 카드별 파스텔 배경/보더/아이콘색/장식색(카테고리 뉘앙스) */
+.rd .t-green{--tile-bg:#E9F6EF;--tile-bd:#D6EEE1;--tile-ic:#37A374;--tile-dec:#37A374;}
+.rd .t-lav{--tile-bg:#EFECFB;--tile-bd:#E1DBF6;--tile-ic:#7C6CF0;--tile-dec:#7C6CF0;}
+.rd .t-cyan{--tile-bg:#E6F4F8;--tile-bd:#D2ECF1;--tile-ic:#2FA3BE;--tile-dec:#2FA3BE;}
+.rd .t-pink{--tile-bg:#FBEAF3;--tile-bd:#F3D8E7;--tile-ic:#E0619B;--tile-dec:#E0619B;}
+.rd .hm-tile-ic{color:var(--tile-ic);}
+/* 우하단 은은한 잎 장식 */
+.rd .hm-tile::after{content:"";position:absolute;right:-16px;bottom:-16px;width:78px;height:78px;z-index:0;
+  pointer-events:none;background-color:var(--tile-dec);opacity:.14;
+  -webkit-mask:url(../assets/leaf_sprig_small.svg) no-repeat bottom right/contain;
+  mask:url(../assets/leaf_sprig_small.svg) no-repeat bottom right/contain;}
 
 /* ── 오늘의 학교생활 (선+여백) ── */
 .rd .hm-life{margin-top:28px;}
