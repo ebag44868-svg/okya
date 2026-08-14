@@ -124,9 +124,9 @@ const BOOK_COVERS=['linear-gradient(150deg,#7B6CFF,#9C8BFF)','linear-gradient(15
 function bookCover(b){const s=(b.title||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0);return BOOK_COVERS[s%BOOK_COVERS.length]}
 function bookCoverEl(b,big){const badge=b.status==='matched'?'<span class="book-badge done">교환완료</span>':`<span class="book-badge ${b.kind==='나눔'?'give':'swap'}">${esc(b.kind||'교환')}</span>`;return`<div class="book-cover${big?' big':''}" style="${b.photo?'':`background:${bookCover(b)}`}">${b.photo?`<img src="${esc(b.photo)}">`:`<div class="bc-title">${esc(b.title||'')}</div>`}${badge}</div>`}
 async function rBookPage(){
-  app().innerHTML=`<div class="screen fade-in p3">
+  app().innerHTML=`<div class="screen fade-in p3 rd cmrd">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">책 교환</div><button id="bk-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 등록</button></div>
-    ${featHero('📚','책 교환','교재를 나누고 필요한 책과 교환해요','book')}
+    ${featHero('📚','책 교환','읽지 않는 책을 나누고, 필요한 책을 구해요','book')}
     <div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
   </div>${bnav()}`
   bindNav()
@@ -136,7 +136,7 @@ async function rBookPage(){
 }
 function rBookNew(){
   let photoFile=null
-  app().innerHTML=`<div class="screen fade-in p3">
+  app().innerHTML=`<div class="screen fade-in p3 rd cmrd">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">책 등록</div><div style="width:34px"></div></div>
     <div class="chal-detail form2 tone-book">
       <div class="pcard">
@@ -519,7 +519,7 @@ async function iBook(){
   cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rBookDetail(el.dataset.open)))
 }
 async function rBookDetail(id){
-  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">책 교환</div><div style="width:34px"></div></div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
+  app().innerHTML=`<div class="screen fade-in p3 rd cmrd"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">책 교환</div><div style="width:34px"></div></div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
   bindNav()
   document.getElementById('bk').onclick=pop
   let b=null
@@ -562,7 +562,7 @@ async function rBookDetail(id){
 async function rConfirmBook(id){
   let b=null;try{const r=await wt(sb.from('okya_books').select('*').eq('id',id).single());b=r.data}catch{}
   if(!b){pop();return}
-  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${b.kind} 확정</div><div style="width:34px"></div></div><div class="pcard"><div class="sec" style="margin-bottom:4px">${esc(b.title)}</div><div style="font-size:12px;color:var(--sub);margin-bottom:14px">누구와 ${b.kind}할까요?</div><div style="display:flex;flex-direction:column;gap:8px">${(b.applicants||[]).map(a=>`<label class="check-item"><input type="radio" name="rc" value="${a.id}" data-name="${esc(a.name)}">${esc(a.name)}</label>`).join('')||'<div class="empty">신청자가 없어요</div>'}</div><button class="pbtn pri" id="cf" style="margin-top:14px">확정하기</button></div></div>`
+  app().innerHTML=`<div class="screen no-nav fade-in p3 cmrd"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${b.kind} 확정</div><div style="width:34px"></div></div><div class="pcard"><div class="sec" style="margin-bottom:4px">${esc(b.title)}</div><div style="font-size:12px;color:var(--sub);margin-bottom:14px">누구와 ${b.kind}할까요?</div><div style="display:flex;flex-direction:column;gap:8px">${(b.applicants||[]).map(a=>`<label class="check-item"><input type="radio" name="rc" value="${a.id}" data-name="${esc(a.name)}">${esc(a.name)}</label>`).join('')||'<div class="empty">신청자가 없어요</div>'}</div><button class="pbtn pri" id="cf" style="margin-top:14px">확정하기</button></div></div>`
   document.getElementById('bk').onclick=pop
   document.getElementById('cf').onclick=async()=>{const sel=document.querySelector('input[name="rc"]:checked');if(!sel){toast('상대를 선택해줘');return};try{await wt(sb.from('okya_books').update({status:'matched',recipient:sel.value,recipient_name:sel.dataset.name}).eq('id',id))}catch{};notify(sel.value,'book',`${b.kind} 확정 🎉`,`'${b.title}' — ${SESSION.name}님과 ${b.kind}이 확정됐어요`);toast('확정했어요');pop()}
 }
