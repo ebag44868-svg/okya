@@ -16,7 +16,7 @@ function fmtFull(iso){if(!iso)return'';const d=new Date(iso);const w=['일','월
 
 async function rMoney(){
   TAB='money'
-  app().innerHTML=`<div class="screen fade-in p3"><div class="topbar"><div class="t">옥야머니</div><div style="width:34px"></div></div><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>${bnav()}`
+  app().innerHTML=`<div class="screen fade-in p3 rd money2"><div class="mn-wrap"><div class="mn-top"><div class="mn-title">옥야머니</div></div><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
   bindNav()
   const admin=SESSION.role==='admin'
   const txs=await getAllTx()
@@ -33,26 +33,31 @@ async function rMoney(){
   const rowsFor=cat=>{const l=baseList.filter(t=>catMatch(t,cat)).slice(0,20);return{l,html:l.length?l.map(t=>txRow(t,admin,rbal[t.id])).join(''):'<div class="empty" style="padding:30px 20px">해당 거래가 없어요.</div>'}}
   const first=rowsFor('전체')
 
-  app().innerHTML=`<div class="screen fade-in p3 money2">
-    <div class="topbar"><div class="t">옥야머니</div><div style="width:34px"></div></div>
-    <section class="m2-hero">
-      <div class="m2-hero-l">
-        <div class="m2-lbl">${admin?'학생회 총 발행량':'내 잔액'}</div>
-        <div class="m2-bal"><span id="mbalnum">0</span><small>옥</small></div>
-        ${admin?'':`<div class="m2-month"><span>이번 달 <b>+${fmt(gotM)}</b> 받음</span><span class="m2-dot"></span><span><b>-${fmt(useM)}</b> 사용</span></div>`}
+  // 잎사귀 placeholder(교체용 에셋) — 후에 이미지로 대체 가능
+  const DECO='<svg class="mn-leaf %C" viewBox="0 0 100 100" fill="currentColor"><path d="M50 5C30 25 20 55 50 95 80 55 70 25 50 5z"/></svg>'
+  const deco=DECO.replace('%C','d1')+DECO.replace('%C','d2')
+
+  app().innerHTML=`<div class="screen fade-in p3 rd money2"><div class="mn-wrap">
+    <div class="mn-top"><div class="mn-title">옥야머니</div></div>
+    <section class="mn-hero">
+      ${deco}
+      <div class="mn-hero-l">
+        <div class="mn-hero-lbl">${admin?'학생회 총 발행량':'내 잔액'}</div>
+        <div class="mn-hero-bal"><span id="mbalnum">0</span><small>옥</small></div>
+        ${admin?'':`<div class="mn-hero-month">이번 달 <b class="pos">+${fmt(gotM)}</b> 받음 <span class="mn-mid">·</span> <b class="neg">-${fmt(useM)}</b> 사용</div>`}
       </div>
-      <div class="m2-actions">
-        <button class="m2-act pri" id="m-act">${I.send}<span>${admin?'발행':'송금'}</span></button>
-        ${admin?`<button class="m2-act" id="m-recall">${I.recall}<span>회수</span></button>`:''}
-        <button class="m2-act" id="m-hist">${I.hist}<span>내역</span></button>
+      <div class="mn-hero-actions">
+        <button class="mn-act pri" id="m-act">${I.send}<span>${admin?'발행':'송금'}</span></button>
+        ${admin?`<button class="mn-act" id="m-recall">${I.recall}<span>회수</span></button>`:''}
+        <button class="mn-act" id="m-hist">${I.hist}<span>내역</span></button>
       </div>
     </section>
-    <section class="m2-sec">
-      <div class="m2-sec-head"><h2 class="m2-sec-t">${admin?'발행 내역':'최근 거래'}</h2><button class="m2-more" id="m-all">전체보기 ${I.chev}</button></div>
-      <div class="m2-cats" id="m2-cats">${cats.map((c,i)=>`<button class="m2-cat${i===0?' on':''}" data-cat="${c}">${c}</button>`).join('')}</div>
-      <div class="m2-txlist" id="m2-txlist">${first.html}</div>
+    <section class="mn-sec">
+      <div class="mn-sec-head"><h2 class="mn-sec-t">${admin?'발행 내역':'최근 거래'}</h2><button class="mn-more" id="m-all">전체보기 ${I.chev}</button></div>
+      <div class="mn-cats" id="m2-cats">${cats.map((c,i)=>`<button class="mn-cat${i===0?' on':''}" data-cat="${c}">${c}</button>`).join('')}</div>
+      <div class="mn-txlist" id="m2-txlist">${first.html}</div>
     </section>
-  </div>${bnav()}`
+  </div></div>${bnav()}`
   bindNav()
   document.getElementById('m-act').onclick=()=>push(()=>fTransfer(admin?'발행':'송금'))
   if(admin)document.getElementById('m-recall').onclick=()=>push(()=>fTransfer('회수'))
