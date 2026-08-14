@@ -2,13 +2,13 @@
 // ===== 챌린지 (전체화면 포스터 갤러리 → 공모전형 상세 → 인증 → 전원 지급) =====
 // 세부탭 2.0 공용 헤더: 이미지 대신 탭별 색 밴드(제목행 전체를 색으로)
 function featHero(emoji,title,sub,tone){
-  return`<section class="feat-hero tone-${tone||'chal'}"><h1 class="feat-title">${emoji} ${title}</h1></section>`
+  return`<section class="feat-hero tone-${tone||'chal'}"><h1 class="feat-title">${emoji} ${title}</h1>${sub?`<p class="feat-sub">${esc(sub)}</p>`:''}</section>`
 }
 async function rChallengePage(){
   const admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen fade-in p3">
+  app().innerHTML=`<div class="screen fade-in p3 rd cmrd">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지</div>${admin?`<button id="ch-new" style="font-size:13px;font-weight:800;color:var(--primary);background:none">＋ 발행</button>`:`<div style="width:34px"></div>`}</div>
-    ${featHero('🔥','챌린지','참여하고 인증하면 옥야머니를 받아요','chal')}
+    ${featHero('🔥','챌린지','하루 한 번, 작은 도전으로 성장해요','chal')}
     <div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div>
   </div>${bnav()}`
   bindNav()
@@ -22,12 +22,13 @@ async function iChallengeGallery(){
   try{const r=await wt(sb.from('okya_events').select('*').order('at',{ascending:false}));evs=r.data||[]}catch{}
   evs=evs.filter(e=>!isExpired(e))
   const cb=document.getElementById('cb');if(!cb)return
-  cb.innerHTML=(evs.length?`<div class="chal-grid">${evs.map(e=>`<div class="chal-card" data-open="${e.id}"><div class="chal-poster">${e.poster?`<img src="${esc(e.poster)}">`:`<span class="chal-ph">${I.image}포스터 준비 중</span>`}</div><div class="chal-name">${esc(e.title)}</div><div class="chal-intro">${esc(e.descr||'')}</div></div>`).join('')}</div>`:`<div class="empty">진행 중인 챌린지가 없습니다.${admin?'<br><br>우측 상단 <b style="color:var(--primary)">＋ 발행</b>으로 새 챌린지를 만들어보세요.':'<br><br>새로운 챌린지가 곧 올라올 거예요!'}</div>`)+'<div style="height:16px"></div>'
+  const chInfo=`<div class="cm-info">🔥 챌린지에 참여하고 인증하면 <b>옥야머니</b>를 받아요. 카드를 눌러 자세히 보고 인증하세요.</div>`
+  cb.innerHTML=(evs.length?chInfo+`<div class="chal-grid">${evs.map(e=>`<div class="chal-card" data-open="${e.id}"><div class="chal-poster">${e.reward?`<span class="chal-reward">＋${fmt(e.reward)}옥</span>`:''}${e.poster?`<img src="${esc(e.poster)}">`:`<span class="chal-ph">${I.image}포스터 준비 중</span>`}</div><div class="chal-name">${esc(e.title)}</div><div class="chal-intro">${esc(e.descr||'')}</div><button class="chal-join">참여하기</button></div>`).join('')}</div>`:`<div class="empty">진행 중인 챌린지가 없습니다.${admin?'<br><br>우측 상단 <b style="color:var(--primary)">＋ 발행</b>으로 새 챌린지를 만들어보세요.':'<br><br>새로운 챌린지가 곧 올라올 거예요!'}</div>`)+'<div style="height:16px"></div>'
   cb.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>push(()=>rChallengeDetail(el.dataset.open)))
 }
 function rChallengeNew(){
   let posterFile=null
-  app().innerHTML=`<div class="screen fade-in p3">
+  app().innerHTML=`<div class="screen fade-in p3 rd cmrd">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">새 챌린지</div><div style="width:34px"></div></div>
     <div class="chal-detail form2 tone-chal">
       <div class="pcard">
@@ -71,7 +72,7 @@ async function _payChalSubs(e,list){
 }
 async function rChallengeDetail(eid){
   const admin=SESSION.role==='admin'
-  app().innerHTML=`<div class="screen fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지</div>${admin?`<button id="ch-del" style="font-size:12px;font-weight:700;color:var(--danger);background:none">삭제</button>`:`<div style="width:34px"></div>`}</div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
+  app().innerHTML=`<div class="screen fade-in p3 rd cmrd"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지</div>${admin?`<button id="ch-del" style="font-size:12px;font-weight:700;color:var(--danger);background:none">삭제</button>`:`<div style="width:34px"></div>`}</div><div id="cb"><div class="loader" style="min-height:200px"><div class="spin"></div></div></div></div>${bnav()}`
   bindNav()
   document.getElementById('bk').onclick=pop
   let e=null,subs=[]
@@ -424,7 +425,7 @@ async function rVerify(eid){
   let e=null
   try{const r=await wt(sb.from('okya_events').select('*').eq('id',eid).single());e=r.data}catch{}
   if(!e){toast('챌린지를 찾을 수 없어요');return}
-  app().innerHTML=`<div class="screen fade-in p3">
+  app().innerHTML=`<div class="screen fade-in p3 rd cmrd">
     <div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">챌린지 인증</div><div style="width:34px"></div></div>
     <div class="chal-detail form2 tone-chal">
     <div class="pcard"><div style="display:flex;gap:10px;align-items:center"><div class="chip ti-org">${I.star}</div><div style="flex:1"><div class="ti">${esc(e.title)}</div><div class="su">보상 ${fmt(e.reward)}옥 · ${fmtDate(e.deadline)}</div></div></div></div>
@@ -454,14 +455,14 @@ async function rVerify(eid){
 }
 
 async function rGallery(eid){
-  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">인증 사진</div><div style="width:34px"></div></div><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
+  app().innerHTML=`<div class="screen no-nav fade-in p3 cmrd"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">인증 사진</div><div style="width:34px"></div></div><div class="loader" style="min-height:160px"><div class="spin"></div></div></div>`
   document.getElementById('bk').onclick=pop
   const admin=SESSION.role==='admin'
   let subs=[],ev=null
   try{const[r1,r2]=await Promise.allSettled([wt(sb.from('okya_event_subs').select('*').eq('event_id',eid).order('at',{ascending:false})),wt(sb.from('okya_events').select('title,reward').eq('id',eid).single())]);subs=r1.status==='fulfilled'?(r1.value.data||[]):[];ev=r2.status==='fulfilled'?r2.value.data:null}catch{}
   const title=ev?ev.title:'인증 사진'
   const cards=subs.length?subs.map(s=>{const reacts=s.reactions||{};const hearts=Object.values(reacts).filter(v=>v==='heart').length;const tears=Object.values(reacts).filter(v=>v==='tear').length;const my=reacts[SESSION.id];return`<div class="pcard"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div class="ti">${esc(s.names||s.by_name)}</div><div class="su">${fmtDate(s.at)}</div></div>${admin?`<button class="minibtn soft" data-award="${s.id}">지급</button>`:''}</div>${s.photo?`<img src="${s.photo}" style="width:100%;border-radius:14px;display:block">`:''}<div class="reacts" style="margin-top:10px"><button class="react-btn${my==='heart'?' on-r':''}" data-pr="${s.id}::heart">❤️ ${hearts}</button><button class="react-btn${my==='tear'?' on-b':''}" data-pr="${s.id}::tear">😢 ${tears}</button></div></div>`}).join(''):'<div class="empty">아직 인증 사진이 없어요.</div>'
-  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${esc(title)}</div><div style="width:34px"></div></div>${cards}<div style="height:12px"></div></div>`
+  app().innerHTML=`<div class="screen no-nav fade-in p3 cmrd"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">${esc(title)}</div><div style="width:34px"></div></div>${cards}<div style="height:12px"></div></div>`
   document.getElementById('bk').onclick=pop
   document.querySelectorAll('[data-pr]').forEach(b=>b.onclick=async()=>{
     const[id,t]=b.dataset.pr.split('::');let reacts={}
@@ -479,7 +480,7 @@ async function rAward(subId){
   if(!s){pop();return}
   ev=ev||{reward:0,title:''}
   const students=USERS.filter(u=>u.role!=='admin')
-  app().innerHTML=`<div class="screen no-nav fade-in p3"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야머니 지급</div><div style="width:34px"></div></div><div class="pcard"><div style="display:flex;gap:10px;align-items:center"><div class="chip ti-org">${I.star}</div><div style="flex:1"><div class="ti">${esc(ev.title)}</div><div class="su">보상 ${fmt(ev.reward)}옥 · 제출자 ${esc(s.names||'-')}</div></div></div>${s.photo?`<img src="${s.photo}" style="width:100%;border-radius:14px;display:block;margin-top:12px">`:''}</div><div class="pcard"><div class="sec">지급할 학생 선택</div><div style="display:flex;flex-direction:column;gap:8px">${students.map(u=>`<label class="check-item"><input type="checkbox" value="${u.id}" ${u.id===s.by_id?'checked':''}>${esc(u.name)}</label>`).join('')}</div><button class="pbtn pri" id="pay" style="margin-top:14px">${fmt(ev.reward)}옥 지급</button></div></div>`
+  app().innerHTML=`<div class="screen no-nav fade-in p3 cmrd"><div class="phdr"><button class="bk" id="bk">${I.back}</button><div class="ttl">옥야머니 지급</div><div style="width:34px"></div></div><div class="pcard"><div style="display:flex;gap:10px;align-items:center"><div class="chip ti-org">${I.star}</div><div style="flex:1"><div class="ti">${esc(ev.title)}</div><div class="su">보상 ${fmt(ev.reward)}옥 · 제출자 ${esc(s.names||'-')}</div></div></div>${s.photo?`<img src="${s.photo}" style="width:100%;border-radius:14px;display:block;margin-top:12px">`:''}</div><div class="pcard"><div class="sec">지급할 학생 선택</div><div style="display:flex;flex-direction:column;gap:8px">${students.map(u=>`<label class="check-item"><input type="checkbox" value="${u.id}" ${u.id===s.by_id?'checked':''}>${esc(u.name)}</label>`).join('')}</div><button class="pbtn pri" id="pay" style="margin-top:14px">${fmt(ev.reward)}옥 지급</button></div></div>`
   document.getElementById('bk').onclick=pop
   document.getElementById('pay').onclick=async()=>{
     const ids=[...document.querySelectorAll('.check-item input:checked')].map(i=>i.value)
