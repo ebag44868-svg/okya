@@ -302,18 +302,18 @@ async function fTransferAmt(mode,toUser){
 function fTransferConfirm(mode,toUser,amount,reason,myBal){
   // 단계 3: 확인 바텀시트 → 완료 화면
   const ov=document.createElement('div')
-  ov.className='p3sheet-ov'
-  ov.innerHTML=`<div class="p3sheet">
+  ov.className='p3sheet-ov rd'
+  ov.innerHTML=`<div class="p3sheet cf-sheet">
     <div class="grab"></div>
-    <div style="text-align:center;margin-bottom:26px">
-      ${toUser.photo?`<img src="${esc(toUser.photo)}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 16px;box-shadow:var(--sh-blue)">`:`<div style="width:64px;height:64px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:25px;font-weight:800;color:#fff;box-shadow:var(--sh-blue)">${esc(toUser.name.charAt(0))}</div>`}
-      <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.05em;margin-bottom:8px">${mode==='발행'?'발행 확인':(mode==='회수'?'회수 확인':'송금 확인')}</div>
-      <div style="font-size:20px;font-weight:800;color:var(--ink);line-height:1.5">${esc(toUser.name)}님${mode==='회수'?'에게서':'에게'}<br><span style="color:var(--primary)">${fmt(amount)}옥</span> ${mode==='발행'?'발행':(mode==='회수'?'회수':'송금')}할까요?</div>
-      ${reason?`<div style="margin-top:10px;font-size:13px;color:var(--sub)">"${esc(reason)}"</div>`:''}
+    <div class="cf-body">
+      ${toUser.photo?`<img class="cf-av" src="${esc(toUser.photo)}">`:`<div class="cf-av cf-av-ini">${esc(toUser.name.charAt(0))}</div>`}
+      <div class="cf-cap">${mode==='발행'?'발행 확인':(mode==='회수'?'회수 확인':'송금 확인')}</div>
+      <div class="cf-q">${esc(toUser.name)}님${mode==='회수'?'에게서':'에게'}<br><span class="cf-amt">${fmt(amount)}옥</span> ${mode==='발행'?'발행':(mode==='회수'?'회수':'송금')}할까요?</div>
+      ${reason?`<div class="cf-reason">"${esc(reason)}"</div>`:''}
     </div>
-    <div style="display:flex;gap:10px">
-      <button id="tf-cc" style="flex:1;padding:16px;border-radius:14px;background:var(--soft);border:none;font-size:15px;font-weight:700;color:var(--ink2);cursor:pointer">취소</button>
-      <button id="tf-ok" style="flex:2;padding:16px;border-radius:14px;background:var(--grad);border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer;box-shadow:var(--sh-blue)">${mode==='발행'?'발행하기':(mode==='회수'?'회수하기':'보내기')}</button>
+    <div class="cf-btns">
+      <button class="cf-cancel" id="tf-cc">취소</button>
+      <button class="cf-ok" id="tf-ok">${mode==='발행'?'발행하기':(mode==='회수'?'회수하기':'보내기')}</button>
     </div>
   </div>`
   document.body.appendChild(ov)
@@ -333,7 +333,9 @@ function fTransferConfirm(mode,toUser,amount,reason,myBal){
       const verb=mode==='발행'?'에게 발행했어요':(mode==='회수'?'에게서 회수했어요':'에게 보냈어요')
       const remain=mode==='송금'?`남은 잔액 ${fmt(Math.max(0,(myBal||0)-amount))}옥 · `:''
       const tm=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})
-      app().innerHTML=`<div class="screen fade-in p3 mflow">
+      app().innerHTML=`<div class="screen fade-in p3 mflow rd sc-screen">
+        <svg class="sc-leaf s1" viewBox="0 0 100 100" fill="currentColor"><path d="M50 5C30 25 20 55 50 95 80 55 70 25 50 5z"/></svg>
+        <svg class="sc-leaf s2" viewBox="0 0 100 100" fill="currentColor"><path d="M50 5C30 25 20 55 50 95 80 55 70 25 50 5z"/></svg>
         <div class="succ">
           <svg class="ring2" viewBox="0 0 100 100" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><circle class="bgc" cx="50" cy="50" r="42"/><circle class="arc" cx="50" cy="50" r="42" transform="rotate(-90 50 50)"/><path class="chk" d="M33 51l12 12 22-24"/></svg>
           <h2>${fmt(amount)}옥을<br>${esc(toUser.name)}님${verb}</h2>

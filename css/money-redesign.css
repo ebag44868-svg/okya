@@ -146,3 +146,39 @@
 .rd .kpnext{width:100%;padding:15px;border:0;border-radius:14px;color:#fff;font-family:inherit;
   font-size:15px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#2FC178,#25A867);}
 .rd .kpnext:disabled{background:#E3E9E4;color:#B4BDB6;cursor:default;}
+
+/* ===================================================================
+   송금 P3 — ③ 확인 시트(fTransferConfirm) · ④ 완료(success)
+   확인 시트는 body에 붙음 → 오버레이 엘리먼트에 .rd 부여해 스코프.
+   =================================================================== */
+.rd .cf-body{text-align:center;margin-bottom:24px;}
+.rd .cf-av{width:64px;height:64px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 16px;
+  box-shadow:0 8px 22px rgba(47,193,120,.32);}
+.rd .cf-av-ini{background:linear-gradient(135deg,#2FC178,#25A867);display:flex;align-items:center;
+  justify-content:center;font-size:25px;font-weight:800;color:#fff;}
+.rd .cf-cap{font-size:11px;font-weight:700;color:#93A199;letter-spacing:.05em;margin-bottom:8px;}
+.rd .cf-q{font-size:20px;font-weight:800;color:#1B2A24;line-height:1.5;}
+.rd .cf-amt{color:#25A867;}
+.rd .cf-reason{margin-top:10px;font-size:13px;color:#93A199;}
+.rd .cf-btns{display:flex;gap:10px;}
+.rd .cf-cancel{flex:1;padding:16px;border-radius:14px;background:#F1F5F2;border:none;font-family:inherit;
+  font-size:15px;font-weight:700;color:#5C6B63;cursor:pointer;}
+.rd .cf-ok{flex:2;padding:16px;border-radius:14px;border:none;font-family:inherit;font-size:15px;
+  font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(135deg,#2FC178,#25A867);}
+
+.rd .sc-screen{position:relative;overflow:hidden;}
+/* 잎사귀 placeholder(교체용) */
+.rd .sc-leaf{position:absolute;color:#CBEEDB;opacity:.5;z-index:0;pointer-events:none;}
+.rd .sc-leaf.s1{top:9%;right:12%;width:120px;transform:rotate(12deg);}
+.rd .sc-leaf.s2{bottom:11%;left:10%;width:100px;transform:rotate(-14deg);opacity:.4;}
+.rd .succ{position:relative;z-index:1;}
+.rd .succ .ring2{width:92px;height:92px;}
+.rd .succ .ring2 .bgc{stroke:#E3F3EA;}
+.rd .succ .ring2 .arc,.rd .succ .ring2 .chk{stroke:#2FC178;}
+.rd .succ h2{font-size:22px;font-weight:800;color:#1B2A24;line-height:1.45;margin-top:22px;}
+.rd .succ p{font-size:13px;color:#93A199;margin-top:10px;}
+.rd .succ .btns{display:flex;gap:10px;margin-top:28px;}
+.rd .succ .pbtn{flex:1;padding:15px;border-radius:14px;font-family:inherit;font-size:15px;font-weight:800;
+  cursor:pointer;border:0;}
+.rd .succ .pbtn.out{background:#fff;border:1px solid #E3E9E4;color:#1B2A24;}
+.rd .succ .pbtn.pri{background:linear-gradient(135deg,#2FC178,#25A867);color:#fff;}
