@@ -87,10 +87,10 @@ function txDetailSheet(t){
 
 // ── 오버레이 시스템: 뒤 화면 유지 + 한 번에 하나만 (알림=우측상단 / 내역=중앙) ──
 let OK_OV=null
-function openOverlay({variant,title,bodyHTML}){
+function openOverlay({variant,title,bodyHTML,cls}){
   closeOverlay()
   const bd=document.createElement('div');bd.className='ov-backdrop'
-  const pn=document.createElement('div');pn.className='ov-panel p3 '+(variant==='center'?'ov-center':'ov-tr')
+  const pn=document.createElement('div');pn.className='ov-panel p3 '+(variant==='center'?'ov-center':'ov-tr')+(cls?' '+cls:'')
   pn.innerHTML=`<div class="ov-head"><span class="ov-t">${esc(title)}</span><button class="ov-x" aria-label="닫기">✕</button></div>${bodyHTML||''}`
   document.body.appendChild(bd);document.body.appendChild(pn)
   bd.onclick=closeOverlay
@@ -114,7 +114,7 @@ const kstToday=()=>new Date(Date.now()+324e5).toISOString().slice(0,10)
 // 거래 내역 → 중앙 카드 오버레이 (필터 전체/받기/송금/출석 + 날짜, 내부 스크롤)
 async function openHistoryOverlay(){
   const admin=SESSION.role==='admin'
-  const pn=openOverlay({variant:'center',title:admin?'발행 내역':'거래 내역',bodyHTML:'<div class="ov-body" id="ovh-load"><div class="loader" style="min-height:180px"><div class="spin"></div></div></div>'})
+  const pn=openOverlay({variant:'center',cls:'rd',title:admin?'발행 내역':'거래 내역',bodyHTML:'<div class="ov-body" id="ovh-load"><div class="loader" style="min-height:180px"><div class="spin"></div></div></div>'})
   const txs=await getAllTx()
   if(!OK_OV||OK_OV.pn!==pn)return
   const data=admin?txs.filter(t=>t.type==='발행'||t.type==='회수'):txs.filter(t=>t.to===SESSION.id||t.from===SESSION.id)
