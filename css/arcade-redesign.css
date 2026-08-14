@@ -1,0 +1,34 @@
+/* ===================================================================
+   arcade-redesign.css — 아케이드 리디자인 (그린 + 게임별 파스텔)
+   · 래퍼에 .rd(레일/배경/헤더) + .arcrd(그린 토큰 스코프).
+   · 아케이드는 '놀이' 화면 → 헤더/레일/버튼은 그린, 게임 타일은 시안대로
+     게임별 파스텔(복숭아/라벤더/그린/크림) 유지 + 흰 원형 아이콘 디스크.
+   · 아이콘/잎은 교체 가능 placeholder(이모지/소프트글로우). 나중에 에셋 교체.
+   =================================================================== */
+.arcrd{
+  --primary:#2FC178; --primary-d:#25A867; --primary-tint:#E9F8F0;
+  --accent:#2FC178; --accent-d:#25A867; --accent-soft:#E9F8F0;
+  --grad:linear-gradient(135deg,#2FC178,#25A867);
+  --ga:#2FC178; --gb:#59D79B;
+  --sh-blue:0 12px 28px rgba(47,193,120,.28),-3px 4px 14px rgba(47,193,120,.12);
+}
+
+/* ── 메인 타일: 파스텔 카드 + 원형 아이콘 디스크 ── */
+.arcrd .arc-tile{background:#F3F6F4;padding:20px 18px 44px;border-radius:22px;box-shadow:0 8px 22px rgba(31,64,45,.06);overflow:visible;}
+.arcrd .arc-lottery{background:linear-gradient(150deg,#FCEBE0,#FBE0E9);}
+.arcrd .arc-quiz{background:linear-gradient(150deg,#ECEAFB,#E7EDFC);}
+.arcrd .arc-dash{background:linear-gradient(150deg,#E4F6EC,#DEF3EA);}
+.arcrd .arc-math{background:linear-gradient(150deg,#FBF3DE,#FCEBDD);}
+.arcrd .arc-ic{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.86);display:flex;align-items:center;
+  justify-content:center;font-size:28px;box-shadow:0 6px 16px rgba(31,64,45,.12);margin-bottom:14px;}
+.arcrd .arc-ic img{width:64%;height:64%;object-fit:contain;}
+.arcrd .arc-tile-name{font-size:17px;font-weight:900;color:#1B2A24;}
+.arcrd .arc-tile-desc{font-size:12.5px;font-weight:600;color:#5C6B63;margin-top:4px;}
+.arcrd .arc-tile-badge{background:#25A867;color:#fff;top:16px;left:auto;right:16px;backdrop-filter:none;-webkit-backdrop-filter:none;}
+.arcrd .arc-tile-done{top:16px;right:16px;color:#25A867;}
+.arcrd .arc-tile-go{right:18px;bottom:18px;color:#8A9A90;}
+
+/* ── 서브게임 공용: 주요 액션 버튼 그린 ── */
+.arcrd .dash-start,.arcrd .math-submit{background:var(--accent);}
+/* 퀴즈 보기 알파벳 뱃지: 시안처럼 그린 톤 */
+.arcrd .quiz-opt-k{background:var(--accent-soft);color:var(--accent-d);}
