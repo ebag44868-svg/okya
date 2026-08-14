@@ -217,3 +217,11 @@
 @media (min-width:820px) and (min-aspect-ratio:1/1){
   .rd.ov-center{width:min(620px,calc(100vw - 40px));}
 }
+
+/* ===================================================================
+   알림 오버레이 P5 — openNotifOverlay (패널 .rd, 우측상단)
+   헤더/행/날짜헤더는 P4의 .rd .ov-* 재사용. 알림 전용만 그린으로.
+   =================================================================== */
+.rd .ntrow.unread{background:linear-gradient(90deg,#E9F8F0,transparent 70%);}
+.rd .ntrow .ntdot{background:#2FC178;box-shadow:0 0 0 3px rgba(47,193,120,.14);}
+.rd .ntrow .ntchev{color:#c7d0ca;}

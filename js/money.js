@@ -146,7 +146,7 @@ async function openHistoryOverlay(){
 function rHistory(){openHistoryOverlay()}
 // 알림 → 우측 상단 오버레이 (Home 뒤에 유지)
 async function openNotifOverlay(){
-  const pn=openOverlay({variant:'tr',title:'알림',bodyHTML:'<div class="ov-body" id="ntov-body"><div class="loader" style="min-height:120px"><div class="spin"></div></div></div>'})
+  const pn=openOverlay({variant:'tr',cls:'rd',title:'알림',bodyHTML:'<div class="ov-body" id="ntov-body"><div class="loader" style="min-height:120px"><div class="spin"></div></div></div>'})
   await loadNotifs()
   if(!OK_OV||OK_OV.pn!==pn)return
   const body=pn.querySelector('#ntov-body')
